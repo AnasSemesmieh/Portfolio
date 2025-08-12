@@ -16,31 +16,25 @@
     html,body{height:100%}
     body{font-family:var(--mono);margin:0;background:linear-gradient(180deg,#071024 0%, #071527 60%);color:#e6eef8;line-height:1.5;-webkit-font-smoothing:antialiased}
     .container{max-width:var(--maxw);margin:40px auto;padding:28px}
-
     header{display:flex;align-items:center;justify-content:space-between;gap:18px}
     .brand{display:flex;align-items:center;gap:14px}
     .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#4f46e5);display:grid;place-items:center;font-weight:800;color:white}
     .brand h1{margin:0;font-size:18px}
     .brand p{margin:0;color:var(--muted);font-size:13px}
-
     nav{display:flex;gap:12px}
     .navlink{color:var(--muted);text-decoration:none;padding:8px 12px;border-radius:10px;font-size:14px}
     .navlink:hover{background:var(--glass);color:#fff}
-
     .hero{display:grid;grid-template-columns:1fr 360px;gap:32px;margin-top:28px;align-items:center}
     .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:28px;border-radius:var(--radius);box-shadow:0 6px 30px rgba(2,6,23,0.6);}
-
     .intro h2{margin:0;font-size:34px}
     .intro p.lead{color:var(--muted);margin-top:8px}
     .badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
     .chip{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 12px;border-radius:999px;font-size:13px;color:var(--muted)}
-
+    .profile-pic{max-width:180px;border-radius:50%;margin:0 auto 18px;box-shadow:0 4px 20px rgba(124,58,237,0.5);border:4px solid rgba(255,255,255,0.1)}
     .contact-card{padding:18px;text-align:center}
     .contact-card h3{margin:6px 0 2px}
     .contact-card a{display:block;color:var(--accent);text-decoration:none;margin-top:6px}
-
     .sections{display:grid;grid-template-columns:1fr;gap:22px;margin-top:28px}
-
     .timeline{display:flex;flex-direction:column;gap:12px}
     .job{display:flex;gap:14px}
     .job .meta{min-width:140px;color:var(--muted);font-size:13px}
@@ -48,26 +42,14 @@
     .job .body p{margin:6px 0;color:var(--muted);font-size:14px}
     .skills{display:flex;gap:10px;flex-wrap:wrap}
     .skill{background:rgba(255,255,255,0.03);padding:8px 10px;border-radius:8px;font-size:13px}
-
     footer{margin-top:36px;text-align:center;color:var(--muted);font-size:13px}
-
-    /* responsive */
-    @media(max-width:940px){
-      .hero{grid-template-columns:1fr}
-      .brand p{display:none}
-    }
-
-    /* simple light mode */
+    @media(max-width:940px){.hero{grid-template-columns:1fr}.brand p{display:none}}
     .light{--bg:#f7fafc;--card:#ffffff;--muted:#475569;color:#0b1220}
     .toggle{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 10px;border-radius:10px;color:var(--muted);cursor:pointer}
-
-    /* small utilities */
     .muted{color:var(--muted)}
     a.button{background:var(--accent);color:white;padding:10px 14px;border-radius:10px;text-decoration:none;font-weight:600}
-    .timeline .point{width:10px;height:10px;background:var(--accent);border-radius:20px;margin-right:8px}
     .edu{display:flex;gap:12px;align-items:center}
     .card .section-title{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
-
   </style>
 </head>
 <body>
@@ -90,13 +72,11 @@
         <button id="themeToggle" class="toggle" aria-label="Toggle theme">Toggle</button>
       </div>
     </header>
-
     <main>
       <section class="hero">
         <div class="card intro">
           <h2>Engineering Manager driving platform excellence</h2>
           <p class="lead">I lead Platform Engineering teams to deliver cost-optimised, scalable and resilient cloud-native automation and DevSecOps solutions in Azure. I build high-performing teams and champion best practices that improve velocity, reliability, and cost-efficiency.</p>
-
           <div class="badges">
             <div class="chip">C#</div>
             <div class="chip">Azure</div>
@@ -105,20 +85,18 @@
             <div class="chip">Microservices</div>
             <div class="chip">Architecture</div>
           </div>
-
           <div style="margin-top:20px;display:flex;gap:12px;align-items:center">
             <a class="button" href="#contact">Get in touch</a>
             <a class="navlink" href="/resume.pdf" download>Download CV</a>
           </div>
         </div>
-
         <aside class="card contact-card">
+          <img src="profile.jpg" alt="Anas Semesmieh" class="profile-pic">
           <h3>Contact</h3>
           <div class="muted">Sydney, Australia</div>
           <div style="margin-top:8px">📱 +61 437 501 834</div>
           <div style="margin-top:6px">✉️ <a href="mailto:anas.semesmieh@gmail.com">anas.semesmieh@gmail.com</a></div>
           <div style="margin-top:6px"><a href="https://www.linkedin.com/in/anassemesmieh" target="_blank">LinkedIn /anassemesmieh</a></div>
-
           <div style="margin-top:12px">
             <div class="section-title">Certifications</div>
             <div class="muted">CCNA • Oracle OCA • ASP.NET Core (Beginner→Advanced)</div>
@@ -237,18 +215,6 @@
       })
     });
   </script>
-
-  <!--
-    Deployment Instructions:
-    1. Create a new GitHub repo (e.g. anas-portfolio). Add this file as index.html at the repo root.
-    2. Push to GitHub. In repo Settings -> Pages set Source to 'main' branch and folder '/' (root). GitHub will publish at https://<your-username>.github.io/<repo-name>/ or at username.github.io if repo named username.github.io
-    3. To use a custom domain: create a file named CNAME in the repo root containing your domain (e.g. example.com). Then add DNS records at your registrar:
-       - For Apex domain (example.com): create A records pointing to GitHub Pages IPs: 185.199.108.153, 185.199.109.153, 185.199.110.153, 185.199.111.153
-       - For WWW subdomain: create CNAME record 'www' -> <your-username>.github.io
-    4. In GitHub Pages settings, set the custom domain to your domain and enforce HTTPS (GitHub will provision a certificate).
-
-    Optional: Replace /resume.pdf link with an uploaded resume in the repo, or change styles to suit your taste.
-  -->
 
 </body>
 </html>
