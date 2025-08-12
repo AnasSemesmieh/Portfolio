@@ -198,7 +198,6 @@
 
     .job .meta {
       min-width: 140px;
-      color: var(--muted);
       font-size: 13px
     }
 
@@ -363,7 +362,9 @@
     .edu {
       display: flex;
       gap: 12px;
-      align-items: center
+      align-items: center;
+      justify-content: space-around;
+      flex-direction: row;
     }
 
     .card .section-title {
@@ -386,289 +387,6 @@
 
   <!-- Favicon -->
   <link rel="icon" href="/profile.ico" type="image/x-icon" />
-</head>
-
-<head>
-  <!-- Basic SEO -->
-  <title>Anas Semesmieh — Software Engineer & Engineering Manager</title>
-  <meta name="description"
-    content="Portfolio of Anas Semesmieh — Experienced Software Engineer and Engineering Manager specializing in platform engineering, cloud technologies, and web development." />
-  <meta name="keywords"
-    content="Anas Semesmieh, software engineer, engineering manager, platform engineering, cloud, web development" />
-  <meta name="author" content="Anas Semesmieh" />
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <meta name="description"
-    content="Anas Semesmieh — Engineering Manager, Platform Engineering, Cloud-native development, DevOps & Solutions Architecture." />
-  <!-- Favicon -->
-  <link rel="icon" href="/profile.ico" type="image/x-icon" />
-
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #0f1724;
-      --card: #0b1220;
-      --muted: #94a3b8;
-      --accent: #7c3aed;
-      --glass: rgba(255, 255, 255, 0.04);
-      --maxw: 1100px;
-      --radius: 14px;
-      --mono: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-    }
-
-    * {
-      box-sizing: border-box
-    }
-
-    html,
-    body {
-      height: 100%
-    }
-
-    body {
-      font-family: var(--mono);
-      margin: 0;
-      background: linear-gradient(90deg, #071024 0%, #071527 60%);
-      color: #e6eef8;
-      line-height: 1.5;
-      -webkit-font-smoothing: antialiased
-    }
-
-    .container {
-      max-width: var(--maxw);
-      margin: 40px auto;
-      padding: 28px
-    }
-
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 18px
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 14px
-    }
-
-    .logo {
-      width: 56px;
-      height: 56px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, var(--accent), #4f46e5);
-      display: grid;
-      place-items: center;
-      font-weight: 800;
-      color: white
-    }
-
-    .brand h1 {
-      margin: 0;
-      font-size: 18px
-    }
-
-    .brand p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 13px
-    }
-
-    nav {
-      display: flex;
-      gap: 12px
-    }
-
-    .navlink {
-      color: var(--muted);
-      text-decoration: none;
-      padding: 8px 12px;
-      border-radius: 10px;
-      font-size: 14px
-    }
-
-    .navlink:hover {
-      background: var(--glass);
-      color: #fff
-    }
-
-    .hero {
-      display: grid;
-      grid-template-columns: 1fr 360px;
-      gap: 32px;
-      margin-top: 28px;
-      align-items: center
-    }
-
-    .card {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
-      padding: 28px;
-      border-radius: var(--radius);
-      box-shadow: 0 6px 30px rgba(2, 6, 23, 0.6);
-    }
-
-    .intro h2 {
-      margin: 0;
-      font-size: 34px
-    }
-
-    .intro p.lead {
-      color: var(--muted);
-      margin-top: 8px
-    }
-
-    .badges {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 18px
-    }
-
-    .chip {
-      background: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      padding: 8px 12px;
-      border-radius: 999px;
-      font-size: 13px;
-      color: var(--muted)
-    }
-
-    .profile-pic {
-      max-width: 220px;
-      width: 100%;
-      border-radius: 20%;
-      margin: 0 auto 0px;
-      box-shadow: 0 4px 20px rgba(124, 58, 237, 0.5);
-      border: 4px solid rgba(255, 255, 255, 0.1)
-    }
-
-    .contact-card {
-      padding: 18px;
-      text-align: center
-    }
-
-    .contact-card h3 {
-      margin: 6px 0 2px
-    }
-
-    .contact-card a {
-      display: block;
-      color: var(--accent);
-      text-decoration: none;
-      margin-top: 6px
-    }
-
-    .sections {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 22px;
-      margin-top: 28px
-    }
-
-    .timeline {
-      display: flex;
-      flex-direction: column;
-      gap: 12px
-    }
-
-    .job {
-      display: flex;
-      gap: 14px
-    }
-
-    .job .meta {
-      min-width: 140px;
-      color: var(--muted);
-      font-size: 13px
-    }
-
-    .job .body h4 {
-      margin: 0;
-      font-size: 16px
-    }
-
-    .job .body p {
-      margin: 6px 0;
-      color: var(--muted);
-      font-size: 14px
-    }
-
-    .skills {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap
-    }
-
-    .skill {
-      background: rgba(255, 255, 255, 0.03);
-      padding: 8px 10px;
-      border-radius: 8px;
-      font-size: 13px
-    }
-
-    footer {
-      margin-top: 36px;
-      text-align: center;
-      color: var(--muted);
-      font-size: 13px
-    }
-
-    @media(max-width:940px) {
-      .hero {
-        grid-template-columns: 1fr
-      }
-
-      .brand p {
-        display: none
-      }
-    }
-
-    .light {
-      --bg: #f7fafc;
-      --card: #ffffff;
-      --muted: #475569;
-      color: #0b1220
-    }
-
-    .toggle {
-      background: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      padding: 8px 10px;
-      border-radius: 10px;
-      color: var(--muted);
-      cursor: pointer
-    }
-
-    .muted {
-      color: var(--muted)
-    }
-
-    a.button {
-      background: var(--accent);
-      color: white;
-      padding: 10px 14px;
-      border-radius: 10px;
-      text-decoration: none;
-      font-weight: 600
-    }
-
-    .edu {
-      display: flex;
-      gap: 12px;
-      align-items: center
-    }
-
-    .card .section-title {
-      font-size: 13px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 12px
-    }
-  </style>
 </head>
 
 <body>
@@ -701,7 +419,7 @@
           <div class="badges">
             <div class="chip">C#</div>
             <div class="chip">Azure</div>
-            <div class="chip">DevOps</div>
+            <div class="chip">DevSecOps</div>
             <div class="chip">CI/CD</div>
             <div class="chip">Microservices</div>
             <div class="chip">Architecture</div>
@@ -724,7 +442,7 @@
       <section id="about" class="sections">
         <div class="card">
           <div class="section-title">About</div>
-          <p>I'm an Engineering Manager with more than a decade of experience building cloud-native solutions, platform
+          <p>With more than a decade of experience building cloud-native solutions, platform
             services, and DevSecOps automation. I enjoy designing architectures that are resilient and cost-efficient
             and mentoring engineers to grow into high-performing autonomous teams. Recently, I led platform engineering
             at Pickles Auctions and contributed to its digital transformation in the automotive industry.</p>
@@ -737,7 +455,7 @@
               <div class="meta">2021 — Present<br><strong>Pickles Auctions</strong><br>Sydney</div>
               <div class="body">
                 <h4>Engineering Manager — Platform Engineering</h4>
-                <p class="muted">Leading Platform Engineering: build engineering, release engineering, environment and
+                <p class="muted">Leading Platform Engineering: build/release engineering, environment &
                   configuration management, and cost optimization in Azure. Provide technical leadership, drive adoption
                   of platform services, recruit and mentor engineers.</p>
               </div>
@@ -813,11 +531,13 @@
               <div class="edu">
                 <div>
                   <strong>Staffordshire University</strong>
-                  <div class="muted">MSc, Software Engineering (2014 - 2017)</div>
+                  <div>2014 - 2017</div>
+                  <div class="muted">MSc, Software Engineering</div>
                 </div>
-                <div style="margin-left:24px">
+                <div>
                   <strong>Arab International University</strong>
-                  <div class="muted">BSc, Computer & Software Engineering (2008 - 2013)</div>
+                  <div>2008 - 2013</div>
+                  <div class="muted">BSc, Software Engineering</div>
                 </div>
               </div>
             </div>
@@ -840,7 +560,7 @@
     </main>
 
     <footer>
-      <div class="muted">© Anas Semesmieh — Engineering Manager • Built with ❤️</div>
+      <div class="muted">©2025 Anas Semesmieh • Built with ❤️</div>
     </footer>
 
   </div>
