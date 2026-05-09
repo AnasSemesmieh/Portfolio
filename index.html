@@ -3,7 +3,7 @@
 
 <head>
   <!-- Basic SEO -->
-  <title>Anas Semesmieh — Engineering Manager & Solutions Architect</title>
+  <title>Anas Semesmieh | Engineering Manager, Solutions Architect, Platform Engineering Expert</title>
   <meta name="description"
     content="Portfolio of Anas Semesmieh — Experienced Solutions Architect and Engineering Manager specializing in platform engineering, cloud technologies, and web development." />
   <meta name="keywords"
@@ -385,8 +385,93 @@
   <!-- Replace with your Twitter handle or remove -->
   <!-- <meta name="twitter:creator" content="@anas" /> -->
 
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://anas.semesmieh.com/" />
+
+  <!-- Additional SEO Meta Tags -->
+  <meta name="theme-color" content="#7c3aed" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:site_name" content="Anas Semesmieh Portfolio" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  
+  <!-- Performance Hints -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="dns-prefetch" href="https://www.linkedin.com" />
+
   <!-- Favicon -->
   <link rel="icon" href="/profile.ico" type="image/x-icon" />
+
+  <!-- Structured Data: Person + Professional Profile -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Anas Semesmieh",
+    "url": "https://anas.semesmieh.com",
+    "image": "https://anas.semesmieh.com/profile-close.jpg",
+    "jobTitle": "Engineering Manager & Solutions Architect",
+    "description": "Experienced Engineering Manager and Solutions Architect specializing in platform engineering, cloud-native solutions, DevSecOps, and Azure infrastructure",
+    "location": {
+      "@type": "Place",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Sydney",
+        "addressCountry": "AU"
+      }
+    },
+    "email": "anas.semesmieh@gmail.com",
+    "sameAs": [
+      "https://www.linkedin.com/in/anassemesmieh"
+    ],
+    "expertise": [
+      "Platform Engineering",
+      "Cloud Architecture",
+      "Azure",
+      "DevSecOps",
+      "CI/CD",
+      "Microservices",
+      "Team Leadership",
+      "Cost Optimization"
+    ],
+    "knowsAbout": [
+      "C# / .NET Core",
+      "Azure Serverless",
+      "Infrastructure as Code",
+      "Microservices Architecture",
+      "CI/CD Pipelines",
+      "Team Leadership"
+    ]
+  }
+  </script>
+
+  <!-- Structured Data: BreadcrumbList -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://anas.semesmieh.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "About",
+        "item": "https://anas.semesmieh.com/#about"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Experience",
+        "item": "https://anas.semesmieh.com/#experience"
+      }
+    ]
+  }
+  </script>
 </head>
 
 <body>
@@ -412,7 +497,7 @@
     <main>
       <section class="hero">
         <div class="card intro">
-          <h2>Driving Software, Platform, and Operational excellence</h2>
+          <h1>Driving Software, Platform, and Operational excellence</h1>
           <p class="lead">I lead Platform Engineering teams to deliver innovative, cost-optimised, scalable and
             resilient cloud-native automation and DevSecOps solutions in Azure. I build high-performing teams and
             champion best practices that improve velocity, reliability, and cost-efficiency.</p>
@@ -430,12 +515,11 @@
           </div>
         </div>
         <aside class="card contact-card">
-          <img src="profile-close.jpg" alt="Anas Semesmieh" class="profile-pic">
+          <img src="profile-close.jpg" alt="Anas Semesmieh — Engineering Manager & Solutions Architect" class="profile-pic" loading="lazy">
           <div style="margin-top:8px"> Sydney, Australia </div>
           <div style="margin-top:8px">📱 +61 437 501 834</div>
           <div style="margin-top:6px"><a href="mailto:anas.semesmieh@gmail.com">anas.semesmieh@gmail.com</a></div>
-          <!-- <div style="margin-top:6px"><a href="https://www.linkedin.com/in/anassemesmieh" target="_blank">LinkedIn /anassemesmieh</a></div> -->
-
+          <div style="margin-top:8px"><a href="https://www.linkedin.com/in/anassemesmieh" target="_blank" rel="noopener noreferrer">🔗 LinkedIn Profile</a></div>
         </aside>
       </section>
 
@@ -453,11 +537,15 @@
           <div class="section-title">Experience</div>
           <div class="timeline">
 
-            <div class="job">
-              <div class="meta">2021 — Present<br><strong>Pickles Auctions</strong><br>Sydney</div>
+            <div class="job" itemscope itemtype="https://schema.org/EmployeeRole">
+              <div class="meta">
+                <span itemprop="startDate" content="2021">2021</span> — <span itemprop="endDate" content="2026-01">Present</span><br>
+                <strong itemprop="company" itemscope itemtype="https://schema.org/Organization"><span itemprop="name">Pickles Auctions</span></strong><br>
+                <span itemprop="jobLocation" itemscope itemtype="https://schema.org/Place"><span itemprop="name">Sydney</span></span>
+              </div>
               <div class="body">
-                <h4>Engineering Manager — Platform Engineering</h4>
-                <p class="muted">Leading Platform Engineering: build/release engineering, environment & configuration
+                <h4 itemprop="jobTitle">Engineering Manager — Platform Engineering</h4>
+                <p class="muted" itemprop="description">Leading Platform Engineering: build/release engineering, environment & configuration
                   management, and cost optimization in Azure. Provide technical leadership, drive adoption of platform
                   services, recruit and mentor engineers.</p>
                 <ul>
@@ -467,16 +555,20 @@
                   <li>Designed and delivered scalable auction platform architecture, enabling new digital sales channels.</li>
                   <li>Oversaw post-sale digitisation and D365 integration, enhancing operational efficiency.</li>
                   <li>Supported major product transformations including CarZapp app rebuild & web redesign.</li>
-                  <li>Levraging AI, Secured 2nd place in company hackathon with innovative solution prototype competing against 100 engineers</li>
+                  <li>Leveraging AI, Secured 2nd place in company hackathon with innovative solution prototype competing against 100 engineers</li>
                 </ul>
               </div>
             </div>
 
-            <div class="job">
-              <div class="meta">2018 — 2021<br><strong>CarZapp</strong><br>Kuala Lumpur</div>
+            <div class="job" itemscope itemtype="https://schema.org/EmployeeRole">
+              <div class="meta">
+                <span itemprop="startDate" content="2018">2018</span> — <span itemprop="endDate" content="2021">2021</span><br>
+                <strong itemprop="company" itemscope itemtype="https://schema.org/Organization"><span itemprop="name">CarZapp</span></strong><br>
+                <span itemprop="jobLocation" itemscope itemtype="https://schema.org/Place"><span itemprop="name">Kuala Lumpur</span></span>
+              </div>
               <div class="body">
-                <h4>Development Lead</h4>
-                <p class="muted">Built .NET Core microservices, cloud-native solutions on Azure, managed mobile app
+                <h4 itemprop="jobTitle">Development Lead</h4>
+                <p class="muted" itemprop="description">Built .NET Core microservices, cloud-native solutions on Azure, managed mobile app
                   deployments and implemented CI/CD using Azure DevOps. Led frontend work with Angular and coordinated
                   dev teams and product stakeholders.</p>
                 <ul>
@@ -488,11 +580,15 @@
               </div>
             </div>
 
-            <div class="job">
-              <div class="meta">2016 — 2018<br><strong>Strateq Group</strong><br>Kuala Lumpur</div>
+            <div class="job" itemscope itemtype="https://schema.org/EmployeeRole">
+              <div class="meta">
+                <span itemprop="startDate" content="2016">2016</span> — <span itemprop="endDate" content="2018">2018</span><br>
+                <strong itemprop="company" itemscope itemtype="https://schema.org/Organization"><span itemprop="name">Strateq Group</span></strong><br>
+                <span itemprop="jobLocation" itemscope itemtype="https://schema.org/Place"><span itemprop="name">Kuala Lumpur</span></span>
+              </div>
               <div class="body">
-                <h4>Solutions Architect / Senior Software Engineer</h4>
-                <p class="muted">Led DevOps best practices, designed IoT and realtime analytics solutions, implemented
+                <h4 itemprop="jobTitle">Solutions Architect / Senior Software Engineer</h4>
+                <p class="muted" itemprop="description">Led DevOps best practices, designed IoT and realtime analytics solutions, implemented
                   migrations and enterprise integrations.</p>
                 <ul>
                   <li>Architected IoT and real-time analytics platform for major retail client.</li>
@@ -562,15 +658,15 @@
             <div style="margin-top:14px">
               <div class="section-title">Education</div>
               <div class="edu">
-                <div>
-                  <strong>Staffordshire University</strong>
-                  <div>2014 - 2017</div>
-                  <div class="muted">MSc, Software Engineering</div>
+                <div itemscope itemtype="https://schema.org/EducationalOccupationalCredential">
+                  <strong itemprop="name">Staffordshire University</strong>
+                  <div itemprop="startDate" content="2014">2014</div> - <div itemprop="endDate" content="2017">2017</div>
+                  <div class="muted" itemprop="credentialCategory">MSc, Software Engineering</div>
                 </div>
-                <div>
-                  <strong>Arab International University</strong>
-                  <div>2008 - 2013</div>
-                  <div class="muted">BSc, Software Engineering</div>
+                <div itemscope itemtype="https://schema.org/EducationalOccupationalCredential">
+                  <strong itemprop="name">Arab International University</strong>
+                  <div itemprop="startDate" content="2008">2008</div> - <div itemprop="endDate" content="2013">2013</div>
+                  <div class="muted" itemprop="credentialCategory">BSc, Software Engineering</div>
                 </div>
               </div>
             </div>
