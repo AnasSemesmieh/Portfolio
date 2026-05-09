@@ -7,7 +7,7 @@
   <meta name="description"
     content="Portfolio of Anas Semesmieh — Experienced Solutions Architect and Engineering Manager specializing in platform engineering, cloud technologies, and web development." />
   <meta name="keywords"
-    content="Anas Semesmieh, Solutions Architect, engineering manager, platform engineering, cloud, web development" />
+    content="Anas Semesmieh, Solutions Architect, engineering manager, platform engineering, cloud, Docker, GitHub Actions, Terraform, IaC, DevSecOps, Azure, homelab" />
   <meta name="author" content="Anas Semesmieh" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -270,7 +270,12 @@
       }
 
       nav {
-        display: none !important;
+        gap: 6px;
+      }
+
+      .navlink {
+        font-size: 12px;
+        padding: 6px 8px;
       }
 
       .hero {
@@ -431,14 +436,21 @@
       "Azure",
       "DevSecOps",
       "CI/CD",
+      "Docker",
+      "GitHub Actions",
+      "Terraform",
       "Microservices",
       "Team Leadership",
-      "Cost Optimization"
+      "Cost Optimization",
+      "Self-Hosting"
     ],
     "knowsAbout": [
       "C# / .NET Core",
       "Azure Serverless",
       "Infrastructure as Code",
+      "Docker & Containerisation",
+      "GitHub Actions",
+      "Terraform / Bicep",
       "Microservices Architecture",
       "CI/CD Pipelines",
       "Team Leadership"
@@ -504,6 +516,8 @@
           <div class="badges">
             <div class="chip">C#</div>
             <div class="chip">Azure</div>
+            <div class="chip">Docker</div>
+            <div class="chip">IaC</div>
             <div class="chip">DevSecOps</div>
             <div class="chip">CI/CD</div>
             <div class="chip">Microservices</div>
@@ -511,7 +525,7 @@
           </div>
           <div style="margin-top:20px;display:flex;gap:12px;align-items:center">
             <a class="button" href="#contact">Discuss a Role</a>
-            <a class="navlink" href="/Anas Semesmieh's Resume.pdf" download>Download Resume</a>
+            <a class="navlink" href="/anas-semesmieh-resume.pdf" download>Download Resume</a>
           </div>
         </div>
         <aside class="card contact-card">
@@ -521,6 +535,7 @@
           <div style="margin-top:6px"><a href="mailto:anas@semesmieh.com">anas@semesmieh.com</a></div>
           <div class="muted" style="margin-top:8px">Open to Engineering Manager, Head of Platform/Engineering, and Solutions Architect roles.</div>
           <div style="margin-top:8px"><a href="https://www.linkedin.com/in/anassemesmieh" target="_blank" rel="noopener noreferrer">🔗 LinkedIn Profile</a></div>
+          <div style="margin-top:4px"><a href="https://github.com/AnasSemesmieh" target="_blank" rel="noopener noreferrer">🐙 GitHub Profile</a></div>
         </aside>
       </section>
 
@@ -641,9 +656,10 @@
           <div class="skills">
             <div class="skill">C# / .NET Core</div>
             <div class="skill">Azure (Serverless, Functions, Event Grid)</div>
-            <div class="skill">CI/CD (Azure DevOps)</div>
+            <div class="skill">CI/CD (GitHub Actions, Azure DevOps)</div>
+            <div class="skill">Docker & Containerisation</div>
             <div class="skill">Microservices & APIs</div>
-            <div class="skill">Infrastructure as Code</div>
+            <div class="skill">Infrastructure as Code (Terraform, Bicep)</div>
             <div class="skill">Angular / TypeScript / Frontend</div>
             <div class="skill">Team leadership & Hiring</div>
             <div class="skill">Cost optimization</div>
@@ -687,8 +703,22 @@
       </section>
       <section class="sections">
         <div class="card">
+          <div class="section-title">Open Source & Homelab</div>
+          <p class="muted">I run a Docker-based homelab with 10+ self-hosted services — Traefik, Pi-hole, Plex, Arr stack, Immich, Home Assistant — with automated backups, secret redaction, and sub-hour disaster recovery. The full config is public on GitHub.</p>
+          <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
+            <a class="button" href="https://github.com/AnasSemesmieh/homelab" target="_blank" rel="noopener noreferrer">Homelab Repo</a>
+            <a class="navlink" href="/blog/posts/homelab-start-here.html">Read the Series</a>
+          </div>
+        </div>
+
+        <div class="card">
           <div class="section-title">Blog</div>
-          <p class="muted">I share practical notes on platform engineering, Azure architecture, DevSecOps, and leadership lessons from scaling teams and infrastructure.</p>
+          <p class="muted">Practical notes on platform engineering, Azure architecture, DevSecOps, Docker homelab builds, and leadership lessons from scaling teams and infrastructure.</p>
+          <ul style="list-style:none;padding:0;margin:8px 0 0">
+            <li style="margin-bottom:6px"><a href="/blog/posts/ai-adoption-platform-teams.html" style="color:var(--accent);text-decoration:none">Driving AI Adoption in Platform Teams</a></li>
+            <li style="margin-bottom:6px"><a href="/blog/posts/homelab-docker-compose-stack.html" style="color:var(--accent);text-decoration:none">Docker Compose All The Things: 10+ Services on One Host</a></li>
+            <li style="margin-bottom:6px"><a href="/blog/posts/homelab-backup-automation.html" style="color:var(--accent);text-decoration:none">Automated Config Backup with Secret Redaction</a></li>
+          </ul>
           <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
             <a class="button" href="/blog/">Read the Blog</a>
           </div>
@@ -701,6 +731,7 @@
           <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
             <a class="button" href="mailto:anas@semesmieh.com?subject=Opportunity%20for%20Anas%20Semesmieh">Email Anas</a>
             <a class="navlink" href="https://www.linkedin.com/in/anassemesmieh" target="_blank" rel="noopener noreferrer">Connect on LinkedIn</a>
+            <a class="navlink" href="https://github.com/AnasSemesmieh" target="_blank" rel="noopener noreferrer">GitHub</a>
           </div>
         </div>
       </section>

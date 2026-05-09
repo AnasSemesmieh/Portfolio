@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
   <channel>
     <title>Anas Semesmieh Blog</title>
@@ -13,6 +13,42 @@
       <guid>https://anas.semesmieh.com/blog/posts/ai-adoption-platform-teams.html</guid>
       <pubDate>Sun, 10 May 2026 11:00:00 +0000</pubDate>
       <description>A practical framework for adopting AI in platform engineering with guardrails, measurable outcomes, and team-wide enablement.</description>
+    </item>
+
+    <item>
+      <title>My Home Lab Journey: Start Here</title>
+      <link>https://anas.semesmieh.com/blog/posts/homelab-start-here.html</link>
+      <guid>https://anas.semesmieh.com/blog/posts/homelab-start-here.html</guid>
+      <pubDate>Sun, 10 May 2026 11:00:00 +0000</pubDate>
+      <description>Introduction to my Docker-based homelab running Traefik, Pi-hole, Plex, Arr stack, Immich, Home Assistant with automated backups and disaster recovery.</description>
+    </item>
+    <item>
+      <title>Automated Config Backup with Secret Redaction</title>
+      <link>https://anas.semesmieh.com/blog/posts/homelab-backup-automation.html</link>
+      <guid>https://anas.semesmieh.com/blog/posts/homelab-backup-automation.html</guid>
+      <pubDate>Sun, 10 May 2026 11:00:00 +0000</pubDate>
+      <description>How I built a daily backup pipeline that syncs configs, redacts secrets, scans for leaks, and pushes sanitized snapshots to GitHub.</description>
+    </item>
+    <item>
+      <title>Docker Compose All The Things: Running 10+ Services on One Host</title>
+      <link>https://anas.semesmieh.com/blog/posts/homelab-docker-compose-stack.html</link>
+      <guid>https://anas.semesmieh.com/blog/posts/homelab-docker-compose-stack.html</guid>
+      <pubDate>Sun, 10 May 2026 11:00:00 +0000</pubDate>
+      <description>Running Traefik, Pi-hole, Plex, Arr stack, Immich, Home Assistant on a single Ubuntu host with Docker Compose.</description>
+    </item>
+    <item>
+      <title>Homelab Disaster Recovery in Under an Hour</title>
+      <link>https://anas.semesmieh.com/blog/posts/homelab-disaster-recovery.html</link>
+      <guid>https://anas.semesmieh.com/blog/posts/homelab-disaster-recovery.html</guid>
+      <pubDate>Sun, 10 May 2026 11:00:00 +0000</pubDate>
+      <description>How I rebuild my entire homelab from a clean Ubuntu install using a Git-backed config repo, compose-based restore, and secret rehydration.</description>
+    </item>
+    <item>
+      <title>Secrets Management for Homelabs: Redaction, Scanning, and Rehydration</title>
+      <link>https://anas.semesmieh.com/blog/posts/homelab-secrets-management.html</link>
+      <guid>https://anas.semesmieh.com/blog/posts/homelab-secrets-management.html</guid>
+      <pubDate>Sun, 10 May 2026 11:00:00 +0000</pubDate>
+      <description>A complete secrets lifecycle with automated redaction, leak scanning, rehydration workflows, and rotation practices.</description>
     </item>
 
     <item>

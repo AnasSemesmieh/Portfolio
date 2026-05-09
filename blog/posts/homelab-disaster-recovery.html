@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Homelab Disaster Recovery in Under an Hour | Anas Semesmieh</title>
+  <meta name="description" content="How I rebuild my entire homelab from a clean Ubuntu install using a Git-backed config repo, compose-based restore, and automated secret rehydration." />
+  <meta name="author" content="Anas Semesmieh" />
+  <link rel="canonical" href="https://anas.semesmieh.com/blog/posts/homelab-disaster-recovery.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Homelab Disaster Recovery in Under an Hour" />
+  <meta property="og:description" content="Rebuilding a full homelab from zero using a Git-backed config repo, compose-based restore, and secret rehydration." />
+  <meta property="og:url" content="https://anas.semesmieh.com/blog/posts/homelab-disaster-recovery.html" />
+  <meta property="og:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Homelab Disaster Recovery in Under an Hour" />
+  <meta name="twitter:description" content="Rebuilding a full homelab from zero using a Git-backed config repo, compose-based restore, and secret rehydration." />
+  <meta name="twitter:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <style>
+    :root {
+      --bg: #0b1220; --card: #101a2c; --muted: #8ea0be; --text: #e6eef8;
+      --accent: #16a34a; --border: rgba(255,255,255,0.08); --maxw: 800px;
+      --radius: 14px; --font: "IBM Plex Sans","Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; color:var(--text); font-family:var(--font); line-height:1.72;
+      background: radial-gradient(circle at 10% 0%,#13203a 0%,transparent 42%),radial-gradient(circle at 90% 20%,#0e1a32 0%,transparent 38%),var(--bg); }
+    .wrap { max-width:var(--maxw); margin:0 auto; padding:30px 18px 80px; }
+    .nav { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px; }
+    .nav a { text-decoration:none; color:var(--muted); padding:8px 12px; border-radius:10px; border:1px solid transparent; }
+    .nav a:hover { color:var(--text); border-color:var(--border); background:rgba(255,255,255,0.03); }
+    article { border:1px solid var(--border); border-radius:var(--radius); padding:24px; background:var(--card); }
+    h1 { margin-top:0; font-size:34px; line-height:1.2; }
+    .meta { color:var(--muted); font-size:14px; margin-bottom:20px; }
+    h2 { margin-top:28px; }
+    h3 { margin-top:22px; color: #b7f7cd; }
+    .callout { border-left:3px solid var(--accent); padding:10px 14px; background:rgba(22,163,74,0.09); border-radius:8px; margin:18px 0; }
+    code { background:rgba(255,255,255,0.07); padding:2px 6px; border-radius:4px; font-size:14px; }
+    pre { background:rgba(0,0,0,0.3); padding:14px; border-radius:8px; overflow-x:auto; font-size:13px; line-height:1.5; color: #e6eef8; }
+    a { color: var(--accent); }
+    @media (max-width:700px) { h1 { font-size:28px; } article { padding:18px; } }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org","@type":"BlogPosting",
+    "headline":"Homelab Disaster Recovery in Under an Hour",
+    "datePublished":"2026-05-10","dateModified":"2026-05-10",
+    "author":{"@type":"Person","name":"Anas Semesmieh","url":"https://anas.semesmieh.com/"},
+    "publisher":{"@type":"Person","name":"Anas Semesmieh"},
+    "mainEntityOfPage":"https://anas.semesmieh.com/blog/posts/homelab-disaster-recovery.html",
+    "image":"https://anas.semesmieh.com/profile-wide.jpg",
+    "description":"How I rebuild my entire homelab from a clean Ubuntu install using a Git-backed config repo, compose-based restore, and secret rehydration."
+  }
+  </script>
+</head>
+
+<body>
+  <div class="wrap">
+    <nav class="nav" aria-label="Post navigation">
+      <a href="/">Portfolio</a>
+      <a href="/blog/">All Posts</a>
+      <a href="/blog/rss.xml">RSS</a>
+    </nav>
+
+    <article>
+      <h1>Homelab Disaster Recovery in Under an Hour</h1>
+      <p class="meta">By Anas Semesmieh · May 10, 2026 · Homelab · Disaster Recovery</p>
+
+      <p>Disk dies. Power surge fries the board. You fat-finger an <code>rm -rf</code>. Whatever the cause, the question is always the same: <em>how fast can I get back to normal?</em> For my homelab, the answer is under an hour — because I designed for exactly this scenario.</p>
+
+      <div class="callout">
+        Full runbooks: <a href="https://github.com/AnasSemesmieh/homelab/blob/main/docs/FRESH-INSTALL.md" target="_blank">FRESH-INSTALL.md</a> · <a href="https://github.com/AnasSemesmieh/homelab/blob/main/docs/RESTORE.md" target="_blank">RESTORE.md</a>
+      </div>
+
+      <h2>The Recovery Timeline</h2>
+      <p>Here's how the hour breaks down:</p>
+      <ul>
+        <li><strong>0–15 min:</strong> Install Ubuntu Server, configure static IP, firewall, and install Docker</li>
+        <li><strong>15–20 min:</strong> Clone the backup repo and verify inventory</li>
+        <li><strong>20–30 min:</strong> Rehydrate secrets and inject into config files</li>
+        <li><strong>30–40 min:</strong> Run compose-based restore (dry-run first, then apply)</li>
+        <li><strong>40–55 min:</strong> Bring up services in dependency order</li>
+        <li><strong>55–60 min:</strong> Validate, re-enable backup automation</li>
+      </ul>
+
+      <h2>Phase 1: Host Bootstrap</h2>
+      <p>Start with a minimal Ubuntu Server install. The fresh-install runbook covers every step:</p>
+      <pre># Post-install essentials
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y curl wget git jq net-tools htop vim
+
+# Static IP via netplan
+sudo vim /etc/netplan/00-installer-config.yaml
+
+# Firewall
+sudo ufw enable
+sudo ufw allow 22/tcp    # SSH
+sudo ufw allow 80/tcp    # HTTP
+sudo ufw allow 443/tcp   # HTTPS
+sudo ufw allow 53/tcp    # DNS
+sudo ufw allow 53/udp    # DNS
+
+# Docker
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+sudo usermod -aG docker $USER</pre>
+
+      <h2>Phase 2: Clone + Secrets</h2>
+      <pre># Clone backup repo
+git clone https://github.com/AnasSemesmieh/homelab.git ~/homelab-backup
+cd ~/homelab-backup
+
+# Verify inventory
+cat inventory/include-paths.txt | head -20</pre>
+      <p>Then create the local secrets file (<code>~/.homelab-secrets.env</code>) with all API keys, passwords, and tokens. The <a href="https://github.com/AnasSemesmieh/homelab/blob/main/docs/SECRETS.md" target="_blank">SECRETS.md</a> catalog documents every secret: where it's used, how to source it, format validation, and rotation procedures.</p>
+      <pre># Inject secrets into config files
+source ~/.homelab-secrets.env
+sed -i "s|PlexOnlineToken=\"REDACTED\"|PlexOnlineToken=\"$PLEX_ONLINE_TOKEN\"|g" \
+  configs/plex/config/Library/Application\ Support/Plex\ Media\ Server/Preferences.xml
+
+# Verify all REDACTED values replaced
+grep -r "REDACTED" configs/ && echo "ERROR" || echo "OK: All secrets injected"</pre>
+
+      <h2>Phase 3: Compose-Based Restore</h2>
+      <p>This is the clever part. Instead of manually copying files, I built a Docker Compose restore helper that maps the backup into the right directories:</p>
+      <pre># Preview what will be copied (dry-run)
+docker compose -f restore/docker-compose.restore.yml run --rm \
+  -e DRY_RUN=true restore-configs
+
+# Apply (no overwrite — safe for existing files)
+docker compose -f restore/docker-compose.restore.yml run --rm \
+  -e DRY_RUN=false -e OVERWRITE=false restore-configs</pre>
+      <p>The restore container mounts <code>configs/</code> read-only and copies files to <code>/home/anas/</code>, preserving the directory structure. Each service gets its <code>docker-compose.yml</code> and config files placed exactly where they need to be.</p>
+
+      <h2>Phase 4: Ordered Bring-up</h2>
+      <p>Infrastructure first, then applications:</p>
+      <pre># 1. Traefik (reverse proxy + TLS)
+cd ~/traefik && docker compose up -d
+
+# 2. Pi-hole (DNS)
+cd ~/pihole && docker compose up -d
+
+# 3. Applications
+cd ~/homepage && docker compose up -d
+cd ~/plex && docker compose up -d
+cd ~/tautulli && docker compose up -d
+cd ~/arrstack && docker compose up -d
+cd ~/immich && docker compose up -d
+cd ~/homeassistant && docker compose up -d</pre>
+
+      <h2>Phase 5: Validation</h2>
+      <pre># All containers running?
+docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+
+# Service connectivity
+docker exec traefik nslookup pihole
+docker exec homepage curl -s http://traefik:8080/ping
+
+# Re-enable backup automation
+crontab -e  # Add daily + weekly cron jobs
+./scripts/backup-and-push.sh  # Test first run</pre>
+
+      <h2>Restoring from a Specific Snapshot</h2>
+      <p>If I need a point-in-time restore instead of latest:</p>
+      <pre># List available snapshots
+git tag -l "backup-*"
+
+# Checkout specific snapshot
+git checkout tags/backup-2026-05-09
+
+# Restore from that snapshot
+docker compose -f restore/docker-compose.restore.yml run --rm \
+  -e DRY_RUN=false -e OVERWRITE=true restore-configs
+
+# Return to latest
+git checkout main</pre>
+
+      <h2>Rollback Procedures</h2>
+      <p>The repo also supports rollbacks for individual services (revert a broken config change) and database state recovery for stateful services like Immich's PostgreSQL. Every scenario is documented in the runbook with exact commands.</p>
+
+      <div class="callout">
+        The real value isn't the restore time — it's the confidence. Knowing I can rebuild everything from scratch means I experiment freely. Break things on Saturday, restore on Sunday.
+      </div>
+
+      <p>Next: <a href="/blog/posts/homelab-secrets-management.html">Secrets Management for Homelabs</a> — the full lifecycle of redaction, scanning, and rehydration.</p>
+    </article>
+  </div>
+</body>
+</html>

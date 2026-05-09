@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Home Lab Journey: Start Here | Anas Semesmieh</title>
+  <meta name="description" content="Introduction to my Docker-based homelab running Traefik, Pi-hole, Plex, Arr stack, Immich, Home Assistant, and more — with automated backups and disaster recovery." />
+  <meta name="author" content="Anas Semesmieh" />
+  <link rel="canonical" href="https://anas.semesmieh.com/blog/posts/homelab-start-here.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="My Home Lab Journey: Start Here" />
+  <meta property="og:description" content="A platform engineering leader's Docker-based homelab with automated backups, secret redaction, and disaster recovery." />
+  <meta property="og:url" content="https://anas.semesmieh.com/blog/posts/homelab-start-here.html" />
+  <meta property="og:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="My Home Lab Journey: Start Here" />
+  <meta name="twitter:description" content="A platform engineering leader's Docker-based homelab with automated backups, secret redaction, and disaster recovery." />
+  <meta name="twitter:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <style>
+    :root {
+      --bg: #0b1220; --card: #101a2c; --muted: #8ea0be; --text: #e6eef8;
+      --accent: #16a34a; --border: rgba(255,255,255,0.08); --maxw: 800px;
+      --radius: 14px; --font: "IBM Plex Sans","Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; color:var(--text); font-family:var(--font); line-height:1.72;
+      background: radial-gradient(circle at 10% 0%,#13203a 0%,transparent 42%),radial-gradient(circle at 90% 20%,#0e1a32 0%,transparent 38%),var(--bg); }
+    .wrap { max-width:var(--maxw); margin:0 auto; padding:30px 18px 80px; }
+    .nav { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px; }
+    .nav a { text-decoration:none; color:var(--muted); padding:8px 12px; border-radius:10px; border:1px solid transparent; }
+    .nav a:hover { color:var(--text); border-color:var(--border); background:rgba(255,255,255,0.03); }
+    article { border:1px solid var(--border); border-radius:var(--radius); padding:24px; background:var(--card); }
+    h1 { margin-top:0; font-size:34px; line-height:1.2; }
+    .meta { color:var(--muted); font-size:14px; margin-bottom:20px; }
+    h2 { margin-top:28px; }
+    .callout { border-left:3px solid var(--accent); padding:10px 14px; background:rgba(22,163,74,0.09); border-radius:8px; margin:18px 0; }
+    code { background:rgba(255,255,255,0.07); padding:2px 6px; border-radius:4px; font-size:14px; }
+    pre { background:rgba(0,0,0,0.3); padding:14px; border-radius:8px; overflow-x:auto; font-size:13px; line-height:1.5; }
+    a { color: var(--accent); }
+    @media (max-width:700px) { h1 { font-size:28px; } article { padding:18px; } }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org","@type":"BlogPosting",
+    "headline":"My Home Lab Journey: Start Here",
+    "datePublished":"2026-05-10","dateModified":"2026-05-10",
+    "author":{"@type":"Person","name":"Anas Semesmieh","url":"https://anas.semesmieh.com/"},
+    "publisher":{"@type":"Person","name":"Anas Semesmieh"},
+    "mainEntityOfPage":"https://anas.semesmieh.com/blog/posts/homelab-start-here.html",
+    "image":"https://anas.semesmieh.com/profile-wide.jpg",
+    "description":"Introduction to my Docker-based homelab running Traefik, Pi-hole, Plex, Arr stack, Immich, Home Assistant, and more."
+  }
+  </script>
+</head>
+
+<body>
+  <div class="wrap">
+    <nav class="nav" aria-label="Post navigation">
+      <a href="/">Portfolio</a>
+      <a href="/blog/">All Posts</a>
+      <a href="/blog/rss.xml">RSS</a>
+    </nav>
+
+    <article>
+      <h1>My Home Lab Journey: Start Here</h1>
+      <p class="meta">By Anas Semesmieh · May 10, 2026 · Homelab</p>
+
+      <p>As a platform engineering leader, I spend my weekdays designing cloud architectures and scaling teams. On weekends, I run a homelab — not because I have to, but because it keeps my hands dirty and my instincts sharp. This series documents everything I've built, broken, and automated along the way.</p>
+
+      <div class="callout">
+        Every config, script, and runbook referenced in this series is open source in my <a href="https://github.com/AnasSemesmieh/homelab" target="_blank">homelab repo</a>.
+      </div>
+
+      <h2>What I Run</h2>
+      <p>My homelab is a single Ubuntu Server host running everything via Docker Compose. Here's the full stack:</p>
+      <ul>
+        <li><strong>Traefik</strong> — Reverse proxy with a self-signed wildcard TLS certificate (<code>*.homelab</code>) from a local CA</li>
+        <li><strong>Pi-hole</strong> — DNS server and ad blocker, serving as the network's primary DNS</li>
+        <li><strong>Plex</strong> — Media server for movies and TV</li>
+        <li><strong>Tautulli</strong> — Plex monitoring and analytics</li>
+        <li><strong>Arr Stack</strong> — Prowlarr, Radarr, Sonarr, qBittorrent, and Gluetun (WireGuard VPN) for media acquisition</li>
+        <li><strong>Immich</strong> — Self-hosted photo backup with PostgreSQL</li>
+        <li><strong>Home Assistant</strong> — Home automation hub</li>
+        <li><strong>Homepage</strong> — Dashboard with live widgets pulling stats from every service</li>
+        <li><strong>Glances</strong> — System metrics (CPU, memory, network, disk)</li>
+      </ul>
+
+      <h2>The Backup-First Philosophy</h2>
+      <p>The centerpiece of my homelab isn't any single service — it's the automated backup system. My <a href="https://github.com/AnasSemesmieh/homelab" target="_blank">repo</a> is the source of truth for all configuration. Every day at 03:25 UTC, a cron job:</p>
+      <ol>
+        <li><strong>Syncs</strong> allowlisted config files from <code>~/</code> into <code>configs/</code> using an inventory file</li>
+        <li><strong>Redacts</strong> every password, API key, and token automatically via regex patterns</li>
+        <li><strong>Scans</strong> for any unredacted secrets — and blocks the push if anything slips through</li>
+        <li><strong>Commits and pushes</strong> the sanitized snapshot to GitHub</li>
+      </ol>
+      <p>Every Sunday, a weekly snapshot tag (<code>backup-YYYY-MM-DD</code>) is created for point-in-time recovery. The entire setup can be rebuilt from zero using the repo's fresh-install and restore runbooks.</p>
+
+      <h2>Why This Matters for My Career</h2>
+      <p>Running this lab forces me to practice what I preach: infrastructure as code, automated pipelines, secret management, disaster recovery, and documentation-first operations. When I advise teams on platform engineering practices at work, I've already battle-tested those patterns at home — on my own weekends, with my own hardware.</p>
+
+      <h2>What This Series Covers</h2>
+      <ul>
+        <li><a href="/blog/posts/homelab-backup-automation.html">Automated Config Backup with Secret Redaction</a> — The daily/weekly backup pipeline that keeps my configs safe and secrets out of Git</li>
+        <li><a href="/blog/posts/homelab-docker-compose-stack.html">Docker Compose All The Things</a> — Running 10+ services on a single host with Traefik, Pi-hole, and internal TLS</li>
+        <li><a href="/blog/posts/homelab-disaster-recovery.html">Disaster Recovery in Under an Hour</a> — Fresh-install and compose-based restore workflows</li>
+        <li><a href="/blog/posts/homelab-secrets-management.html">Secrets Management for Homelabs</a> — Redaction, scanning, rehydration, and rotation practices</li>
+      </ul>
+    </article>
+  </div>
+</body>
+</html>

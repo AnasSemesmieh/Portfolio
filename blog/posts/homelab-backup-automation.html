@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Automated Config Backup with Secret Redaction | Anas Semesmieh</title>
+  <meta name="description" content="How I built a daily automated backup pipeline for my homelab that syncs configs, redacts secrets, scans for leaks, and pushes sanitized snapshots to GitHub." />
+  <meta name="author" content="Anas Semesmieh" />
+  <link rel="canonical" href="https://anas.semesmieh.com/blog/posts/homelab-backup-automation.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Automated Config Backup with Secret Redaction" />
+  <meta property="og:description" content="Building a daily backup pipeline that syncs, redacts, scans, and pushes homelab configs — automatically." />
+  <meta property="og:url" content="https://anas.semesmieh.com/blog/posts/homelab-backup-automation.html" />
+  <meta property="og:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Automated Config Backup with Secret Redaction" />
+  <meta name="twitter:description" content="Building a daily backup pipeline that syncs, redacts, scans, and pushes homelab configs — automatically." />
+  <meta name="twitter:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <style>
+    :root {
+      --bg: #0b1220; --card: #101a2c; --muted: #8ea0be; --text: #e6eef8;
+      --accent: #16a34a; --border: rgba(255,255,255,0.08); --maxw: 800px;
+      --radius: 14px; --font: "IBM Plex Sans","Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; color:var(--text); font-family:var(--font); line-height:1.72;
+      background: radial-gradient(circle at 10% 0%,#13203a 0%,transparent 42%),radial-gradient(circle at 90% 20%,#0e1a32 0%,transparent 38%),var(--bg); }
+    .wrap { max-width:var(--maxw); margin:0 auto; padding:30px 18px 80px; }
+    .nav { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px; }
+    .nav a { text-decoration:none; color:var(--muted); padding:8px 12px; border-radius:10px; border:1px solid transparent; }
+    .nav a:hover { color:var(--text); border-color:var(--border); background:rgba(255,255,255,0.03); }
+    article { border:1px solid var(--border); border-radius:var(--radius); padding:24px; background:var(--card); }
+    h1 { margin-top:0; font-size:34px; line-height:1.2; }
+    .meta { color:var(--muted); font-size:14px; margin-bottom:20px; }
+    h2 { margin-top:28px; }
+    .callout { border-left:3px solid var(--accent); padding:10px 14px; background:rgba(22,163,74,0.09); border-radius:8px; margin:18px 0; }
+    code { background:rgba(255,255,255,0.07); padding:2px 6px; border-radius:4px; font-size:14px; }
+    pre { background:rgba(0,0,0,0.3); padding:14px; border-radius:8px; overflow-x:auto; font-size:13px; line-height:1.5; color: #e6eef8; }
+    a { color: var(--accent); }
+    @media (max-width:700px) { h1 { font-size:28px; } article { padding:18px; } }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org","@type":"BlogPosting",
+    "headline":"Automated Config Backup with Secret Redaction",
+    "datePublished":"2026-05-10","dateModified":"2026-05-10",
+    "author":{"@type":"Person","name":"Anas Semesmieh","url":"https://anas.semesmieh.com/"},
+    "publisher":{"@type":"Person","name":"Anas Semesmieh"},
+    "mainEntityOfPage":"https://anas.semesmieh.com/blog/posts/homelab-backup-automation.html",
+    "image":"https://anas.semesmieh.com/profile-wide.jpg",
+    "description":"How I built a daily automated backup pipeline for my homelab that syncs configs, redacts secrets, scans for leaks, and pushes sanitized snapshots to GitHub."
+  }
+  </script>
+</head>
+
+<body>
+  <div class="wrap">
+    <nav class="nav" aria-label="Post navigation">
+      <a href="/">Portfolio</a>
+      <a href="/blog/">All Posts</a>
+      <a href="/blog/rss.xml">RSS</a>
+    </nav>
+
+    <article>
+      <h1>Automated Config Backup with Secret Redaction</h1>
+      <p class="meta">By Anas Semesmieh · May 10, 2026 · Homelab · Automation</p>
+
+      <p>The worst time to think about backups is after you've lost your configs. My homelab runs 10+ Docker Compose services, and losing even one <code>docker-compose.yml</code> or <code>config.ini</code> means hours of reconstruction from memory. So I built a fully automated backup pipeline that runs every night — and it's the single most valuable thing in my lab.</p>
+
+      <div class="callout">
+        The full pipeline is open source: <a href="https://github.com/AnasSemesmieh/homelab/tree/main/scripts" target="_blank">homelab/scripts/</a>
+      </div>
+
+      <h2>The Pipeline: Sync → Redact → Scan → Commit → Push</h2>
+      <p>Every day at 03:25 UTC, a cron job triggers <code>backup-and-push.sh</code>, which orchestrates five stages:</p>
+
+      <h3>1. Sync — Allowlist-based config capture</h3>
+      <p>Instead of backing up everything (and drowning in noise), I maintain an explicit allowlist in <code>inventory/include-paths.txt</code>. Only files listed there get synced into <code>configs/</code>:</p>
+      <pre>traefik/docker-compose.yml
+pihole/docker-compose.yml
+plex/config/Library/Application Support/Plex Media Server/Preferences.xml
+homepage/config/services.yaml
+arrstack/docker-compose.yml
+...</pre>
+      <p>The <code>sync-configs.sh</code> script reads each line, checks if the source file exists under <code>$HOME</code>, and copies it into the repo preserving directory structure. Runtime artifacts — logs, databases, media, temp files — are intentionally excluded.</p>
+
+      <h3>2. Redact — Automatic secret removal</h3>
+      <p>This is where it gets interesting. The <code>redact-secrets.sh</code> script uses <code>sed</code> to replace sensitive values with <code>REDACTED</code> placeholders. It handles:</p>
+      <ul>
+        <li>Generic patterns: <code>password</code>, <code>api_key</code>, <code>token</code>, <code>secret</code>, <code>client_secret</code></li>
+        <li>Service-specific patterns: <code>PlexOnlineToken</code>, <code>PlexOnlineUsername</code>, Tailscale keys (<code>tskey-api-*</code>), Portainer tokens (<code>ptr_*</code>)</li>
+        <li>WireGuard private keys in the Arr stack's Gluetun config</li>
+      </ul>
+      <p>The result: every config file is safe to commit to a public repo. No secrets ever touch Git history.</p>
+
+      <h3>3. Scan — Safety gate before commit</h3>
+      <p>Even with automated redaction, mistakes happen. The <code>scan-secrets.sh</code> script acts as a second line of defense, running inverse pattern matching:</p>
+      <pre>grep -RInE '(password|api_?key|token|secret)[[:space:]]*[:=][[:space:]]*[^#[:space:]]+' configs/</pre>
+      <p>If <em>any</em> match is found, the script exits with code 1 — and the entire pipeline stops. No commit, no push. This gate has saved me more than once from pushing a freshly added service config that the redaction patterns hadn't covered yet.</p>
+
+      <h3>4. Commit — Only when changes exist</h3>
+      <p>The script checks <code>git status --porcelain</code> and only commits if there are actual changes. Commit messages are standardized: <code>backup: sync homelab configs</code>.</p>
+
+      <h3>5. Pull + Rebase + Push</h3>
+      <p>Before pushing, the script does a <code>git pull --rebase</code> to maintain linear history. If there are conflicts (rare, since I'm the only contributor), it fails safely and waits for manual intervention.</p>
+
+      <h2>Weekly Snapshot Tags</h2>
+      <p>Every Sunday at 03:40 UTC, <code>weekly-tag.sh</code> runs the full daily backup first, then creates a dated tag:</p>
+      <pre>git tag backup-2026-05-09
+git push origin backup-2026-05-09</pre>
+      <p>These tags serve as restore points. If I want to roll back to a known-good state from two weeks ago, I checkout that tag and run the restore workflow.</p>
+
+      <h2>Monitoring Backup Health</h2>
+      <p>I monitor backup health with a simple script that checks the age of <code>backup-cron.log</code>. If no backup has run in 30+ hours, it alerts. Logs are structured so I can grep for errors:</p>
+      <pre>tail -50 ~/homelab-backup/backup-cron.log
+grep -i "error\|failed" ~/homelab-backup/backup-cron.log</pre>
+
+      <h2>Cron Setup</h2>
+      <pre># Daily backup at 03:25 UTC
+25 3 * * * cd /home/anas/homelab-backup && ./scripts/backup-and-push.sh >> backup-cron.log 2>&1
+
+# Weekly snapshot tag at 03:40 UTC (Sunday)
+40 3 * * 0 cd /home/anas/homelab-backup && ./scripts/weekly-tag.sh >> backup-weekly.log 2>&1</pre>
+      <p>SSH keys are configured for passwordless Git push from cron. The remote is set to SSH (<code>git@github.com:AnasSemesmieh/homelab.git</code>) to avoid credential prompts.</p>
+
+      <h2>What I Learned</h2>
+      <ul>
+        <li><strong>Allowlists beat blocklists.</strong> Explicitly listing what to back up is safer than trying to exclude everything you don't want.</li>
+        <li><strong>Two layers of secret protection.</strong> Automated redaction catches the expected; scanning catches the unexpected.</li>
+        <li><strong>Cron failures are silent.</strong> Always redirect stderr to a log file and monitor it.</li>
+        <li><strong>Weekly tags are cheap insurance.</strong> Git tags cost nothing but give you named restore points forever.</li>
+      </ul>
+
+      <p>See the full scripts and configs in the <a href="https://github.com/AnasSemesmieh/homelab" target="_blank">homelab repo</a>, or continue to the next post: <a href="/blog/posts/homelab-docker-compose-stack.html">Docker Compose All The Things</a>.</p>
+    </article>
+  </div>
+</body>
+</html>
