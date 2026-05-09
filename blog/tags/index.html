@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Blog Tags | Anas Semesmieh</title>
+  <meta name="description" content="Browse blog tags on platform engineering, IaC, IDP, automation, and DevSecOps." />
+  <link rel="canonical" href="https://anas.semesmieh.com/blog/tags/" />
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #101a2c;
+      --muted: #8ea0be;
+      --text: #e6eef8;
+      --accent: #16a34a;
+      --border: rgba(255, 255, 255, 0.08);
+      --maxw: 900px;
+      --radius: 14px;
+      --font: "IBM Plex Sans", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.6;
+      background: var(--bg);
+    }
+
+    .wrap { max-width: var(--maxw); margin: 0 auto; padding: 30px 18px 60px; }
+    .nav { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+    .nav a { color: var(--muted); text-decoration: none; padding: 8px 12px; border-radius: 10px; }
+    .nav a:hover { color: var(--text); background: rgba(255, 255, 255, 0.05); }
+    .taglist { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+    .tag { border: 1px solid rgba(22, 163, 74, 0.35); color: #b7f7cd; border-radius: 999px; padding: 4px 12px; font-size: 13px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 12px; }
+    h1 { margin-top: 0; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <nav class="nav" aria-label="Tag navigation">
+      <a href="/">Portfolio</a>
+      <a href="/blog/">All Posts</a>
+      <a href="/blog/categories/">Categories</a>
+    </nav>
+
+    <h1>Tags</h1>
+
+    <div class="taglist">
+      <span class="tag">Platform Engineering</span>
+      <span class="tag">IaC</span>
+      <span class="tag">IDP</span>
+      <span class="tag">Automation</span>
+      <span class="tag">Developer Experience</span>
+      <span class="tag">Cloud Architecture</span>
+      <span class="tag">KTLO</span>
+      <span class="tag">AI Adoption</span>
+      <span class="tag">Engineering Leadership</span>
+    </div>
+
+    <div class="card">
+      <p><a href="/blog/posts/platform-engineering-at-scale.html">How Platform Engineering Creates Strategic Capacity</a></p>
+      <p><a href="/blog/posts/immutable-infrastructure-journey.html">From Legacy to Immutable: A Practical IaC Maturity Journey</a></p>
+      <p><a href="/blog/posts/idp-self-service-playbook.html">Designing an Internal Developer Portal That Teams Actually Use</a></p>
+      <p><a href="/blog/posts/ai-adoption-platform-teams.html">Driving AI Adoption in Platform Teams Without Losing Engineering Discipline</a></p>
+    </div>
+  </div>
+</body>
+
+</html>

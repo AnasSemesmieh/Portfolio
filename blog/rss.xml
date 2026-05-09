@@ -5,7 +5,31 @@
     <link>https://anas.semesmieh.com/blog/</link>
     <description>Platform engineering, Azure architecture, DevSecOps, and engineering leadership insights.</description>
     <language>en-au</language>
-    <lastBuildDate>Sat, 09 May 2026 12:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 10 May 2026 11:00:00 +0000</lastBuildDate>
+
+    <item>
+      <title>Driving AI Adoption in Platform Teams Without Losing Engineering Discipline</title>
+      <link>https://anas.semesmieh.com/blog/posts/ai-adoption-platform-teams.html</link>
+      <guid>https://anas.semesmieh.com/blog/posts/ai-adoption-platform-teams.html</guid>
+      <pubDate>Sun, 10 May 2026 11:00:00 +0000</pubDate>
+      <description>A practical framework for adopting AI in platform engineering with guardrails, measurable outcomes, and team-wide enablement.</description>
+    </item>
+
+    <item>
+      <title>From Legacy to Immutable: A Practical IaC Maturity Journey</title>
+      <link>https://anas.semesmieh.com/blog/posts/immutable-infrastructure-journey.html</link>
+      <guid>https://anas.semesmieh.com/blog/posts/immutable-infrastructure-journey.html</guid>
+      <pubDate>Sun, 10 May 2026 10:00:00 +0000</pubDate>
+      <description>A practical approach to driving Infrastructure as Code maturity and moving toward immutable infrastructure across legacy and modern environments.</description>
+    </item>
+
+    <item>
+      <title>Designing an Internal Developer Portal That Teams Actually Use</title>
+      <link>https://anas.semesmieh.com/blog/posts/idp-self-service-playbook.html</link>
+      <guid>https://anas.semesmieh.com/blog/posts/idp-self-service-playbook.html</guid>
+      <pubDate>Sun, 10 May 2026 09:00:00 +0000</pubDate>
+      <description>A practical playbook for rolling out an internal developer portal, increasing adoption, and enabling safe self-service engineering workflows.</description>
+    </item>
 
     <item>
       <title>How Platform Engineering Creates Strategic Capacity</title>

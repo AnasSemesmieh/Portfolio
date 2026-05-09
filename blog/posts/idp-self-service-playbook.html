@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Designing an Internal Developer Portal That Teams Actually Use | Anas Semesmieh</title>
+  <meta name="description" content="A practical playbook for rolling out an internal developer portal, increasing adoption, and enabling safe self-service engineering workflows." />
+  <meta name="author" content="Anas Semesmieh" />
+  <link rel="canonical" href="https://anas.semesmieh.com/blog/posts/idp-self-service-playbook.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Designing an Internal Developer Portal That Teams Actually Use" />
+  <meta property="og:description" content="How to design self-service workflows that reduce platform bottlenecks and improve developer experience." />
+  <meta property="og:url" content="https://anas.semesmieh.com/blog/posts/idp-self-service-playbook.html" />
+  <meta property="og:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Designing an Internal Developer Portal That Teams Actually Use" />
+  <meta name="twitter:description" content="How to design self-service workflows that reduce platform bottlenecks and improve developer experience." />
+  <meta name="twitter:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #101a2c;
+      --muted: #8ea0be;
+      --text: #e6eef8;
+      --accent: #16a34a;
+      --border: rgba(255, 255, 255, 0.08);
+      --maxw: 800px;
+      --radius: 14px;
+      --font: "IBM Plex Sans", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.72;
+      background:
+        radial-gradient(circle at 10% 0%, #13203a 0%, transparent 42%),
+        radial-gradient(circle at 90% 20%, #0e1a32 0%, transparent 38%),
+        var(--bg);
+    }
+
+    .wrap {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 30px 18px 80px;
+    }
+
+    .nav {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: var(--muted);
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+    }
+
+    .nav a:hover {
+      color: var(--text);
+      border-color: var(--border);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    article {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      background: var(--card);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 34px;
+      line-height: 1.2;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    h2 { margin-top: 28px; }
+
+    .callout {
+      border-left: 3px solid var(--accent);
+      padding: 10px 14px;
+      background: rgba(22, 163, 74, 0.09);
+      border-radius: 8px;
+      margin: 18px 0;
+    }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Designing an Internal Developer Portal That Teams Actually Use",
+    "datePublished": "2026-05-10",
+    "dateModified": "2026-05-10",
+    "author": {
+      "@type": "Person",
+      "name": "Anas Semesmieh",
+      "url": "https://anas.semesmieh.com/"
+    },
+    "publisher": {
+      "@type": "Person",
+      "name": "Anas Semesmieh"
+    },
+    "mainEntityOfPage": "https://anas.semesmieh.com/blog/posts/idp-self-service-playbook.html",
+    "image": "https://anas.semesmieh.com/profile-wide.jpg",
+    "description": "A practical playbook for rolling out an internal developer portal, increasing adoption, and enabling safe self-service engineering workflows."
+  }
+  </script>
+</head>
+
+<body>
+  <div class="wrap">
+    <nav class="nav" aria-label="Post navigation">
+      <a href="/">Portfolio</a>
+      <a href="/blog/">All Posts</a>
+      <a href="/blog/categories/">Categories</a>
+      <a href="/blog/rss.xml">RSS</a>
+    </nav>
+
+    <article>
+      <h1>Designing an Internal Developer Portal That Teams Actually Use</h1>
+      <p class="meta">By Anas Semesmieh · May 10, 2026 · IDP, Developer Experience</p>
+
+      <p>An Internal Developer Portal can either become the team entry point for delivery or just another dashboard no one opens. Adoption depends on solving real pain points and embedding portal workflows into daily engineering operations.</p>
+
+      <div class="callout">
+        The best IDP strategy starts with high-frequency workflows where delays are visible and costly.
+      </div>
+
+      <h2>1. Start with tasks teams already repeat</h2>
+      <p>Prioritize workflows such as environment provisioning, service onboarding, and release checks. If the portal simplifies work teams already do weekly, adoption follows naturally.</p>
+
+      <h2>2. Make platform standards easy to consume</h2>
+      <p>Bundle policy checks, templates, and secure defaults into guided workflows. This raises quality and reduces cognitive load without requiring every team to become platform experts.</p>
+
+      <h2>3. Define service ownership and support paths</h2>
+      <p>Clear ownership and response expectations build trust. Teams need to know who owns each workflow, how to get help, and what service levels to expect.</p>
+
+      <h2>4. Measure outcomes, not just clicks</h2>
+      <p>Track lead-time reduction, request turnaround, and reduction in manual platform tickets. These metrics show whether the portal is driving strategic value, not just usage activity.</p>
+
+      <h2>Closing thought</h2>
+      <p>A successful IDP is a product. It improves developer experience while scaling consistency, security, and delivery speed across the engineering organization.</p>
+    </article>
+  </div>
+</body>
+
+</html>
