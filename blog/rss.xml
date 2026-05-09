@@ -8,42 +8,6 @@
     <lastBuildDate>Sun, 10 May 2026 11:00:00 +0000</lastBuildDate>
 
     <item>
-      <title>Driving AI Adoption in Platform Teams Without Losing Engineering Discipline</title>
-      <link>https://anas.semesmieh.com/blog/posts/ai-adoption-platform-teams.html</link>
-      <guid>https://anas.semesmieh.com/blog/posts/ai-adoption-platform-teams.html</guid>
-      <pubDate>Sun, 10 May 2026 11:00:00 +0000</pubDate>
-      <description>A practical framework for adopting AI in platform engineering with guardrails, measurable outcomes, and team-wide enablement.</description>
-    </item>
-
-    <item>
-      <title>My Home Lab Journey: Start Here</title>
-      <link>https://anas.semesmieh.com/blog/posts/homelab-start-here.html</link>
-      <guid>https://anas.semesmieh.com/blog/posts/homelab-start-here.html</guid>
-      <pubDate>Sun, 10 May 2026 11:00:00 +0000</pubDate>
-      <description>Introduction to my Docker-based homelab running Traefik, Pi-hole, Plex, Arr stack, Immich, Home Assistant with automated backups and disaster recovery.</description>
-    </item>
-    <item>
-      <title>Automated Config Backup with Secret Redaction</title>
-      <link>https://anas.semesmieh.com/blog/posts/homelab-backup-automation.html</link>
-      <guid>https://anas.semesmieh.com/blog/posts/homelab-backup-automation.html</guid>
-      <pubDate>Sun, 10 May 2026 11:00:00 +0000</pubDate>
-      <description>How I built a daily backup pipeline that syncs configs, redacts secrets, scans for leaks, and pushes sanitized snapshots to GitHub.</description>
-    </item>
-    <item>
-      <title>Docker Compose All The Things: Running 10+ Services on One Host</title>
-      <link>https://anas.semesmieh.com/blog/posts/homelab-docker-compose-stack.html</link>
-      <guid>https://anas.semesmieh.com/blog/posts/homelab-docker-compose-stack.html</guid>
-      <pubDate>Sun, 10 May 2026 11:00:00 +0000</pubDate>
-      <description>Running Traefik, Pi-hole, Plex, Arr stack, Immich, Home Assistant on a single Ubuntu host with Docker Compose.</description>
-    </item>
-    <item>
-      <title>Homelab Disaster Recovery in Under an Hour</title>
-      <link>https://anas.semesmieh.com/blog/posts/homelab-disaster-recovery.html</link>
-      <guid>https://anas.semesmieh.com/blog/posts/homelab-disaster-recovery.html</guid>
-      <pubDate>Sun, 10 May 2026 11:00:00 +0000</pubDate>
-      <description>How I rebuild my entire homelab from a clean Ubuntu install using a Git-backed config repo, compose-based restore, and secret rehydration.</description>
-    </item>
-    <item>
       <title>Secrets Management for Homelabs: Redaction, Scanning, and Rehydration</title>
       <link>https://anas.semesmieh.com/blog/posts/homelab-secrets-management.html</link>
       <guid>https://anas.semesmieh.com/blog/posts/homelab-secrets-management.html</guid>
@@ -52,26 +16,66 @@
     </item>
 
     <item>
-      <title>From Legacy to Immutable: A Practical IaC Maturity Journey</title>
-      <link>https://anas.semesmieh.com/blog/posts/immutable-infrastructure-journey.html</link>
-      <guid>https://anas.semesmieh.com/blog/posts/immutable-infrastructure-journey.html</guid>
-      <pubDate>Sun, 10 May 2026 10:00:00 +0000</pubDate>
-      <description>A practical approach to driving Infrastructure as Code maturity and moving toward immutable infrastructure across legacy and modern environments.</description>
+      <title>Homelab Disaster Recovery in Under an Hour</title>
+      <link>https://anas.semesmieh.com/blog/posts/homelab-disaster-recovery.html</link>
+      <guid>https://anas.semesmieh.com/blog/posts/homelab-disaster-recovery.html</guid>
+      <pubDate>Thu, 07 May 2026 11:00:00 +0000</pubDate>
+      <description>How I rebuild my entire homelab from a clean Ubuntu install using a Git-backed config repo, compose-based restore, and secret rehydration.</description>
+    </item>
+
+    <item>
+      <title>Driving AI Adoption in Platform Teams Without Losing Engineering Discipline</title>
+      <link>https://anas.semesmieh.com/blog/posts/ai-adoption-platform-teams.html</link>
+      <guid>https://anas.semesmieh.com/blog/posts/ai-adoption-platform-teams.html</guid>
+      <pubDate>Sun, 03 May 2026 11:00:00 +0000</pubDate>
+      <description>A practical framework for adopting AI in platform engineering with guardrails, measurable outcomes, and team-wide enablement.</description>
+    </item>
+
+    <item>
+      <title>Automated Config Backup with Secret Redaction</title>
+      <link>https://anas.semesmieh.com/blog/posts/homelab-backup-automation.html</link>
+      <guid>https://anas.semesmieh.com/blog/posts/homelab-backup-automation.html</guid>
+      <pubDate>Tue, 28 Apr 2026 11:00:00 +0000</pubDate>
+      <description>How I built a daily backup pipeline that syncs configs, redacts secrets, scans for leaks, and pushes sanitized snapshots to GitHub.</description>
+    </item>
+
+    <item>
+      <title>Docker Compose All The Things: Running 10+ Services on One Host</title>
+      <link>https://anas.semesmieh.com/blog/posts/homelab-docker-compose-stack.html</link>
+      <guid>https://anas.semesmieh.com/blog/posts/homelab-docker-compose-stack.html</guid>
+      <pubDate>Mon, 20 Apr 2026 11:00:00 +0000</pubDate>
+      <description>Running Traefik, Pi-hole, Plex, Arr stack, Immich, Home Assistant on a single Ubuntu host with Docker Compose.</description>
+    </item>
+
+    <item>
+      <title>My Home Lab Journey: Start Here</title>
+      <link>https://anas.semesmieh.com/blog/posts/homelab-start-here.html</link>
+      <guid>https://anas.semesmieh.com/blog/posts/homelab-start-here.html</guid>
+      <pubDate>Sun, 12 Apr 2026 11:00:00 +0000</pubDate>
+      <description>Introduction to my Docker-based homelab running Traefik, Pi-hole, Plex, Arr stack, Immich, Home Assistant with automated backups and disaster recovery.</description>
     </item>
 
     <item>
       <title>Designing an Internal Developer Portal That Teams Actually Use</title>
       <link>https://anas.semesmieh.com/blog/posts/idp-self-service-playbook.html</link>
       <guid>https://anas.semesmieh.com/blog/posts/idp-self-service-playbook.html</guid>
-      <pubDate>Sun, 10 May 2026 09:00:00 +0000</pubDate>
+      <pubDate>Thu, 02 Apr 2026 09:00:00 +0000</pubDate>
       <description>A practical playbook for rolling out an internal developer portal, increasing adoption, and enabling safe self-service engineering workflows.</description>
+    </item>
+
+    <item>
+      <title>From Legacy to Immutable: A Practical IaC Maturity Journey</title>
+      <link>https://anas.semesmieh.com/blog/posts/immutable-infrastructure-journey.html</link>
+      <guid>https://anas.semesmieh.com/blog/posts/immutable-infrastructure-journey.html</guid>
+      <pubDate>Tue, 24 Mar 2026 10:00:00 +0000</pubDate>
+      <description>A practical approach to driving Infrastructure as Code maturity and moving toward immutable infrastructure across legacy and modern environments.</description>
     </item>
 
     <item>
       <title>How Platform Engineering Creates Strategic Capacity</title>
       <link>https://anas.semesmieh.com/blog/posts/platform-engineering-at-scale.html</link>
       <guid>https://anas.semesmieh.com/blog/posts/platform-engineering-at-scale.html</guid>
-      <pubDate>Sat, 09 May 2026 12:00:00 +0000</pubDate>
+      <pubDate>Sun, 15 Mar 2026 12:00:00 +0000</pubDate>
       <description>Reducing KTLO effort, enabling IDP self-service, and leveraging automation and AI-assisted workflows.</description>
     </item>
   </channel>

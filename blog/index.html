@@ -146,6 +146,70 @@
       font-size: 14px;
     }
 
+    .controls {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .search-box {
+      flex: 1 1 260px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 14px;
+      outline: none;
+    }
+
+    .search-box::placeholder { color: var(--muted); }
+    .search-box:focus { border-color: rgba(22, 163, 74, 0.5); }
+
+    .sort-btn {
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--muted);
+      font-family: var(--font);
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .sort-btn:hover { color: var(--text); border-color: rgba(22, 163, 74, 0.4); }
+
+    .filter-bar {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .filter-pill {
+      font-size: 12px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-family: var(--font);
+    }
+
+    .filter-pill:hover { color: var(--text); border-color: rgba(22, 163, 74, 0.4); }
+    .filter-pill.active { background: rgba(22, 163, 74, 0.15); color: #b7f7cd; border-color: rgba(22, 163, 74, 0.5); }
+
+    .no-results {
+      text-align: center;
+      color: var(--muted);
+      padding: 40px 0;
+      display: none;
+    }
+
     @media (max-width: 700px) {
       h1 { font-size: 26px; }
       .hero { padding: 18px; }
@@ -167,113 +231,28 @@
     </header>
 
     <section class="hero">
-      <h1>Platform Engineering Field Notes</h1>
+      <h1>Platform Engineering Field Notes and Homelab Adventures</h1>
       <p class="muted">Practical lessons on Azure architecture, IaC maturity, DevSecOps, internal developer platforms, Docker homelab builds, and team leadership.</p>
     </section>
 
-    <main class="grid">
-      <article>
-        <a class="post" href="/blog/posts/ai-adoption-platform-teams.html">
-          <h2>Driving AI Adoption in Platform Teams Without Losing Engineering Discipline</h2>
-          <p class="meta">May 10, 2026 Â· 7 min read</p>
-          <p>A practical framework for scaling AI-assisted workflows with quality guardrails, measurable outcomes, and team-wide enablement.</p>
-          <div class="tags">
-            <span class="tag">AI Adoption</span>
-            <span class="tag">Engineering Leadership</span>
-            <span class="tag">Platform Engineering</span>
-          </div>
-        </a>
-      </article>
-
-      <article>
-        <a class="post" href="/blog/posts/immutable-infrastructure-journey.html">
-          <h2>From Legacy to Immutable: A Practical IaC Maturity Journey</h2>
-          <p class="meta">May 10, 2026 Â· 9 min read</p>
-          <p>How to evolve from manually managed environments to an immutable infrastructure mindset without disrupting delivery across legacy and modern systems.</p>
-          <div class="tags">
-            <span class="tag">IaC</span>
-            <span class="tag">Cloud Architecture</span>
-            <span class="tag">Platform Engineering</span>
-          </div>
-        </a>
-      </article>
-
-      <article>
-        <a class="post" href="/blog/posts/idp-self-service-playbook.html">
-          <h2>Designing an Internal Developer Portal That Teams Actually Use</h2>
-          <p class="meta">May 10, 2026 Â· 7 min read</p>
-          <p>A practical playbook for introducing self-service workflows, scaling platform adoption, and improving developer experience with measurable outcomes.</p>
-          <div class="tags">
-            <span class="tag">IDP</span>
-            <span class="tag">Developer Experience</span>
-            <span class="tag">Automation</span>
-          </div>
-        </a>
-      </article>
-
-      <article>
-        <a class="post" href="/blog/posts/platform-engineering-at-scale.html">
-          <h2>How Platform Engineering Creates Strategic Capacity</h2>
-          <p class="meta">May 9, 2026 Â· 8 min read</p>
-          <p>A practical breakdown of reducing KTLO load, enabling self-service through an IDP, and using automation to unlock high-value delivery outcomes.</p>
-          <div class="tags">
-            <span class="tag">Platform Engineering</span>
-            <span class="tag">IDP</span>
-            <span class="tag">KTLO</span>
-            <span class="tag">Automation</span>
-          </div>
-        </a>
-      </article>
-      <!-- Homelab Series -->
-      <article>
-        <a class="post" href="/blog/posts/homelab-start-here.html">
-          <h2>My Home Lab Journey: Start Here</h2>
-          <p class="meta">May 10, 2026 · 6 min read</p>
-          <p>Introduction to my Docker-based homelab running Traefik, Pi-hole, Plex, Arr stack, Immich, Home Assistant — with automated backups and disaster recovery.</p>
-          <div class="tags">
-            <span class="tag">Homelab</span>
-            <span class="tag">Docker</span>
-            <span class="tag">Platform Engineering</span>
-          </div>
-        </a>
-      </article>
-      <article>
-        <a class="post" href="/blog/posts/homelab-backup-automation.html">
-          <h2>Automated Config Backup with Secret Redaction</h2>
-          <p class="meta">May 10, 2026 · 8 min read</p>
-          <p>How I built a daily backup pipeline that syncs configs, redacts secrets, scans for leaks, and pushes sanitized snapshots to GitHub — automatically.</p>
-          <div class="tags">
-            <span class="tag">Homelab</span>
-            <span class="tag">Automation</span>
-            <span class="tag">Security</span>
-          </div>
-        </a>
-      </article>
-      <article>
-        <a class="post" href="/blog/posts/homelab-docker-compose-stack.html">
-          <h2>Docker Compose All The Things: Running 10+ Services on One Host</h2>
-          <p class="meta">May 10, 2026 · 9 min read</p>
-          <p>Running Traefik, Pi-hole, Plex, Arr stack, Immich, Home Assistant, and more on a single Ubuntu host with Docker Compose, internal TLS, and local DNS.</p>
-          <div class="tags">
-            <span class="tag">Homelab</span>
-            <span class="tag">Docker</span>
-            <span class="tag">Self-Hosting</span>
-          </div>
-        </a>
-      </article>
-      <article>
-        <a class="post" href="/blog/posts/homelab-disaster-recovery.html">
-          <h2>Homelab Disaster Recovery in Under an Hour</h2>
-          <p class="meta">May 10, 2026 · 8 min read</p>
-          <p>How I rebuild my entire homelab from a clean Ubuntu install using a Git-backed config repo, compose-based restore, and automated secret rehydration.</p>
-          <div class="tags">
-            <span class="tag">Homelab</span>
-            <span class="tag">Disaster Recovery</span>
-            <span class="tag">Automation</span>
-          </div>
-        </a>
-      </article>
-      <article>
+    <main>
+      <div class="controls">
+        <input type="text" class="search-box" id="searchBox" placeholder="Search posts..." aria-label="Search blog posts">
+        <button class="sort-btn" id="sortBtn" aria-label="Toggle sort order">Newest first ↓</button>
+      </div>
+      <div class="filter-bar" id="filterBar">
+        <button class="filter-pill active" data-filter="all">All</button>
+        <button class="filter-pill" data-filter="Platform Engineering">Platform Engineering</button>
+        <button class="filter-pill" data-filter="Homelab">Homelab</button>
+        <button class="filter-pill" data-filter="Docker">Docker</button>
+        <button class="filter-pill" data-filter="Security">Security</button>
+        <button class="filter-pill" data-filter="Automation">Automation</button>
+        <button class="filter-pill" data-filter="IaC">IaC</button>
+        <button class="filter-pill" data-filter="IDP">IDP</button>
+        <button class="filter-pill" data-filter="Engineering Leadership">Leadership</button>
+      </div>
+      <div class="grid" id="postGrid">
+      <article data-date="2026-05-10" data-tags="Homelab,Security,Secrets Management">
         <a class="post" href="/blog/posts/homelab-secrets-management.html">
           <h2>Secrets Management for Homelabs: Redaction, Scanning, and Rehydration</h2>
           <p class="meta">May 10, 2026 · 7 min read</p>
@@ -285,12 +264,181 @@
           </div>
         </a>
       </article>
+
+      <article data-date="2026-05-07" data-tags="Homelab,Disaster Recovery,Automation">
+        <a class="post" href="/blog/posts/homelab-disaster-recovery.html">
+          <h2>Homelab Disaster Recovery in Under an Hour</h2>
+          <p class="meta">May 7, 2026 · 8 min read</p>
+          <p>How I rebuild my entire homelab from a clean Ubuntu install using a Git-backed config repo, compose-based restore, and automated secret rehydration.</p>
+          <div class="tags">
+            <span class="tag">Homelab</span>
+            <span class="tag">Disaster Recovery</span>
+            <span class="tag">Automation</span>
+          </div>
+        </a>
+      </article>
+
+      <article data-date="2026-05-03" data-tags="AI Adoption,Engineering Leadership,Platform Engineering">
+        <a class="post" href="/blog/posts/ai-adoption-platform-teams.html">
+          <h2>Driving AI Adoption in Platform Teams Without Losing Engineering Discipline</h2>
+          <p class="meta">May 3, 2026 · 7 min read</p>
+          <p>A practical framework for scaling AI-assisted workflows with quality guardrails, measurable outcomes, and team-wide enablement.</p>
+          <div class="tags">
+            <span class="tag">AI Adoption</span>
+            <span class="tag">Engineering Leadership</span>
+            <span class="tag">Platform Engineering</span>
+          </div>
+        </a>
+      </article>
+
+      <article data-date="2026-04-28" data-tags="Homelab,Automation,Security">
+        <a class="post" href="/blog/posts/homelab-backup-automation.html">
+          <h2>Automated Config Backup with Secret Redaction</h2>
+          <p class="meta">April 28, 2026 · 8 min read</p>
+          <p>How I built a daily backup pipeline that syncs configs, redacts secrets, scans for leaks, and pushes sanitized snapshots to GitHub — automatically.</p>
+          <div class="tags">
+            <span class="tag">Homelab</span>
+            <span class="tag">Automation</span>
+            <span class="tag">Security</span>
+          </div>
+        </a>
+      </article>
+
+      <article data-date="2026-04-20" data-tags="Homelab,Docker,Self-Hosting">
+        <a class="post" href="/blog/posts/homelab-docker-compose-stack.html">
+          <h2>Docker Compose All The Things: Running 10+ Services on One Host</h2>
+          <p class="meta">April 20, 2026 · 9 min read</p>
+          <p>Running Traefik, Pi-hole, Plex, Arr stack, Immich, Home Assistant, and more on a single Ubuntu host with Docker Compose, internal TLS, and local DNS.</p>
+          <div class="tags">
+            <span class="tag">Homelab</span>
+            <span class="tag">Docker</span>
+            <span class="tag">Self-Hosting</span>
+          </div>
+        </a>
+      </article>
+
+      <article data-date="2026-04-12" data-tags="Homelab,Docker,Platform Engineering">
+        <a class="post" href="/blog/posts/homelab-start-here.html">
+          <h2>My Home Lab Journey: Start Here</h2>
+          <p class="meta">April 12, 2026 · 6 min read</p>
+          <p>Introduction to my Docker-based homelab running Traefik, Pi-hole, Plex, Arr stack, Immich, Home Assistant — with automated backups and disaster recovery.</p>
+          <div class="tags">
+            <span class="tag">Homelab</span>
+            <span class="tag">Docker</span>
+            <span class="tag">Platform Engineering</span>
+          </div>
+        </a>
+      </article>
+
+      <article data-date="2026-04-02" data-tags="IDP,Developer Experience,Automation">
+        <a class="post" href="/blog/posts/idp-self-service-playbook.html">
+          <h2>Designing an Internal Developer Portal That Teams Actually Use</h2>
+          <p class="meta">April 2, 2026 · 7 min read</p>
+          <p>A practical playbook for introducing self-service workflows, scaling platform adoption, and improving developer experience with measurable outcomes.</p>
+          <div class="tags">
+            <span class="tag">IDP</span>
+            <span class="tag">Developer Experience</span>
+            <span class="tag">Automation</span>
+          </div>
+        </a>
+      </article>
+
+      <article data-date="2026-03-24" data-tags="IaC,Cloud Architecture,Platform Engineering">
+        <a class="post" href="/blog/posts/immutable-infrastructure-journey.html">
+          <h2>From Legacy to Immutable: A Practical IaC Maturity Journey</h2>
+          <p class="meta">March 24, 2026 · 9 min read</p>
+          <p>How to evolve from manually managed environments to an immutable infrastructure mindset without disrupting delivery across legacy and modern systems.</p>
+          <div class="tags">
+            <span class="tag">IaC</span>
+            <span class="tag">Cloud Architecture</span>
+            <span class="tag">Platform Engineering</span>
+          </div>
+        </a>
+      </article>
+
+      <article data-date="2026-03-15" data-tags="Platform Engineering,IDP,KTLO,Automation">
+        <a class="post" href="/blog/posts/platform-engineering-at-scale.html">
+          <h2>How Platform Engineering Creates Strategic Capacity</h2>
+          <p class="meta">March 15, 2026 · 8 min read</p>
+          <p>A practical breakdown of reducing KTLO load, enabling self-service through an IDP, and using automation to unlock high-value delivery outcomes.</p>
+          <div class="tags">
+            <span class="tag">Platform Engineering</span>
+            <span class="tag">IDP</span>
+            <span class="tag">KTLO</span>
+            <span class="tag">Automation</span>
+          </div>
+        </a>
+      </article>
+      <p class="no-results" id="noResults">No posts match your search or filter.</p>
+      </div>
     </main>
 
     <footer>
       <p>Â©2026 Anas Semesmieh</p>
     </footer>
   </div>
+
+  <script>
+    (() => {
+      const grid = document.getElementById('postGrid');
+      const searchBox = document.getElementById('searchBox');
+      const sortBtn = document.getElementById('sortBtn');
+      const filterBar = document.getElementById('filterBar');
+      const noResults = document.getElementById('noResults');
+      let sortAsc = false;
+      let activeFilter = 'all';
+
+      function getArticles() {
+        return Array.from(grid.querySelectorAll('article'));
+      }
+
+      function applyFilters() {
+        const query = searchBox.value.toLowerCase().trim();
+        const articles = getArticles();
+        let visible = 0;
+
+        articles.forEach(a => {
+          const text = a.textContent.toLowerCase();
+          const tags = a.dataset.tags || '';
+          const matchesSearch = !query || text.includes(query);
+          const matchesFilter = activeFilter === 'all' || tags.split(',').some(t => t.trim() === activeFilter);
+          const show = matchesSearch && matchesFilter;
+          a.style.display = show ? '' : 'none';
+          if (show) visible++;
+        });
+
+        noResults.style.display = visible === 0 ? 'block' : 'none';
+      }
+
+      function sortPosts() {
+        const articles = getArticles();
+        articles.sort((a, b) => {
+          const da = a.dataset.date || '';
+          const db = b.dataset.date || '';
+          return sortAsc ? da.localeCompare(db) : db.localeCompare(da);
+        });
+        articles.forEach(a => grid.appendChild(a));
+        grid.appendChild(noResults);
+      }
+
+      searchBox.addEventListener('input', applyFilters);
+
+      sortBtn.addEventListener('click', () => {
+        sortAsc = !sortAsc;
+        sortBtn.textContent = sortAsc ? 'Oldest first ↑' : 'Newest first ↓';
+        sortPosts();
+      });
+
+      filterBar.addEventListener('click', (e) => {
+        const pill = e.target.closest('.filter-pill');
+        if (!pill) return;
+        filterBar.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        activeFilter = pill.dataset.filter;
+        applyFilters();
+      });
+    })();
+  </script>
 </body>
 
 </html>
