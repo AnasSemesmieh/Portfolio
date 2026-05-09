@@ -20,26 +20,38 @@
   <style>
     :root {
       --bg: #0b1220; --card: #101a2c; --muted: #8ea0be; --text: #e6eef8;
-      --accent: #16a34a; --border: rgba(255,255,255,0.08); --maxw: 800px;
-      --radius: 14px; --font: "IBM Plex Sans","Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
+      --accent: #22c55e; --heading: #60a5fa; --border: rgba(255,255,255,0.07);
+      --maxw: 860px; --radius: 16px;
+      --font: "Inter","IBM Plex Sans","Segoe UI",system-ui,sans-serif;
     }
-    * { box-sizing: border-box; }
-    body { margin:0; color:var(--text); font-family:var(--font); line-height:1.72;
-      background: radial-gradient(circle at 10% 0%,#13203a 0%,transparent 42%),radial-gradient(circle at 90% 20%,#0e1a32 0%,transparent 38%),var(--bg); }
-    .wrap { max-width:var(--maxw); margin:0 auto; padding:30px 18px 80px; }
-    .nav { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px; }
-    .nav a { text-decoration:none; color:var(--muted); padding:8px 12px; border-radius:10px; border:1px solid transparent; }
-    .nav a:hover { color:var(--text); border-color:var(--border); background:rgba(255,255,255,0.03); }
-    article { border:1px solid var(--border); border-radius:var(--radius); padding:24px; background:var(--card); }
-    h1 { margin-top:0; font-size:34px; line-height:1.2; }
-    .meta { color:var(--muted); font-size:14px; margin-bottom:20px; }
-    h2 { margin-top:28px; }
-    h3 { margin-top:22px; color: #b7f7cd; }
-    .callout { border-left:3px solid var(--accent); padding:10px 14px; background:rgba(22,163,74,0.09); border-radius:8px; margin:18px 0; }
-    code { background:rgba(255,255,255,0.07); padding:2px 6px; border-radius:4px; font-size:14px; }
-    pre { background:rgba(0,0,0,0.3); padding:14px; border-radius:8px; overflow-x:auto; font-size:13px; line-height:1.5; color: #e6eef8; }
-    a { color: var(--accent); }
-    @media (max-width:700px) { h1 { font-size:28px; } article { padding:18px; } }
+    * { box-sizing: border-box; margin: 0; }
+    body { color:var(--text); font-family:var(--font); line-height:1.75;
+      background: radial-gradient(ellipse at 15% 0%,#13203a 0%,transparent 50%),radial-gradient(ellipse at 85% 15%,#0e1a32 0%,transparent 45%),var(--bg);
+      -webkit-font-smoothing: antialiased; }
+    .wrap { max-width:var(--maxw); margin:0 auto; padding:32px 24px 80px; }
+    .nav { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:24px; }
+    .nav a { text-decoration:none; color:var(--muted); padding:7px 13px; border-radius:10px; font-size:14px; transition: color 0.15s, background 0.15s; }
+    .nav a:hover { color:var(--text); background:rgba(255,255,255,0.04); }
+    article { border:1px solid var(--border); border-radius:var(--radius); padding:32px; background:var(--card); }
+    h1 { font-size:36px; line-height:1.2; color: var(--heading); }
+    .meta { color:var(--muted); font-size:14px; margin:10px 0 24px; padding-bottom:20px; border-bottom:1px solid var(--border); }
+    h2 { margin-top:32px; margin-bottom:12px; font-size:24px; color: var(--heading); }
+    h3 { margin-top:24px; margin-bottom:8px; color: #86efac; }
+    p { margin: 10px 0; }
+    ul, ol { margin: 10px 0; padding-left: 22px; }
+    li { margin: 4px 0; }
+    .callout { border-left:3px solid var(--accent); padding:12px 16px; background:rgba(34,197,94,0.07); border-radius:10px; margin:20px 0; }
+    code { background:rgba(255,255,255,0.07); padding:2px 6px; border-radius:4px; font-size:13.5px; }
+    pre { background:rgba(0,0,0,0.35); padding:16px; border-radius:10px; overflow-x:auto; font-size:13px; line-height:1.55; color:#e6eef8; }
+    pre code { background:none; padding:0; }
+    a { color: var(--accent); text-decoration:none; }
+    a:hover { text-decoration: underline; }
+    table { width:100%; border-collapse:collapse; margin:18px 0; font-size:14px; }
+    th, td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { color:var(--muted); font-weight:600; font-size:13px; text-transform:uppercase; letter-spacing:0.5px; }
+    .series-nav { margin-top:32px; padding-top:20px; border-top:1px solid var(--border); }
+    .series-nav a { display:inline-block; margin-right:12px; }
+    @media (max-width:700px) { .wrap { padding:16px 14px 48px; } h1 { font-size:28px; } article { padding:20px; } }
   </style>
   <script type="application/ld+json">
   {
@@ -65,23 +77,23 @@
 
     <article>
       <h1>Homelab Disaster Recovery in Under an Hour</h1>
-      <p class="meta">By Anas Semesmieh · May 7, 2026 · Homelab · Disaster Recovery</p>
+      <p class="meta">By Anas Semesmieh Â· May 7, 2026 Â· Homelab Â· Disaster Recovery</p>
 
-      <p>Disk dies. Power surge fries the board. You fat-finger an <code>rm -rf</code>. Whatever the cause, the question is always the same: <em>how fast can I get back to normal?</em> For my homelab, the answer is under an hour — because I designed for exactly this scenario.</p>
+      <p>Disk dies. Power surge fries the board. You fat-finger an <code>rm -rf</code>. Whatever the cause, the question is always the same: <em>how fast can I get back to normal?</em> For my homelab, the answer is under an hour â€” because I designed for exactly this scenario.</p>
 
       <div class="callout">
-        Full runbooks: <a href="https://github.com/AnasSemesmieh/homelab/blob/main/docs/FRESH-INSTALL.md" target="_blank">FRESH-INSTALL.md</a> · <a href="https://github.com/AnasSemesmieh/homelab/blob/main/docs/RESTORE.md" target="_blank">RESTORE.md</a>
+        Full runbooks: <a href="https://github.com/AnasSemesmieh/homelab/blob/main/docs/FRESH-INSTALL.md" target="_blank">FRESH-INSTALL.md</a> Â· <a href="https://github.com/AnasSemesmieh/homelab/blob/main/docs/RESTORE.md" target="_blank">RESTORE.md</a>
       </div>
 
       <h2>The Recovery Timeline</h2>
       <p>Here's how the hour breaks down:</p>
       <ul>
-        <li><strong>0–15 min:</strong> Install Ubuntu Server, configure static IP, firewall, and install Docker</li>
-        <li><strong>15–20 min:</strong> Clone the backup repo and verify inventory</li>
-        <li><strong>20–30 min:</strong> Rehydrate secrets and inject into config files</li>
-        <li><strong>30–40 min:</strong> Run compose-based restore (dry-run first, then apply)</li>
-        <li><strong>40–55 min:</strong> Bring up services in dependency order</li>
-        <li><strong>55–60 min:</strong> Validate, re-enable backup automation</li>
+        <li><strong>0â€“15 min:</strong> Install Ubuntu Server, configure static IP, firewall, and install Docker</li>
+        <li><strong>15â€“20 min:</strong> Clone the backup repo and verify inventory</li>
+        <li><strong>20â€“30 min:</strong> Rehydrate secrets and inject into config files</li>
+        <li><strong>30â€“40 min:</strong> Run compose-based restore (dry-run first, then apply)</li>
+        <li><strong>40â€“55 min:</strong> Bring up services in dependency order</li>
+        <li><strong>55â€“60 min:</strong> Validate, re-enable backup automation</li>
       </ul>
 
       <h2>Phase 1: Host Bootstrap</h2>
@@ -128,7 +140,7 @@ grep -r "REDACTED" configs/ && echo "ERROR" || echo "OK: All secrets injected"</
 docker compose -f restore/docker-compose.restore.yml run --rm \
   -e DRY_RUN=true restore-configs
 
-# Apply (no overwrite — safe for existing files)
+# Apply (no overwrite â€” safe for existing files)
 docker compose -f restore/docker-compose.restore.yml run --rm \
   -e DRY_RUN=false -e OVERWRITE=false restore-configs</pre>
       <p>The restore container mounts <code>configs/</code> read-only and copies files to <code>/home/anas/</code>, preserving the directory structure. Each service gets its <code>docker-compose.yml</code> and config files placed exactly where they need to be.</p>
@@ -180,10 +192,10 @@ git checkout main</pre>
       <p>The repo also supports rollbacks for individual services (revert a broken config change) and database state recovery for stateful services like Immich's PostgreSQL. Every scenario is documented in the runbook with exact commands.</p>
 
       <div class="callout">
-        The real value isn't the restore time — it's the confidence. Knowing I can rebuild everything from scratch means I experiment freely. Break things on Saturday, restore on Sunday.
+        The real value isn't the restore time â€” it's the confidence. Knowing I can rebuild everything from scratch means I experiment freely. Break things on Saturday, restore on Sunday.
       </div>
 
-      <p>Next: <a href="/blog/posts/homelab-secrets-management.html">Secrets Management for Homelabs</a> — the full lifecycle of redaction, scanning, and rehydration.</p>
+      <p>Next: <a href="/blog/posts/homelab-secrets-management.html">Secrets Management for Homelabs</a> â€” the full lifecycle of redaction, scanning, and rehydration.</p>
     </article>
   </div>
 </body>
