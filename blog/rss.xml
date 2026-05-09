@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+  <channel>
+    <title>Anas Semesmieh Blog</title>
+    <link>https://anas.semesmieh.com/blog/</link>
+    <description>Platform engineering, Azure architecture, DevSecOps, and engineering leadership insights.</description>
+    <language>en-au</language>
+    <lastBuildDate>Sat, 09 May 2026 12:00:00 +0000</lastBuildDate>
+
+    <item>
+      <title>How Platform Engineering Creates Strategic Capacity</title>
+      <link>https://anas.semesmieh.com/blog/posts/platform-engineering-at-scale.html</link>
+      <guid>https://anas.semesmieh.com/blog/posts/platform-engineering-at-scale.html</guid>
+      <pubDate>Sat, 09 May 2026 12:00:00 +0000</pubDate>
+      <description>Reducing KTLO effort, enabling IDP self-service, and leveraging automation and AI-assisted workflows.</description>
+    </item>
+  </channel>
+</rss>

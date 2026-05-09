@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>How Platform Engineering Creates Strategic Capacity | Anas Semesmieh</title>
+  <meta name="description" content="How to reduce KTLO burden, implement IDP self-service, and use AI-assisted workflows to improve engineering outcomes." />
+  <meta name="author" content="Anas Semesmieh" />
+  <link rel="canonical" href="https://anas.semesmieh.com/blog/posts/platform-engineering-at-scale.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="How Platform Engineering Creates Strategic Capacity" />
+  <meta property="og:description" content="Reducing KTLO by 30 percent through IDP, automation, and AI-assisted workflows." />
+  <meta property="og:url" content="https://anas.semesmieh.com/blog/posts/platform-engineering-at-scale.html" />
+  <meta property="og:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="How Platform Engineering Creates Strategic Capacity" />
+  <meta name="twitter:description" content="Reducing KTLO by 30 percent through IDP, automation, and AI-assisted workflows." />
+  <meta name="twitter:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #101a2c;
+      --muted: #8ea0be;
+      --text: #e6eef8;
+      --accent: #16a34a;
+      --border: rgba(255, 255, 255, 0.08);
+      --maxw: 800px;
+      --radius: 14px;
+      --font: "IBM Plex Sans", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.72;
+      background:
+        radial-gradient(circle at 10% 0%, #13203a 0%, transparent 42%),
+        radial-gradient(circle at 90% 20%, #0e1a32 0%, transparent 38%),
+        var(--bg);
+    }
+
+    .wrap {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 30px 18px 80px;
+    }
+
+    .nav {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: var(--muted);
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+    }
+
+    .nav a:hover {
+      color: var(--text);
+      border-color: var(--border);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    article {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      background: var(--card);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 34px;
+      line-height: 1.2;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    h2 { margin-top: 28px; }
+
+    .callout {
+      border-left: 3px solid var(--accent);
+      padding: 10px 14px;
+      background: rgba(22, 163, 74, 0.09);
+      border-radius: 8px;
+      margin: 18px 0;
+    }
+
+    @media (max-width: 700px) {
+      h1 { font-size: 28px; }
+      article { padding: 18px; }
+    }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "How Platform Engineering Creates Strategic Capacity",
+    "datePublished": "2026-05-09",
+    "dateModified": "2026-05-09",
+    "author": {
+      "@type": "Person",
+      "name": "Anas Semesmieh",
+      "url": "https://anas.semesmieh.com/"
+    },
+    "publisher": {
+      "@type": "Person",
+      "name": "Anas Semesmieh"
+    },
+    "mainEntityOfPage": "https://anas.semesmieh.com/blog/posts/platform-engineering-at-scale.html",
+    "image": "https://anas.semesmieh.com/profile-wide.jpg",
+    "description": "How to reduce KTLO burden, implement IDP self-service, and use AI-assisted workflows to improve engineering outcomes."
+  }
+  </script>
+</head>
+
+<body>
+  <div class="wrap">
+    <nav class="nav" aria-label="Post navigation">
+      <a href="/">Portfolio</a>
+      <a href="/blog/">All Posts</a>
+      <a href="/blog/rss.xml">RSS</a>
+    </nav>
+
+    <article>
+      <h1>How Platform Engineering Creates Strategic Capacity</h1>
+      <p class="meta">By Anas Semesmieh · May 9, 2026 · Platform Engineering</p>
+
+      <p>A common platform challenge is that teams become trapped in KTLO work while strategic delivery slows down. In practice, this creates a cycle of constant firefighting, fragmented ownership, and low confidence in release quality.</p>
+
+      <div class="callout">
+        The most reliable way to break this cycle is to combine self-service, automation, and clear platform product ownership.
+      </div>
+
+      <h2>1. Reduce KTLO to reclaim engineering focus</h2>
+      <p>One of our biggest goals was to reduce operational load that added little strategic value. Through workflow standardization, automated runbooks, and better platform guardrails, we reduced KTLO effort by 30 percent. That recovered capacity was redirected to architecture modernization and delivery acceleration.</p>
+
+      <h2>2. Introduce an Internal Developer Portal</h2>
+      <p>We introduced an IDP to simplify common tasks for product teams. Instead of waiting on platform engineers for every request, teams could use self-service workflows for provisioning, environment updates, and release-related actions. This improved developer experience and shortened lead time for change.</p>
+
+      <h2>3. Expand automation across repetitive workflows</h2>
+      <p>Automations were designed as products, not scripts. We targeted friction points that occurred frequently and had measurable impact on lead time, reliability, or security posture. This helped scale consistency as systems and teams grew.</p>
+
+      <h2>4. Use AI-assisted workflows pragmatically</h2>
+      <p>AI was used behind the scenes to increase execution speed, improve documentation quality, and accelerate analysis and implementation tasks. The important point was practical adoption: AI usage was promoted with clear patterns and guardrails so the team could use it responsibly and repeatedly.</p>
+
+      <h2>Closing thought</h2>
+      <p>Platform engineering delivers the most value when it is treated as an internal product that balances legacy constraints with modern architecture goals. The objective is not only reliability, but also strategic capacity.</p>
+    </article>
+  </div>
+</body>
+
+</html>

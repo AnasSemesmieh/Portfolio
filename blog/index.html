@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Anas Semesmieh Blog | Platform Engineering, Azure, DevSecOps</title>
+  <meta name="description" content="Blog by Anas Semesmieh on platform engineering, cloud architecture, DevSecOps, IaC maturity, and engineering leadership." />
+  <meta name="author" content="Anas Semesmieh" />
+  <link rel="canonical" href="https://anas.semesmieh.com/blog/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Anas Semesmieh Blog" />
+  <meta property="og:description" content="Platform engineering, Azure architecture, DevSecOps, and engineering leadership insights." />
+  <meta property="og:url" content="https://anas.semesmieh.com/blog/" />
+  <meta property="og:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Anas Semesmieh Blog" />
+  <meta name="twitter:description" content="Platform engineering, Azure architecture, DevSecOps, and leadership insights." />
+  <meta name="twitter:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <meta name="theme-color" content="#0b1220" />
+  <link rel="alternate" type="application/rss+xml" title="Anas Semesmieh Blog RSS" href="/blog/rss.xml" />
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #101a2c;
+      --muted: #8ea0be;
+      --text: #e6eef8;
+      --accent: #16a34a;
+      --border: rgba(255, 255, 255, 0.08);
+      --maxw: 980px;
+      --radius: 14px;
+      --font: "IBM Plex Sans", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.6;
+      background:
+        radial-gradient(circle at 10% 0%, #13203a 0%, transparent 42%),
+        radial-gradient(circle at 90% 20%, #0e1a32 0%, transparent 38%),
+        var(--bg);
+    }
+
+    .wrap {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 30px 18px 60px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 26px;
+    }
+
+    .brand {
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+
+    .nav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: var(--muted);
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+    }
+
+    .nav a:hover {
+      color: var(--text);
+      border-color: var(--border);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .hero {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    h1 { margin: 0 0 8px; font-size: 32px; }
+
+    .muted { color: var(--muted); margin: 0; }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .post {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      background: var(--card);
+    }
+
+    .post:hover { border-color: rgba(22, 163, 74, 0.6); }
+
+    .post h2 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    .meta {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .tags {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      font-size: 12px;
+      color: #b7f7cd;
+      border: 1px solid rgba(22, 163, 74, 0.35);
+      border-radius: 999px;
+      padding: 4px 10px;
+    }
+
+    footer {
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 700px) {
+      h1 { font-size: 26px; }
+      .hero { padding: 18px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header class="topbar">
+      <div class="brand">Anas Semesmieh Blog</div>
+      <nav class="nav" aria-label="Blog navigation">
+        <a href="/">Portfolio</a>
+        <a href="/blog/">Blog Home</a>
+        <a href="/blog/rss.xml">RSS</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <h1>Platform Engineering Field Notes</h1>
+      <p class="muted">Practical lessons on Azure architecture, IaC maturity, DevSecOps, internal developer platforms, and team leadership.</p>
+    </section>
+
+    <main class="grid">
+      <article>
+        <a class="post" href="/blog/posts/platform-engineering-at-scale.html">
+          <h2>How Platform Engineering Creates Strategic Capacity</h2>
+          <p class="meta">May 9, 2026 · 8 min read</p>
+          <p>A practical breakdown of reducing KTLO load, enabling self-service through an IDP, and using automation to unlock high-value delivery outcomes.</p>
+          <div class="tags">
+            <span class="tag">Platform Engineering</span>
+            <span class="tag">IDP</span>
+            <span class="tag">KTLO</span>
+            <span class="tag">Automation</span>
+          </div>
+        </a>
+      </article>
+    </main>
+
+    <footer>
+      <p>©2026 Anas Semesmieh</p>
+    </footer>
+  </div>
+</body>
+
+</html>
