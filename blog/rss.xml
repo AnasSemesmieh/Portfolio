@@ -5,7 +5,15 @@
     <link>https://anas.semesmieh.com/blog/</link>
     <description>Platform engineering, Azure architecture, DevSecOps, and engineering leadership insights.</description>
     <language>en-au</language>
-    <lastBuildDate>Sun, 10 May 2026 11:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 11 May 2026 12:00:00 +0000</lastBuildDate>
+
+    <item>
+      <title>Single Sign-On for Homelabs: Authentik, Traefik Forward-Auth, and Cloudflare Tunnel</title>
+      <link>https://anas.semesmieh.com/blog/posts/homelab-sso-authentik.html</link>
+      <guid>https://anas.semesmieh.com/blog/posts/homelab-sso-authentik.html</guid>
+      <pubDate>Sun, 11 May 2026 12:00:00 +0000</pubDate>
+      <description>How I eliminated password fatigue across 15+ self-hosted apps with Authentik SSO, Traefik forward-auth middleware, MFA, and external access via Cloudflare Tunnel.</description>
+    </item>
 
     <item>
       <title>Secrets Management for Homelabs: Redaction, Scanning, and Rehydration</title>

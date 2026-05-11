@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Single Sign-On for Homelabs: Authentik, Traefik Forward-Auth, and Cloudflare Tunnel | Anas Semesmieh</title>
+  <meta name="description" content="How I eliminated password fatigue across 15+ self-hosted apps with Authentik SSO, Traefik forward-auth middleware, MFA, and external access via Cloudflare Tunnel — with full configuration files." />
+  <meta name="author" content="Anas Semesmieh" />
+  <link rel="canonical" href="https://anas.semesmieh.com/blog/posts/homelab-sso-authentik.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Single Sign-On for Homelabs: Authentik, Traefik Forward-Auth, and Cloudflare Tunnel" />
+  <meta property="og:description" content="How I eliminated password fatigue across 15+ self-hosted apps with Authentik SSO, Traefik forward-auth, MFA, and Cloudflare Tunnel for external access." />
+  <meta property="og:url" content="https://anas.semesmieh.com/blog/posts/homelab-sso-authentik.html" />
+  <meta property="og:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Single Sign-On for Homelabs: Authentik, Traefik Forward-Auth, and Cloudflare Tunnel" />
+  <meta name="twitter:description" content="How I eliminated password fatigue across 15+ self-hosted apps with Authentik SSO, Traefik forward-auth, MFA, and Cloudflare Tunnel for external access." />
+  <meta name="twitter:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <style>
+    :root {
+      --bg: #0b1220; --card: #101a2c; --muted: #8ea0be; --text: #e6eef8;
+      --accent: #22c55e; --heading: #60a5fa; --border: rgba(255,255,255,0.07);
+      --maxw: 860px; --radius: 16px;
+      --font: "Inter","IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; }
+    body { color:var(--text); font-family:var(--font); line-height:1.75;
+      background: radial-gradient(ellipse at 15% 0%,#13203a 0%,transparent 50%),radial-gradient(ellipse at 85% 15%,#0e1a32 0%,transparent 45%),var(--bg);
+      -webkit-font-smoothing: antialiased; }
+    .wrap { max-width:var(--maxw); margin:0 auto; padding:32px 24px 80px; }
+    .nav { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:24px; }
+    .nav a { text-decoration:none; color:var(--muted); padding:7px 13px; border-radius:10px; font-size:14px; transition: color 0.15s, background 0.15s; }
+    .nav a:hover { color:var(--text); background:rgba(255,255,255,0.04); }
+    article { border:1px solid var(--border); border-radius:var(--radius); padding:32px; background:var(--card); }
+    h1 { font-size:34px; line-height:1.2; color: var(--heading); }
+    .meta { color:var(--muted); font-size:14px; margin:10px 0 24px; padding-bottom:20px; border-bottom:1px solid var(--border); }
+    h2 { margin-top:32px; margin-bottom:12px; font-size:24px; color: var(--heading); }
+    h3 { margin-top:24px; margin-bottom:8px; color: #86efac; }
+    p { margin: 10px 0; }
+    ul, ol { margin: 10px 0; padding-left: 22px; }
+    li { margin: 4px 0; }
+    .callout { border-left:3px solid var(--accent); padding:12px 16px; background:rgba(34,197,94,0.07); border-radius:10px; margin:20px 0; }
+    code { background:rgba(255,255,255,0.07); padding:2px 6px; border-radius:4px; font-size:13.5px; }
+    pre { background:rgba(0,0,0,0.35); padding:16px; border-radius:10px; overflow-x:auto; font-size:13px; line-height:1.55; color:#e6eef8; }
+    pre code { background:none; padding:0; }
+    a { color: var(--accent); text-decoration:none; }
+    a:hover { text-decoration: underline; }
+    table { width:100%; border-collapse:collapse; margin:18px 0; font-size:14px; }
+    th, td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
+    th { color:var(--muted); font-weight:600; font-size:13px; text-transform:uppercase; letter-spacing:0.5px; }
+    .series-nav { margin-top:32px; padding-top:20px; border-top:1px solid var(--border); }
+    .series-nav a { display:inline-block; margin-right:12px; }
+    @media (max-width:700px) { .wrap { padding:16px 14px 48px; } h1 { font-size:28px; } article { padding:20px; } }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Single Sign-On for Homelabs: Authentik, Traefik Forward-Auth, and Cloudflare Tunnel",
+    "datePublished": "2026-05-11",
+    "dateModified": "2026-05-11",
+    "author": {
+      "@type": "Person",
+      "name": "Anas Semesmieh",
+      "url": "https://anas.semesmieh.com/"
+    },
+    "publisher": {
+      "@type": "Person",
+      "name": "Anas Semesmieh"
+    },
+    "mainEntityOfPage": "https://anas.semesmieh.com/blog/posts/homelab-sso-authentik.html",
+    "image": "https://anas.semesmieh.com/profile-wide.jpg",
+    "description": "How I eliminated password fatigue across 15+ self-hosted apps with Authentik SSO, Traefik forward-auth middleware, MFA, and external access via Cloudflare Tunnel."
+  }
+  </script>
+</head>
+
+<body>
+  <div class="wrap">
+    <nav class="nav" aria-label="Post navigation">
+      <a href="/">Portfolio</a>
+      <a href="/blog/">All Posts</a>
+      <a href="/blog/categories/">Categories</a>
+      <a href="/blog/rss.xml">RSS</a>
+    </nav>
+
+    <article>
+      <h1>Single Sign-On for Homelabs: Authentik, Traefik Forward-Auth, and Cloudflare Tunnel</h1>
+      <p class="meta">By <a href="/">Anas Semesmieh</a> &middot; May 11, 2026 &middot; Homelab, SSO, Authentik</p>
+
+      <p>I run 15+ self-hosted services. Each one had its own login page, its own password, its own session timeout. Plex has plex.tv auth. Portainer has local accounts. The Arr stack has Forms authentication. Tautulli has yet another password. Opening my homelab dashboard meant clicking through login screens like it was 2005.</p>
+
+      <p>Today I fixed that. One login — everywhere. Internally on <code>*.homelab.internal</code> and externally on <code>*.semesmieh.com</code> via Cloudflare Tunnel. With MFA. Here's exactly how.</p>
+
+      <div class="callout">
+        Every config file in this post is real and running in production on my homelab right now. Secrets are redacted, but the structure is copy-paste ready.
+      </div>
+
+      <h2>Architecture Overview</h2>
+      <p>The authentication flow works like this:</p>
+      <ol>
+        <li>User visits <code>https://sonarr.homelab.internal</code></li>
+        <li>Traefik intercepts the request and calls Authentik's forward-auth endpoint</li>
+        <li>If no valid session cookie exists, Authentik returns a 401 and Traefik redirects to the login page at <code>auth.homelab.internal</code></li>
+        <li>User authenticates (password + MFA)</li>
+        <li>Authentik sets a session cookie scoped to <code>.homelab.internal</code> and redirects back</li>
+        <li>Traefik sees the valid cookie on subsequent requests and passes through to the app</li>
+      </ol>
+
+      <p>The key insight: because the cookie is scoped to the <strong>parent domain</strong> (<code>.homelab.internal</code>), a single login works for every subdomain. No per-app configuration needed for forward-auth — it's all handled at the reverse proxy layer.</p>
+
+      <p>Components:</p>
+      <ul>
+        <li><strong>Authentik</strong> — Identity Provider (OIDC, forward-auth, user management)</li>
+        <li><strong>Traefik</strong> — Reverse proxy with forwardAuth middleware</li>
+        <li><strong>Pi-hole</strong> — Wildcard DNS resolution (<code>*.homelab.internal</code> → server IP)</li>
+        <li><strong>Cloudflare Tunnel</strong> — Secure external access without port forwarding</li>
+        <li><strong>Self-signed CA</strong> — Internal TLS with trusted wildcard certificate</li>
+      </ul>
+
+      <h2>Deploying Authentik</h2>
+      <p>Authentik runs as four containers: the server (API + UI), a background worker, PostgreSQL, and Redis. Here's the complete <code>docker-compose.yml</code>:</p>
+
+      <pre><code># ~/authentik/docker-compose.yml
+services:
+  postgresql:
+    image: docker.io/library/postgres:16-alpine
+    container_name: authentik-postgresql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 5s
+    volumes:
+      - database:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: ${PG_PASS}
+      POSTGRES_USER: authentik
+      POSTGRES_DB: authentik
+    networks:
+      - authentik-internal
+
+  redis:
+    image: docker.io/library/redis:alpine
+    container_name: authentik-redis
+    command: --save 60 1 --loglevel warning
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 3s
+    volumes:
+      - redis:/data
+    networks:
+      - authentik-internal
+
+  server:
+    image: ghcr.io/goauthentik/server:2026.2.2
+    container_name: authentik-server
+    restart: unless-stopped
+    command: server
+    environment:
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY}
+      AUTHENTIK_REDIS__HOST: redis
+      AUTHENTIK_POSTGRESQL__HOST: postgresql
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${PG_PASS}
+      AUTHENTIK_BOOTSTRAP_PASSWORD: ${AUTHENTIK_BOOTSTRAP_PASSWORD}
+      AUTHENTIK_BOOTSTRAP_TOKEN: ${AUTHENTIK_BOOTSTRAP_TOKEN}
+      AUTHENTIK_BOOTSTRAP_EMAIL: ${AUTHENTIK_BOOTSTRAP_EMAIL}
+    volumes:
+      - ./media:/media
+      - ./custom-templates:/templates
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik
+      - traefik.http.routers.authentik-http.rule=Host(`auth.homelab.internal`)
+      - traefik.http.routers.authentik-http.entrypoints=web
+      - traefik.http.routers.authentik-http.middlewares=authentik-https-redirect
+      - traefik.http.middlewares.authentik-https-redirect.redirectscheme.scheme=https
+      - traefik.http.routers.authentik-https.rule=Host(`auth.homelab.internal`)
+      - traefik.http.routers.authentik-https.entrypoints=websecure
+      - traefik.http.routers.authentik-https.tls=true
+      - traefik.http.services.authentik.loadbalancer.server.port=9000
+    networks:
+      - authentik-internal
+      - traefik
+
+  worker:
+    image: ghcr.io/goauthentik/server:2026.2.2
+    container_name: authentik-worker
+    restart: unless-stopped
+    command: worker
+    environment:
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY}
+      AUTHENTIK_REDIS__HOST: redis
+      AUTHENTIK_POSTGRESQL__HOST: postgresql
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${PG_PASS}
+    user: root
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./media:/media
+      - ./custom-templates:/templates
+      - ./certs:/certs
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - authentik-internal
+
+volumes:
+  database:
+  redis:
+
+networks:
+  authentik-internal:
+    driver: bridge
+  traefik:
+    name: traefik
+    external: true</code></pre>
+
+      <p>The <code>.env</code> file:</p>
+      <pre><code># ~/authentik/.env
+AUTHENTIK_SECRET_KEY=REDACTED
+PG_PASS=REDACTED
+AUTHENTIK_BOOTSTRAP_PASSWORD=REDACTED
+AUTHENTIK_BOOTSTRAP_TOKEN=REDACTED
+AUTHENTIK_BOOTSTRAP_EMAIL=anas@semesmieh.com</code></pre>
+
+      <p>Key decisions:</p>
+      <ul>
+        <li><strong>Two networks:</strong> <code>authentik-internal</code> keeps PostgreSQL and Redis isolated. Only the server and worker join the shared <code>traefik</code> network.</li>
+        <li><strong>Bootstrap variables:</strong> Set the admin password, API token, and email on first boot — no manual setup wizard needed.</li>
+        <li><strong>Worker has Docker socket:</strong> Required for the embedded outpost to discover containers on the host.</li>
+      </ul>
+
+      <h2>DNS &amp; Certificates</h2>
+      <h3>Wildcard DNS via Pi-hole</h3>
+      <p>Pi-hole v6 supports wildcard DNS natively. In <code>pihole.toml</code>:</p>
+      <pre><code># /etc/pihole/pihole.toml (excerpt)
+[dns]
+  hosts = [
+    "192.168.20.69 auth.homelab.internal",
+    "192.168.20.69 homepage.homelab.internal",
+    "192.168.20.69 sonarr.homelab.internal",
+    "192.168.20.69 radarr.homelab.internal",
+    # ... all other services
+  ]</code></pre>
+
+      <p>Every <code>*.homelab.internal</code> subdomain resolves to the server's static IP. Traefik then routes based on the Host header.</p>
+
+      <h3>Self-Signed CA &amp; Wildcard Certificate</h3>
+      <p>I created a local Certificate Authority valid for 10 years, and a wildcard certificate for <code>*.homelab.internal</code>:</p>
+      <pre><code># Generate the CA (once, valid 10 years)
+openssl req -x509 -new -nodes \
+  -keyout homelab-ca.key -out homelab-ca.crt \
+  -days 3650 -subj "/CN=Homelab Local CA"
+
+# Generate a wildcard cert signed by the CA (valid ~2 years)
+openssl req -new -nodes \
+  -keyout homelab.key -out homelab.csr \
+  -subj "/CN=*.homelab.internal"
+
+cat &gt; san.cnf &lt;&lt;EOF
+[req]
+distinguished_name = req_distinguished_name
+[req_distinguished_name]
+[v3_ext]
+subjectAltName = DNS:*.homelab.internal, DNS:homelab.internal
+EOF
+
+openssl x509 -req -in homelab.csr \
+  -CA homelab-ca.crt -CAkey homelab-ca.key -CAcreateserial \
+  -out homelab.crt -days 825 \
+  -extfile san.cnf -extensions v3_ext</code></pre>
+
+      <p>Import <code>homelab-ca.crt</code> into your browser's trust store and you'll get green padlocks on every internal service.</p>
+
+      <h3>Traefik TLS Configuration</h3>
+      <pre><code># ~/traefik/dynamic/tls.yaml
+tls:
+  certificates:
+    - certFile: /certs/homelab.crt
+      keyFile: /certs/homelab.key
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /certs/homelab.crt
+        keyFile: /certs/homelab.key</code></pre>
+
+      <h2>Forward-Auth Middleware</h2>
+      <p>This is where the magic happens. A single Traefik middleware definition protects every app behind Authentik without touching the apps themselves.</p>
+
+      <h3>Authentik: Create a Proxy Provider</h3>
+      <p>In Authentik, create a <strong>Proxy Provider</strong> in <code>forward_domain</code> mode:</p>
+      <ul>
+        <li><strong>Name:</strong> homelab-forward-auth</li>
+        <li><strong>Mode:</strong> Forward auth (domain level)</li>
+        <li><strong>External host:</strong> <code>https://auth.homelab.internal</code></li>
+        <li><strong>Cookie domain:</strong> <code>homelab.internal</code></li>
+      </ul>
+      <p>Then create an Application linked to this provider, and add the provider to the embedded outpost. The outpost exposes the <code>/outpost.goauthentik.io/</code> path that Traefik calls.</p>
+
+      <h3>Traefik: Dynamic Configuration</h3>
+      <p>This file defines the forwardAuth middleware, the outpost router, and the outpost service:</p>
+      <pre><code># ~/traefik/dynamic/authentik.yaml
+http:
+  routers:
+    authentik-outpost:
+      rule: "HostRegexp(`{host:.+}`) &amp;&amp; PathPrefix(`/outpost.goauthentik.io/`)"
+      entryPoints:
+        - websecure
+      tls: {}
+      service: authentik-outpost
+      priority: 25
+
+  middlewares:
+    authentik:
+      forwardAuth:
+        address: http://authentik-server:9000/outpost.goauthentik.io/auth/traefik
+        trustForwardHeader: true
+        authResponseHeaders:
+          - X-authentik-username
+          - X-authentik-groups
+          - X-authentik-email
+          - X-authentik-name
+          - X-authentik-uid
+          - X-authentik-jwt
+          - X-authentik-meta-jwks
+          - X-authentik-meta-outpost
+          - X-authentik-meta-provider
+          - X-authentik-meta-app
+          - X-authentik-meta-version
+        addAuthCookiesToResponse:
+          - authentik_proxy_8936af85
+
+  services:
+    authentik-outpost:
+      loadBalancer:
+        servers:
+          - url: "http://authentik-server:9000/outpost.goauthentik.io"</code></pre>
+
+      <p>The <code>addAuthCookiesToResponse</code> field is critical — it passes the proxy session cookie back to the browser through Traefik. The hash suffix is generated by Authentik based on your provider's client ID.</p>
+
+      <h3>Applying Middleware to Apps</h3>
+      <p>For apps managed by Docker labels (e.g., Homepage):</p>
+      <pre><code>labels:
+  - traefik.http.routers.homepage-https.middlewares=authentik@file</code></pre>
+
+      <p>For apps defined in Traefik's file provider (e.g., in <code>homelab-services.yaml</code>):</p>
+      <pre><code>http:
+  routers:
+    sonarr-https:
+      rule: "Host(`sonarr.homelab.internal`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - authentik@file
+      tls: {}
+      service: sonarr-service</code></pre>
+
+      <p>That's it. Any router with <code>authentik@file</code> middleware now requires Authentik authentication.</p>
+
+      <h2>The Cookie Domain Problem</h2>
+      <p>This cost me hours. Originally I used <code>*.homelab</code> as my internal domain. Everything worked in Traefik, Pi-hole resolved it fine, certs were valid. But SSO failed with a 400 error on every login attempt.</p>
+
+      <div class="callout">
+        <strong>Root cause:</strong> Browsers treat single-label domains (like <code>homelab</code>) as a TLD per RFC 6265. They refuse to set cookies with <code>Domain=homelab</code> because that would be a supercookie. The same restriction applies to <code>.local</code>, <code>.localhost</code>, and anything on the Public Suffix List.
+      </div>
+
+      <p>The fix: migrate everything to <code>.homelab.internal</code> — a two-label domain that browsers treat as a proper registrable domain. The migration touched:</p>
+      <ul>
+        <li><strong>Pi-hole DNS:</strong> Update all host entries from <code>*.homelab</code> to <code>*.homelab.internal</code></li>
+        <li><strong>TLS certificate:</strong> Regenerate with <code>*.homelab.internal</code> SAN</li>
+        <li><strong>Traefik routers:</strong> Update every <code>Host()</code> rule</li>
+        <li><strong>Authentik provider:</strong> Change external_host and cookie_domain</li>
+        <li><strong>Docker labels:</strong> Update Host rules on every container</li>
+      </ul>
+
+      <p>After the migration, SSO worked immediately. Lesson learned: <strong>always use a multi-label domain for internal services.</strong></p>
+
+      <h2>Eliminating Double Logins</h2>
+      <p>Forward-auth protects access at the proxy layer, but many apps still show their own login screen after you've already authenticated. Here's how I eliminated the second login for each app:</p>
+
+      <table>
+        <tr><th>App</th><th>Method</th><th>Result</th></tr>
+        <tr><td>Sonarr / Radarr / Prowlarr</td><td><code>AuthenticationMethod=External</code></td><td>No login prompt</td></tr>
+        <tr><td>Portainer</td><td>Native OIDC</td><td>SSO button, auto-create users</td></tr>
+        <tr><td>qBittorrent</td><td>Subnet whitelist</td><td>Bypasses auth for proxy traffic</td></tr>
+        <tr><td>Tautulli</td><td>Guest access enabled</td><td>No login prompt</td></tr>
+        <tr><td>Seerr</td><td>Forward-auth only</td><td>Still needs Plex login (no native OIDC in v3)</td></tr>
+        <tr><td>Homepage / Dockhand</td><td>No built-in auth</td><td>Forward-auth is sufficient</td></tr>
+        <tr><td>Plex</td><td>Excluded from SSO</td><td>Uses plex.tv auth (own system)</td></tr>
+        <tr><td>Home Assistant</td><td>Excluded from SSO</td><td>Uses its own auth (trusted_proxies possible)</td></tr>
+      </table>
+
+      <h3>Arr Stack: External Authentication</h3>
+      <p>Sonarr, Radarr, and Prowlarr all support an <code>External</code> auth mode that trusts the reverse proxy to handle authentication:</p>
+      <pre><code>&lt;!-- ~/arrstack/sonarr/config.xml (same for radarr, prowlarr) --&gt;
+&lt;Config&gt;
+  &lt;AuthenticationMethod&gt;External&lt;/AuthenticationMethod&gt;
+  &lt;AuthenticationRequired&gt;DisabledForLocalAddresses&lt;/AuthenticationRequired&gt;
+  &lt;ApiKey&gt;REDACTED&lt;/ApiKey&gt;
+  &lt;!-- ... other settings ... --&gt;
+&lt;/Config&gt;</code></pre>
+
+      <p>Stop the container, edit <code>config.xml</code>, start it again. The app no longer prompts for credentials — it trusts that Traefik + Authentik already verified the user.</p>
+
+      <h3>Portainer: Native OIDC</h3>
+      <p>Portainer supports OAuth2/OIDC natively. I created a dedicated OAuth2 provider in Authentik with:</p>
+      <ul>
+        <li><strong>Client type:</strong> Confidential</li>
+        <li><strong>Redirect URIs:</strong> <code>https://portainer.homelab.internal/</code> and <code>https://portainer.semesmieh.com/</code></li>
+        <li><strong>Scopes:</strong> openid, email, profile</li>
+        <li><strong>Authorization flow:</strong> implicit-consent (no extra click)</li>
+      </ul>
+
+      <p>Then configured Portainer via its API:</p>
+      <pre><code>curl -X PUT "https://portainer:9443/api/settings" \
+  -H "Authorization: Bearer $JWT" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "AuthenticationMethod": 3,
+    "OAuthSettings": {
+      "ClientID": "YOUR_CLIENT_ID",
+      "ClientSecret": "YOUR_CLIENT_SECRET",
+      "AccessTokenURI": "https://auth.homelab.internal/application/o/token/",
+      "AuthorizationURI": "https://auth.homelab.internal/application/o/authorize/",
+      "ResourceURI": "https://auth.homelab.internal/application/o/userinfo/",
+      "RedirectURI": "https://portainer.homelab.internal/",
+      "UserIdentifier": "email",
+      "Scopes": "openid email profile",
+      "OAuthAutoCreateUsers": true,
+      "SSO": true,
+      "LogoutURI": "https://auth.homelab.internal/application/o/portainer/end-session/"
+    }
+  }'</code></pre>
+
+      <p>Now Portainer shows a "Login with OAuth" button. With SSO enabled, if you're already authenticated with Authentik, it logs you in automatically.</p>
+
+      <h3>qBittorrent: Subnet Whitelist</h3>
+      <p>qBittorrent doesn't support external auth, but it can bypass authentication for trusted subnets. Since all traffic arrives through Traefik (already authenticated), we whitelist everything:</p>
+      <pre><code># ~/arrstack/qbittorrent/qBittorrent/qBittorrent.conf
+[Preferences]
+WebUI\Address=*
+WebUI\AuthSubnetWhitelist=0.0.0.0/0
+WebUI\AuthSubnetWhitelistEnabled=true
+WebUI\ServerDomains=*</code></pre>
+
+      <h3>Tautulli: Guest Access</h3>
+      <p>Tautulli can be configured to allow guest access (no login) when it's already protected by the proxy:</p>
+      <pre><code># ~/tautulli/config/config.ini
+[General]
+allow_guest_access = 1
+http_username =
+http_password =</code></pre>
+
+      <h2>External Access via Cloudflare Tunnel</h2>
+      <p>For access outside my home network, I use Cloudflare Tunnel. No port forwarding, no dynamic DNS, no exposed attack surface. The tunnel connects outbound from my server to Cloudflare's edge, and traffic flows back through it.</p>
+
+      <h3>Second Proxy Provider</h3>
+      <p>External access needs its own proxy provider because the cookie domain is different:</p>
+      <ul>
+        <li><strong>Name:</strong> semesmieh-forward-auth</li>
+        <li><strong>Mode:</strong> Forward auth (domain level)</li>
+        <li><strong>External host:</strong> <code>https://auth.semesmieh.com</code></li>
+        <li><strong>Cookie domain:</strong> <code>semesmieh.com</code></li>
+      </ul>
+
+      <p>This provider is added to the same embedded outpost. The outpost now handles both internal and external domains.</p>
+
+      <h3>External Middleware</h3>
+      <p>A separate middleware in <code>authentik.yaml</code> references the external provider's cookie:</p>
+      <pre><code>    authentik-external:
+      forwardAuth:
+        address: http://authentik-server:9000/outpost.goauthentik.io/auth/traefik
+        trustForwardHeader: true
+        authResponseHeaders:
+          - X-authentik-username
+          - X-authentik-groups
+          - X-authentik-email
+          - X-authentik-name
+          - X-authentik-uid
+          - X-authentik-jwt
+          - X-authentik-meta-jwks
+          - X-authentik-meta-outpost
+          - X-authentik-meta-provider
+          - X-authentik-meta-app
+          - X-authentik-meta-version
+        addAuthCookiesToResponse:
+          - authentik_proxy_7885229f</code></pre>
+
+      <h3>External Traefik Routers</h3>
+      <p>A dedicated file defines all external routers pointing to <code>*.semesmieh.com</code>:</p>
+      <pre><code># ~/traefik/dynamic/external-services.yaml (excerpt)
+http:
+  routers:
+    auth-external-https:
+      rule: "Host(`auth.semesmieh.com`)"
+      entryPoints:
+        - websecure
+      tls: {}
+      service: authentik-service
+
+    homepage-external-https:
+      rule: "Host(`homepage.semesmieh.com`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - authentik-external@file
+      tls: {}
+      service: homepage-external
+
+    sonarr-external-https:
+      rule: "Host(`sonarr.semesmieh.com`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - authentik-external@file
+      tls: {}
+      service: sonarr-external
+
+    # Apps excluded from SSO (own auth systems):
+    plex-external-https:
+      rule: "Host(`plex.semesmieh.com`)"
+      entryPoints:
+        - websecure
+      tls: {}
+      service: plex-service@file
+
+  services:
+    authentik-service:
+      loadBalancer:
+        servers:
+          - url: "http://authentik-server:9000"
+
+    homepage-external:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.20.69:3000"
+
+    sonarr-external:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.20.69:8989"</code></pre>
+
+      <h3>Cloudflare Tunnel Ingress</h3>
+      <p>The tunnel is remotely managed via the Cloudflare dashboard. Each service maps a public hostname to the internal Traefik endpoint:</p>
+      <pre><code># Tunnel ingress rules (configured via CF API/dashboard)
+ingress:
+  - hostname: auth.semesmieh.com
+    service: https://192.168.20.69:443
+    originRequest:
+      noTLSVerify: true
+  - hostname: homepage.semesmieh.com
+    service: https://192.168.20.69:443
+    originRequest:
+      noTLSVerify: true
+  - hostname: sonarr.semesmieh.com
+    service: https://192.168.20.69:443
+    originRequest:
+      noTLSVerify: true
+  # ... 15+ more hostnames, all pointing to Traefik
+  - service: http_status:404</code></pre>
+
+      <p>I created CNAME records for each subdomain pointing to the tunnel's <code>.cfargotunnel.com</code> address. All traffic flows: Internet → Cloudflare Edge → Tunnel → Traefik → forwardAuth → App.</p>
+
+      <h3>DNS Records</h3>
+      <pre><code># 18 CNAME records, all pointing to the tunnel
+auth.semesmieh.com      → &lt;tunnel-id&gt;.cfargotunnel.com
+homepage.semesmieh.com  → (same)
+sonarr.semesmieh.com    → (same)
+radarr.semesmieh.com    → (same)
+plex.semesmieh.com      → (same)
+portainer.semesmieh.com → (same)
+# ... and so on for every exposed service</code></pre>
+
+      <h2>MFA: TOTP + WebAuthn</h2>
+      <p>With services exposed to the internet, MFA is non-negotiable. Authentik supports TOTP (authenticator apps) and WebAuthn (hardware keys, passkeys) out of the box.</p>
+
+      <p>I enrolled both:</p>
+      <ul>
+        <li><strong>TOTP:</strong> Scanned QR code into my authenticator app — works everywhere</li>
+        <li><strong>WebAuthn:</strong> Registered a passkey via Windows Hello — seamless on my primary machine</li>
+      </ul>
+
+      <p>The default authentication flow in Authentik already prompts for MFA if devices are enrolled. No additional flow configuration needed.</p>
+
+      <h2>What I Learned</h2>
+      <div class="callout">
+        <ul style="margin:0; padding-left:18px;">
+          <li><strong>Cookie domains are everything.</strong> Single-label domains silently break SSO. Always use a multi-label domain like <code>.homelab.internal</code> for internal services.</li>
+          <li><strong>Forward-auth beats native OIDC for most apps.</strong> You configure it once in Traefik and it protects any number of apps. Only use native OIDC when the app supports it well (like Portainer).</li>
+          <li><strong>Two providers, one outpost.</strong> Internal and external domains need separate proxy providers (different cookie domains), but they share the same outpost and the same Traefik forwardAuth endpoint.</li>
+          <li><strong>Authentik's embedded outpost is enough.</strong> No need for a standalone proxy container — the embedded outpost handles forward-auth directly through the server container.</li>
+          <li><strong>Cloudflare Tunnel removes all the networking pain.</strong> No NAT, no firewall rules, no dynamic DNS. Just outbound HTTPS from your server to Cloudflare's edge.</li>
+          <li><strong>Eliminate double logins aggressively.</strong> If an app supports External auth or subnet whitelisting, use it. The proxy is your auth layer — the app doesn't need its own.</li>
+        </ul>
+      </div>
+
+      <h2>Final Result</h2>
+      <p>From zero to full SSO in a single session:</p>
+      <ul>
+        <li><strong>15+ apps</strong> protected by a single login</li>
+        <li><strong>Two domains:</strong> <code>*.homelab.internal</code> (internal) and <code>*.semesmieh.com</code> (external)</li>
+        <li><strong>MFA everywhere</strong> — TOTP + WebAuthn</li>
+        <li><strong>Zero port forwarding</strong> — Cloudflare Tunnel for external access</li>
+        <li><strong>One password, one session</strong> — no more login fatigue</li>
+      </ul>
+
+      <p>The entire setup is reproducible from the configs in my <a href="https://github.com/AnasSemesmieh/homelab" target="_blank">homelab repo</a>.</p>
+
+      <div class="series-nav">
+        <p><strong>Homelab Series:</strong></p>
+        <a href="/blog/posts/homelab-start-here.html">Start Here</a>
+        <a href="/blog/posts/homelab-docker-compose-stack.html">Docker Compose Stack</a>
+        <a href="/blog/posts/homelab-backup-automation.html">Backup Automation</a>
+        <a href="/blog/posts/homelab-disaster-recovery.html">Disaster Recovery</a>
+        <a href="/blog/posts/homelab-secrets-management.html">Secrets Management</a>
+      </div>
+    </article>
+  </div>
+</body>
+
+</html>
