@@ -260,6 +260,44 @@
       transform: translateX(3px);
     }
 
+    .social-links {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+      width: 100%;
+    }
+
+    .contact-card .social-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 44px;
+      margin-top: 0;
+      padding: 0 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+      color: #e6eef8;
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform 0.2s, border-color 0.2s, background 0.2s, color 0.2s;
+    }
+
+    .contact-card .social-link:hover {
+      transform: translateY(-1px);
+      border-color: rgba(124, 58, 237, 0.45);
+      background: rgba(124, 58, 237, 0.12);
+      color: #fff;
+    }
+
+    .social-icon {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 18px;
+      fill: currentColor;
+    }
+
     .sections {
       display: grid;
       grid-template-columns: 1fr;
@@ -648,8 +686,20 @@
           <div style="margin-top:8px">📱 +61 437 501 834</div>
           <div style="margin-top:6px"><a href="mailto:anas@semesmieh.com">anas@semesmieh.com</a></div>
           <div class="muted" style="margin-top:8px">Open to Engineering Manager, Head of Platform/Engineering, and Solutions Architect roles.</div>
-          <div style="margin-top:8px"><a href="https://www.linkedin.com/in/anassemesmieh" target="_blank" rel="noopener noreferrer">🔗 LinkedIn Profile</a></div>
-          <div style="margin-top:4px"><a href="https://github.com/AnasSemesmieh" target="_blank" rel="noopener noreferrer">🐙 GitHub Profile</a></div>
+          <div class="social-links">
+            <a class="social-link" href="https://www.linkedin.com/in/anassemesmieh" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn profile">
+              <svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4.98 3.5A2.48 2.48 0 1 0 5 8.46a2.48 2.48 0 0 0-.02-4.96ZM3 9h4v12H3V9Zm7 0h3.83v1.64h.05c.53-1 1.84-2.05 3.78-2.05 4.04 0 4.79 2.66 4.79 6.12V21h-4v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.15 1.45-2.15 2.95V21h-4V9Z" />
+              </svg>
+              <span>LinkedIn</span>
+            </a>
+            <a class="social-link" href="https://github.com/AnasSemesmieh" target="_blank" rel="noopener noreferrer" aria-label="GitHub profile">
+              <svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 .5C5.65.5.5 5.66.5 12.03c0 5.1 3.3 9.42 7.87 10.95.58.11.79-.25.79-.56 0-.27-.01-1.01-.02-1.98-3.2.7-3.87-1.54-3.87-1.54-.52-1.33-1.27-1.68-1.27-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.75 1.18 1.75 1.18 1.02 1.76 2.68 1.25 3.33.96.1-.74.4-1.25.73-1.54-2.56-.29-5.26-1.29-5.26-5.73 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .96-.31 3.14 1.18a10.91 10.91 0 0 1 5.72 0c2.18-1.49 3.14-1.18 3.14-1.18.62 1.59.23 2.76.11 3.05.73.81 1.18 1.84 1.18 3.1 0 4.45-2.71 5.43-5.29 5.71.41.36.78 1.08.78 2.17 0 1.57-.01 2.84-.01 3.23 0 .31.21.68.8.56A11.54 11.54 0 0 0 23.5 12.03C23.5 5.66 18.35.5 12 .5Z" />
+              </svg>
+              <span>GitHub</span>
+            </a>
+          </div>
         </aside>
       </section>
 

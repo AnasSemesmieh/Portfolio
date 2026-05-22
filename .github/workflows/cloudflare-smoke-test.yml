@@ -9,7 +9,7 @@ on:
 jobs:
   smoke-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 12
     env:
       BASE_URL: https://anas.semesmieh.com
     steps:
@@ -34,7 +34,26 @@ jobs:
             local tmp
             tmp=$(mktemp)
             local status
-            status=$(curl -sS -o "$tmp" -w "%{http_code}" --max-time 20 "$BASE_URL$route")
+
+            if ! status=$(curl \
+              -sS \
+              --retry 2 \
+              --retry-delay 2 \
+              --retry-all-errors \
+              --connect-timeout 5 \
+              --max-time 10 \
+              -o "$tmp" \
+              -w "%{http_code}" \
+              "$BASE_URL$route"); then
+              echo "Route request error: $route"
+              if [ -s "$tmp" ]; then
+                echo "Body preview:"
+                head -c 400 "$tmp" || true
+                echo
+              fi
+              rm -f "$tmp"
+              return 1
+            fi
 
             if [ "$status" != "200" ]; then
               echo "Route failed: $route (status $status)"
@@ -49,8 +68,8 @@ jobs:
             return 0
           }
 
-          for attempt in $(seq 1 30); do
-            echo "Smoke test attempt $attempt/30"
+          for attempt in $(seq 1 24); do
+            echo "Smoke test attempt $attempt/24"
             failed=0
 
             for route in "${routes[@]}"; do
@@ -64,11 +83,11 @@ jobs:
               exit 0
             fi
 
-            if [ "$attempt" -lt 30 ]; then
-              echo "Deploy not ready yet; retrying in 20 seconds."
-              sleep 20
+            if [ "$attempt" -lt 24 ]; then
+              echo "Deploy not ready yet; retrying in 15 seconds."
+              sleep 15
             fi
           done
 
-          echo "Smoke test failed after 30 attempts."
+          echo "Smoke test failed after 24 attempts."
           exit 1
