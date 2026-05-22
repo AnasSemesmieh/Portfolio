@@ -9,19 +9,35 @@ on:
 jobs:
   smoke-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
-    env:
-      BASE_URL: https://anas.semesmieh.com
-      USER_AGENT: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
+    timeout-minutes: 5
     steps:
-      - name: Wait for deploy and verify routes
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Serve site locally and verify routes
         shell: bash
         run: |
           set -euo pipefail
 
-          initial_wait_seconds=45
-          echo "Waiting ${initial_wait_seconds}s for deploy propagation before smoke checks."
-          sleep "$initial_wait_seconds"
+          python3 .github/scripts/pages_smoke_server.py --root . --port 8788 >/tmp/pages-smoke-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" >/dev/null 2>&1 || true' EXIT
+
+          BASE_URL="http://127.0.0.1:8788"
+
+          for attempt in $(seq 1 10); do
+            if curl -sS -o /dev/null --max-time 5 "$BASE_URL/"; then
+              break
+            fi
+
+            if [ "$attempt" -eq 10 ]; then
+              echo "Local smoke server failed to start."
+              cat /tmp/pages-smoke-server.log || true
+              exit 1
+            fi
+
+            sleep 1
+          done
 
           routes=(
             "/"
@@ -42,15 +58,7 @@ jobs:
 
             if ! status=$(curl \
               -sS \
-              --retry 2 \
-              --retry-delay 2 \
-              --retry-all-errors \
-              --connect-timeout 5 \
-              --max-time 10 \
-              --user-agent "$USER_AGENT" \
-              --header "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" \
-              --header "Accept-Language: en-US,en;q=0.9" \
-              --compressed \
+              --max-time 5 \
               -o "$tmp" \
               -w "%{http_code}" \
               "$BASE_URL$route"); then
@@ -77,26 +85,8 @@ jobs:
             return 0
           }
 
-          for attempt in $(seq 1 8); do
-            echo "Smoke test attempt $attempt/8"
-            failed=0
-
-            for route in "${routes[@]}"; do
-              if ! check_route "$route"; then
-                failed=1
-              fi
-            done
-
-            if [ "$failed" -eq 0 ]; then
-              echo "All smoke test routes returned 200."
-              exit 0
-            fi
-
-            if [ "$attempt" -lt 8 ]; then
-              echo "Deploy not ready yet; retrying in 30 seconds."
-              sleep 30
-            fi
+          for route in "${routes[@]}"; do
+            check_route "$route"
           done
 
-          echo "Smoke test failed after 8 attempts."
-          exit 1
+          echo "All smoke test routes returned 200."
