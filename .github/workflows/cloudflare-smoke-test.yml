@@ -12,11 +12,16 @@ jobs:
     timeout-minutes: 12
     env:
       BASE_URL: https://anas.semesmieh.com
+      USER_AGENT: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36
     steps:
       - name: Wait for deploy and verify routes
         shell: bash
         run: |
           set -euo pipefail
+
+          initial_wait_seconds=45
+          echo "Waiting ${initial_wait_seconds}s for deploy propagation before smoke checks."
+          sleep "$initial_wait_seconds"
 
           routes=(
             "/"
@@ -42,6 +47,10 @@ jobs:
               --retry-all-errors \
               --connect-timeout 5 \
               --max-time 10 \
+              --user-agent "$USER_AGENT" \
+              --header "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" \
+              --header "Accept-Language: en-US,en;q=0.9" \
+              --compressed \
               -o "$tmp" \
               -w "%{http_code}" \
               "$BASE_URL$route"); then
@@ -68,8 +77,8 @@ jobs:
             return 0
           }
 
-          for attempt in $(seq 1 24); do
-            echo "Smoke test attempt $attempt/24"
+          for attempt in $(seq 1 8); do
+            echo "Smoke test attempt $attempt/8"
             failed=0
 
             for route in "${routes[@]}"; do
@@ -83,11 +92,11 @@ jobs:
               exit 0
             fi
 
-            if [ "$attempt" -lt 24 ]; then
-              echo "Deploy not ready yet; retrying in 15 seconds."
-              sleep 15
+            if [ "$attempt" -lt 8 ]; then
+              echo "Deploy not ready yet; retrying in 30 seconds."
+              sleep 30
             fi
           done
 
-          echo "Smoke test failed after 24 attempts."
+          echo "Smoke test failed after 8 attempts."
           exit 1
