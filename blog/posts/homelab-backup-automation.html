@@ -10,12 +10,12 @@
   <link rel="canonical" href="https://anas.semesmieh.com/blog/posts/homelab-backup-automation.html" />
   <meta property="og:type" content="article" />
   <meta property="og:title" content="Automated Config Backup with Secret Redaction" />
-  <meta property="og:description" content="Building a daily backup pipeline that syncs, redacts, scans, and pushes homelab configs â€” automatically." />
+  <meta property="og:description" content="Building a daily backup pipeline that syncs, redacts, scans, and pushes homelab configs — automatically." />
   <meta property="og:url" content="https://anas.semesmieh.com/blog/posts/homelab-backup-automation.html" />
   <meta property="og:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Automated Config Backup with Secret Redaction" />
-  <meta name="twitter:description" content="Building a daily backup pipeline that syncs, redacts, scans, and pushes homelab configs â€” automatically." />
+  <meta name="twitter:description" content="Building a daily backup pipeline that syncs, redacts, scans, and pushes homelab configs — automatically." />
   <meta name="twitter:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
   <style>
     :root {
@@ -77,18 +77,18 @@
 
     <article>
       <h1>Automated Config Backup with Secret Redaction</h1>
-      <p class="meta">By <a href="/">Anas Semesmieh</a> Â· April 28, 2026 Â· Homelab Â· Automation</p>
+      <p class="meta">By <a href="/">Anas Semesmieh</a> · April 28, 2026 · Homelab · Automation</p>
 
-      <p>The worst time to think about backups is after you've lost your configs. My homelab runs 10+ Docker Compose services, and losing even one <code>docker-compose.yml</code> or <code>config.ini</code> means hours of reconstruction from memory. So I built a fully automated backup pipeline that runs every night â€” and it's the single most valuable thing in my lab.</p>
+      <p>The worst time to think about backups is after you've lost your configs. My homelab runs 10+ Docker Compose services, and losing even one <code>docker-compose.yml</code> or <code>config.ini</code> means hours of reconstruction from memory. So I built a fully automated backup pipeline that runs every night — and it's the single most valuable thing in my lab.</p>
 
       <div class="callout">
         The full pipeline is open source: <a href="https://github.com/AnasSemesmieh/homelab/tree/main/scripts" target="_blank">homelab/scripts/</a>
       </div>
 
-      <h2>The Pipeline: Sync â†’ Redact â†’ Scan â†’ Commit â†’ Push</h2>
+      <h2>The Pipeline: Sync → Redact → Scan → Commit → Push</h2>
       <p>Every day at 03:25 UTC, a cron job triggers <code>backup-and-push.sh</code>, which orchestrates five stages:</p>
 
-      <h3>1. Sync â€” Allowlist-based config capture</h3>
+      <h3>1. Sync — Allowlist-based config capture</h3>
       <p>Instead of backing up everything (and drowning in noise), I maintain an explicit allowlist in <code>inventory/include-paths.txt</code>. Only files listed there get synced into <code>configs/</code>:</p>
       <pre>traefik/docker-compose.yml
 pihole/docker-compose.yml
@@ -96,9 +96,9 @@ plex/config/Library/Application Support/Plex Media Server/Preferences.xml
 homepage/config/services.yaml
 arrstack/docker-compose.yml
 ...</pre>
-      <p>The <code>sync-configs.sh</code> script reads each line, checks if the source file exists under <code>$HOME</code>, and copies it into the repo preserving directory structure. Runtime artifacts â€” logs, databases, media, temp files â€” are intentionally excluded.</p>
+      <p>The <code>sync-configs.sh</code> script reads each line, checks if the source file exists under <code>$HOME</code>, and copies it into the repo preserving directory structure. Runtime artifacts — logs, databases, media, temp files — are intentionally excluded.</p>
 
-      <h3>2. Redact â€” Automatic secret removal</h3>
+      <h3>2. Redact — Automatic secret removal</h3>
       <p>This is where it gets interesting. The <code>redact-secrets.sh</code> script uses <code>sed</code> to replace sensitive values with <code>REDACTED</code> placeholders. It handles:</p>
       <ul>
         <li>Generic patterns: <code>password</code>, <code>api_key</code>, <code>token</code>, <code>secret</code>, <code>client_secret</code></li>
@@ -107,12 +107,12 @@ arrstack/docker-compose.yml
       </ul>
       <p>The result: every config file is safe to commit to a public repo. No secrets ever touch Git history.</p>
 
-      <h3>3. Scan â€” Safety gate before commit</h3>
+      <h3>3. Scan — Safety gate before commit</h3>
       <p>Even with automated redaction, mistakes happen. The <code>scan-secrets.sh</code> script acts as a second line of defense, running inverse pattern matching:</p>
       <pre>grep -RInE '(password|api_?key|token|secret)[[:space:]]*[:=][[:space:]]*[^#[:space:]]+' configs/</pre>
-      <p>If <em>any</em> match is found, the script exits with code 1 â€” and the entire pipeline stops. No commit, no push. This gate has saved me more than once from pushing a freshly added service config that the redaction patterns hadn't covered yet.</p>
+      <p>If <em>any</em> match is found, the script exits with code 1 — and the entire pipeline stops. No commit, no push. This gate has saved me more than once from pushing a freshly added service config that the redaction patterns hadn't covered yet.</p>
 
-      <h3>4. Commit â€” Only when changes exist</h3>
+      <h3>4. Commit — Only when changes exist</h3>
       <p>The script checks <code>git status --porcelain</code> and only commits if there are actual changes. Commit messages are standardized: <code>backup: sync homelab configs</code>.</p>
 
       <h3>5. Pull + Rebase + Push</h3>

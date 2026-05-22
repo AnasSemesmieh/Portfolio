@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>My Home Lab Journey: Start Here | Anas Semesmieh</title>
-  <meta name="description" content="Introduction to my Docker-based homelab running Traefik, Pi-hole, Plex, Arr stack, Immich, Home Assistant, and more â€” with automated backups and disaster recovery." />
+  <meta name="description" content="Introduction to my Docker-based homelab running Traefik, Pi-hole, Plex, Arr stack, Immich, Home Assistant, and more — with automated backups and disaster recovery." />
   <meta name="author" content="Anas Semesmieh" />
   <link rel="canonical" href="https://anas.semesmieh.com/blog/posts/homelab-start-here.html" />
   <meta property="og:type" content="article" />
@@ -77,9 +77,9 @@
 
     <article>
       <h1>My Home Lab Journey: Start Here</h1>
-      <p class="meta">By <a href="/">Anas Semesmieh</a> Â· April 12, 2026 Â· Homelab</p>
+      <p class="meta">By <a href="/">Anas Semesmieh</a> · April 12, 2026 · Homelab</p>
 
-      <p>As a platform engineering leader, I spend my weekdays designing cloud architectures and scaling teams. On weekends, I run a homelab â€” not because I have to, but because it keeps my hands dirty and my instincts sharp. This series documents everything I've built, broken, and automated along the way.</p>
+      <p>As a platform engineering leader, I spend my weekdays designing cloud architectures and scaling teams. On weekends, I run a homelab — not because I have to, but because it keeps my hands dirty and my instincts sharp. This series documents everything I've built, broken, and automated along the way.</p>
 
       <div class="callout">
         Every config, script, and runbook referenced in this series is open source in my <a href="https://github.com/AnasSemesmieh/homelab" target="_blank">homelab repo</a>.
@@ -88,36 +88,36 @@
       <h2>What I Run</h2>
       <p>My homelab is a single Ubuntu Server host running everything via Docker Compose. Here's the full stack:</p>
       <ul>
-        <li><strong>Traefik</strong> â€” Reverse proxy with a self-signed wildcard TLS certificate (<code>*.homelab</code>) from a local CA</li>
-        <li><strong>Pi-hole</strong> â€” DNS server and ad blocker, serving as the network's primary DNS</li>
-        <li><strong>Plex</strong> â€” Media server for movies and TV</li>
-        <li><strong>Tautulli</strong> â€” Plex monitoring and analytics</li>
-        <li><strong>Arr Stack</strong> â€” Prowlarr, Radarr, Sonarr, qBittorrent, and Gluetun (WireGuard VPN) for media acquisition</li>
-        <li><strong>Immich</strong> â€” Self-hosted photo backup with PostgreSQL</li>
-        <li><strong>Home Assistant</strong> â€” Home automation hub</li>
-        <li><strong>Homepage</strong> â€” Dashboard with live widgets pulling stats from every service</li>
-        <li><strong>Glances</strong> â€” System metrics (CPU, memory, network, disk)</li>
+        <li><strong>Traefik</strong> — Reverse proxy with a self-signed wildcard TLS certificate (<code>*.homelab</code>) from a local CA</li>
+        <li><strong>Pi-hole</strong> — DNS server and ad blocker, serving as the network's primary DNS</li>
+        <li><strong>Plex</strong> — Media server for movies and TV</li>
+        <li><strong>Tautulli</strong> — Plex monitoring and analytics</li>
+        <li><strong>Arr Stack</strong> — Prowlarr, Radarr, Sonarr, qBittorrent, and Gluetun (WireGuard VPN) for media acquisition</li>
+        <li><strong>Immich</strong> — Self-hosted photo backup with PostgreSQL</li>
+        <li><strong>Home Assistant</strong> — Home automation hub</li>
+        <li><strong>Homepage</strong> — Dashboard with live widgets pulling stats from every service</li>
+        <li><strong>Glances</strong> — System metrics (CPU, memory, network, disk)</li>
       </ul>
 
       <h2>The Backup-First Philosophy</h2>
-      <p>The centerpiece of my homelab isn't any single service â€” it's the automated backup system. My <a href="https://github.com/AnasSemesmieh/homelab" target="_blank">repo</a> is the source of truth for all configuration. Every day at 03:25 UTC, a cron job:</p>
+      <p>The centerpiece of my homelab isn't any single service — it's the automated backup system. My <a href="https://github.com/AnasSemesmieh/homelab" target="_blank">repo</a> is the source of truth for all configuration. Every day at 03:25 UTC, a cron job:</p>
       <ol>
         <li><strong>Syncs</strong> allowlisted config files from <code>~/</code> into <code>configs/</code> using an inventory file</li>
         <li><strong>Redacts</strong> every password, API key, and token automatically via regex patterns</li>
-        <li><strong>Scans</strong> for any unredacted secrets â€” and blocks the push if anything slips through</li>
+        <li><strong>Scans</strong> for any unredacted secrets — and blocks the push if anything slips through</li>
         <li><strong>Commits and pushes</strong> the sanitized snapshot to GitHub</li>
       </ol>
       <p>Every Sunday, a weekly snapshot tag (<code>backup-YYYY-MM-DD</code>) is created for point-in-time recovery. The entire setup can be rebuilt from zero using the repo's fresh-install and restore runbooks.</p>
 
       <h2>Why This Matters for My Career</h2>
-      <p>Running this lab forces me to practice what I preach: infrastructure as code, automated pipelines, secret management, disaster recovery, and documentation-first operations. When I advise teams on platform engineering practices at work, I've already battle-tested those patterns at home â€” on my own weekends, with my own hardware.</p>
+      <p>Running this lab forces me to practice what I preach: infrastructure as code, automated pipelines, secret management, disaster recovery, and documentation-first operations. When I advise teams on platform engineering practices at work, I've already battle-tested those patterns at home — on my own weekends, with my own hardware.</p>
 
       <h2>What This Series Covers</h2>
       <ul>
-        <li><a href="/blog/posts/homelab-backup-automation.html">Automated Config Backup with Secret Redaction</a> â€” The daily/weekly backup pipeline that keeps my configs safe and secrets out of Git</li>
-        <li><a href="/blog/posts/homelab-docker-compose-stack.html">Docker Compose All The Things</a> â€” Running 10+ services on a single host with Traefik, Pi-hole, and internal TLS</li>
-        <li><a href="/blog/posts/homelab-disaster-recovery.html">Disaster Recovery in Under an Hour</a> â€” Fresh-install and compose-based restore workflows</li>
-        <li><a href="/blog/posts/homelab-secrets-management.html">Secrets Management for Homelabs</a> â€” Redaction, scanning, rehydration, and rotation practices</li>        <li><a href="/blog/posts/homelab-sso-authentik.html">Single Sign-On with Authentik</a> &mdash; Forward-auth, OIDC, MFA, and Cloudflare Tunnel for external access</li>      </ul>
+        <li><a href="/blog/posts/homelab-backup-automation.html">Automated Config Backup with Secret Redaction</a> — The daily/weekly backup pipeline that keeps my configs safe and secrets out of Git</li>
+        <li><a href="/blog/posts/homelab-docker-compose-stack.html">Docker Compose All The Things</a> — Running 10+ services on a single host with Traefik, Pi-hole, and internal TLS</li>
+        <li><a href="/blog/posts/homelab-disaster-recovery.html">Disaster Recovery in Under an Hour</a> — Fresh-install and compose-based restore workflows</li>
+        <li><a href="/blog/posts/homelab-secrets-management.html">Secrets Management for Homelabs</a> — Redaction, scanning, rehydration, and rotation practices</li>        <li><a href="/blog/posts/homelab-sso-authentik.html">Single Sign-On with Authentik</a> &mdash; Forward-auth, OIDC, MFA, and Cloudflare Tunnel for external access</li>      </ul>
     </article>
   </div>
 </body>

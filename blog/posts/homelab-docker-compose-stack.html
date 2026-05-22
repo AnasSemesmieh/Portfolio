@@ -77,16 +77,16 @@
 
     <article>
       <h1>Docker Compose All The Things: Running 10+ Services on One Host</h1>
-      <p class="meta">By <a href="/">Anas Semesmieh</a> Â· April 20, 2026 Â· Homelab Â· Docker</p>
+      <p class="meta">By <a href="/">Anas Semesmieh</a> · April 20, 2026 · Homelab · Docker</p>
 
-      <p>My homelab runs entirely on Docker Compose â€” no Kubernetes, no Nomad, no Proxmox clustering. Just one Ubuntu Server, a dozen <code>docker-compose.yml</code> files, and a reverse proxy that ties it all together. Here's how each piece fits.</p>
+      <p>My homelab runs entirely on Docker Compose — no Kubernetes, no Nomad, no Proxmox clustering. Just one Ubuntu Server, a dozen <code>docker-compose.yml</code> files, and a reverse proxy that ties it all together. Here's how each piece fits.</p>
 
       <h2>The Architecture</h2>
       <p>Each service lives in its own directory under <code>~/</code>, with its own <code>docker-compose.yml</code>. This keeps services isolated, independently restartable, and easy to back up. The bring-up order matters: infrastructure first (Traefik, Pi-hole), then applications.</p>
 
       <h2>Infrastructure Layer</h2>
 
-      <h3>Traefik â€” Reverse Proxy + Local CA TLS</h3>
+      <h3>Traefik — Reverse Proxy + Local CA TLS</h3>
       <p>Traefik is the front door. It routes <code>*.homelab</code> domains to the right container and terminates TLS using a self-signed wildcard certificate from a local CA I generate with OpenSSL:</p>
       <pre>openssl genrsa -out ca.key 4096
 openssl req -new -x509 -days 3650 -key ca.key -out ca.crt \
@@ -101,44 +101,44 @@ openssl x509 -req -in wildcard.csr -CA ca.crt -CAkey ca.key \
   -extfile &lt;(printf "subjectAltName=DNS:*.homelab,DNS:homelab")</pre>
       <p>Every service gets HTTPS automatically. I trust the CA on my client devices so there are no browser warnings. Health check: <code>curl -k https://traefik.homelab/ping</code>.</p>
 
-      <h3>Pi-hole â€” DNS + Ad Blocking</h3>
+      <h3>Pi-hole — DNS + Ad Blocking</h3>
       <p>Pi-hole serves as the network's primary DNS. It resolves <code>*.homelab</code> to the host IP and blocks ads network-wide. My router's DHCP hands out the Pi-hole IP as the DNS server, so every device on the network benefits automatically.</p>
 
       <h2>Application Layer</h2>
 
-      <h3>Homepage â€” The Dashboard</h3>
+      <h3>Homepage — The Dashboard</h3>
       <p>Homepage is the landing page with live widgets pulling stats from every service: Traefik routing status, Pi-hole query counts, Plex active streams, Tautulli history, Portainer container counts, and Glances system metrics. The widget config lives in <code>homepage/config/services.yaml</code>, which references API keys for each service.</p>
 
-      <h3>Plex + Tautulli â€” Media Server + Analytics</h3>
+      <h3>Plex + Tautulli — Media Server + Analytics</h3>
       <p>Plex serves my media library. Tautulli monitors who's watching what, tracks history, and provides Plex usage analytics. Both authenticate via tokens stored in their config files (redacted in the backup repo).</p>
 
-      <h3>Arr Stack â€” Media Acquisition Pipeline</h3>
+      <h3>Arr Stack — Media Acquisition Pipeline</h3>
       <p>This is the most complex service group, running five containers via a single <code>docker-compose.yml</code>:</p>
       <ul>
-        <li><strong>Prowlarr</strong> â€” Indexer aggregator, feeds search results to Radarr/Sonarr</li>
-        <li><strong>Radarr</strong> â€” Movie automation</li>
-        <li><strong>Sonarr</strong> â€” TV show automation</li>
-        <li><strong>qBittorrent</strong> â€” Torrent client</li>
-        <li><strong>Gluetun</strong> â€” VPN container using WireGuard, routing all Arr traffic through the tunnel</li>
+        <li><strong>Prowlarr</strong> — Indexer aggregator, feeds search results to Radarr/Sonarr</li>
+        <li><strong>Radarr</strong> — Movie automation</li>
+        <li><strong>Sonarr</strong> — TV show automation</li>
+        <li><strong>qBittorrent</strong> — Torrent client</li>
+        <li><strong>Gluetun</strong> — VPN container using WireGuard, routing all Arr traffic through the tunnel</li>
       </ul>
       <p>The Arr services communicate via Docker DNS (<code>http://prowlarr:9696</code>), and the WireGuard private key is injected at runtime (never stored in Git).</p>
 
-      <h3>Immich â€” Photo Backup</h3>
+      <h3>Immich — Photo Backup</h3>
       <p>Immich is a self-hosted Google Photos alternative, backed by PostgreSQL. The database password is generated on first install and stored in a local <code>.env</code> file that's excluded from version control. Photos sync automatically from my phone.</p>
 
-      <h3>Home Assistant â€” Automation Hub</h3>
+      <h3>Home Assistant — Automation Hub</h3>
       <p>Home Assistant manages smart home devices. Its config directory is backed up, but runtime state and database are excluded. Long-lived access tokens are generated via the web UI and never committed.</p>
 
-      <h3>Glances â€” System Metrics</h3>
+      <h3>Glances — System Metrics</h3>
       <p>Glances exposes system metrics on port 61208. Homepage's Glances widget pulls CPU, memory, network, and disk stats in real-time. No authentication required for internal access.</p>
 
       <h2>Bring-up Order</h2>
       <p>When rebuilding from scratch, order matters:</p>
       <ol>
-        <li><strong>Traefik</strong> â€” Reverse proxy must be up first for routing</li>
-        <li><strong>Pi-hole</strong> â€” DNS must be available for <code>*.homelab</code> resolution</li>
-        <li><strong>Homepage</strong> â€” Dashboard (can start without backends, widgets show errors until services come up)</li>
-        <li><strong>Plex</strong> â†’ <strong>Tautulli</strong> â†’ <strong>Arr Stack</strong> â†’ <strong>Immich</strong> â†’ <strong>Home Assistant</strong></li>
+        <li><strong>Traefik</strong> — Reverse proxy must be up first for routing</li>
+        <li><strong>Pi-hole</strong> — DNS must be available for <code>*.homelab</code> resolution</li>
+        <li><strong>Homepage</strong> — Dashboard (can start without backends, widgets show errors until services come up)</li>
+        <li><strong>Plex</strong> → <strong>Tautulli</strong> → <strong>Arr Stack</strong> → <strong>Immich</strong> → <strong>Home Assistant</strong></li>
       </ol>
 
       <h2>What Makes This Work</h2>
@@ -152,7 +152,7 @@ openssl x509 -req -in wildcard.csr -CA ca.crt -CAkey ca.key \
         <li><strong>Static IP + Pi-hole</strong> ensures stable, ad-free DNS resolution</li>
       </ul>
 
-      <p>Next up: <a href="/blog/posts/homelab-disaster-recovery.html">Disaster Recovery in Under an Hour</a> â€” how I rebuild this entire stack from a clean Ubuntu install.</p>
+      <p>Next up: <a href="/blog/posts/homelab-disaster-recovery.html">Disaster Recovery in Under an Hour</a> — how I rebuild this entire stack from a clean Ubuntu install.</p>
     </article>
   </div>
 </body>

@@ -77,23 +77,23 @@
 
     <article>
       <h1>Homelab Disaster Recovery in Under an Hour</h1>
-      <p class="meta">By <a href="/">Anas Semesmieh</a> Â· May 7, 2026 Â· Homelab Â· Disaster Recovery</p>
+      <p class="meta">By <a href="/">Anas Semesmieh</a> · May 7, 2026 · Homelab · Disaster Recovery</p>
 
-      <p>Disk dies. Power surge fries the board. You fat-finger an <code>rm -rf</code>. Whatever the cause, the question is always the same: <em>how fast can I get back to normal?</em> For my homelab, the answer is under an hour â€” because I designed for exactly this scenario.</p>
+      <p>Disk dies. Power surge fries the board. You fat-finger an <code>rm -rf</code>. Whatever the cause, the question is always the same: <em>how fast can I get back to normal?</em> For my homelab, the answer is under an hour — because I designed for exactly this scenario.</p>
 
       <div class="callout">
-        Full runbooks: <a href="https://github.com/AnasSemesmieh/homelab/blob/main/docs/FRESH-INSTALL.md" target="_blank">FRESH-INSTALL.md</a> Â· <a href="https://github.com/AnasSemesmieh/homelab/blob/main/docs/RESTORE.md" target="_blank">RESTORE.md</a>
+        Full runbooks: <a href="https://github.com/AnasSemesmieh/homelab/blob/main/docs/FRESH-INSTALL.md" target="_blank">FRESH-INSTALL.md</a> · <a href="https://github.com/AnasSemesmieh/homelab/blob/main/docs/RESTORE.md" target="_blank">RESTORE.md</a>
       </div>
 
       <h2>The Recovery Timeline</h2>
       <p>Here's how the hour breaks down:</p>
       <ul>
-        <li><strong>0â€“15 min:</strong> Install Ubuntu Server, configure static IP, firewall, and install Docker</li>
-        <li><strong>15â€“20 min:</strong> Clone the backup repo and verify inventory</li>
-        <li><strong>20â€“30 min:</strong> Rehydrate secrets and inject into config files</li>
-        <li><strong>30â€“40 min:</strong> Run compose-based restore (dry-run first, then apply)</li>
-        <li><strong>40â€“55 min:</strong> Bring up services in dependency order</li>
-        <li><strong>55â€“60 min:</strong> Validate, re-enable backup automation</li>
+        <li><strong>0–15 min:</strong> Install Ubuntu Server, configure static IP, firewall, and install Docker</li>
+        <li><strong>15–20 min:</strong> Clone the backup repo and verify inventory</li>
+        <li><strong>20–30 min:</strong> Rehydrate secrets and inject into config files</li>
+        <li><strong>30–40 min:</strong> Run compose-based restore (dry-run first, then apply)</li>
+        <li><strong>40–55 min:</strong> Bring up services in dependency order</li>
+        <li><strong>55–60 min:</strong> Validate, re-enable backup automation</li>
       </ul>
 
       <h2>Phase 1: Host Bootstrap</h2>
@@ -140,7 +140,7 @@ grep -r "REDACTED" configs/ && echo "ERROR" || echo "OK: All secrets injected"</
 docker compose -f restore/docker-compose.restore.yml run --rm \
   -e DRY_RUN=true restore-configs
 
-# Apply (no overwrite â€” safe for existing files)
+# Apply (no overwrite — safe for existing files)
 docker compose -f restore/docker-compose.restore.yml run --rm \
   -e DRY_RUN=false -e OVERWRITE=false restore-configs</pre>
       <p>The restore container mounts <code>configs/</code> read-only and copies files to <code>/home/anas/</code>, preserving the directory structure. Each service gets its <code>docker-compose.yml</code> and config files placed exactly where they need to be.</p>
@@ -192,10 +192,10 @@ git checkout main</pre>
       <p>The repo also supports rollbacks for individual services (revert a broken config change) and database state recovery for stateful services like Immich's PostgreSQL. Every scenario is documented in the runbook with exact commands.</p>
 
       <div class="callout">
-        The real value isn't the restore time â€” it's the confidence. Knowing I can rebuild everything from scratch means I experiment freely. Break things on Saturday, restore on Sunday.
+        The real value isn't the restore time — it's the confidence. Knowing I can rebuild everything from scratch means I experiment freely. Break things on Saturday, restore on Sunday.
       </div>
 
-      <p>Next: <a href="/blog/posts/homelab-secrets-management.html">Secrets Management for Homelabs</a> â€” the full lifecycle of redaction, scanning, and rehydration.</p>
+      <p>Next: <a href="/blog/posts/homelab-secrets-management.html">Secrets Management for Homelabs</a> — the full lifecycle of redaction, scanning, and rehydration.</p>
     </article>
   </div>
 </body>
