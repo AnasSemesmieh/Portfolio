@@ -428,7 +428,7 @@
 
       .card .section-title {
         font-size: 12px;
-        margin-bottom: 8px;
+        margin: 0 0 8px;
       }
 
       .contact-card {
@@ -491,7 +491,7 @@
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 1px;
-      margin-bottom: 12px
+      margin: 0 0 12px
     }
   </style>
   <!-- ...existing code... -->
@@ -541,7 +541,8 @@
     },
     "email": "anas@semesmieh.com",
     "sameAs": [
-      "https://www.linkedin.com/in/anassemesmieh"
+      "https://www.linkedin.com/in/anassemesmieh",
+      "https://github.com/AnasSemesmieh"
     ],
     "expertise": [
       "Platform Engineering",
@@ -571,6 +572,20 @@
   }
   </script>
 
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Anas Semesmieh Portfolio",
+    "url": "https://anas.semesmieh.com/",
+    "about": {
+      "@type": "Person",
+      "name": "Anas Semesmieh",
+      "url": "https://anas.semesmieh.com/about/"
+    }
+  }
+  </script>
+
   <!-- Structured Data: BreadcrumbList -->
   <script type="application/ld+json">
   {
@@ -587,13 +602,13 @@
         "@type": "ListItem",
         "position": 2,
         "name": "About",
-        "item": "https://anas.semesmieh.com/#about"
+        "item": "https://anas.semesmieh.com/about/"
       },
       {
         "@type": "ListItem",
         "position": 3,
-        "name": "Experience",
-        "item": "https://anas.semesmieh.com/#experience"
+        "name": "Blog",
+        "item": "https://anas.semesmieh.com/blog/"
       }
     ]
   }
@@ -638,6 +653,7 @@
           </div>
           <div style="margin-top:20px;display:flex;gap:12px;align-items:center">
             <a class="button" href="#contact">Discuss a Role</a>
+            <a class="navlink" href="/about/">View Full Bio</a>
             <a class="navlink" href="/anas-semesmieh-resume.pdf" download>Download Resume</a>
           </div>
         </div>
@@ -665,7 +681,7 @@
 
       <section id="about" class="sections">
         <div class="card">
-          <div class="section-title">🏆 Featured Wins</div>
+          <h2 class="section-title">Featured Wins</h2>
           <ul>
             <li>Reduced Azure cloud spend by 50% through targeted platform and cost-optimization initiatives.</li>
             <li>Led GitOps migration from Azure DevOps to GitHub, improving CI/CD reliability, security, and release confidence.</li>
@@ -677,13 +693,14 @@
         </div>
 
         <div class="card">
-          <div class="section-title">👨‍💻 About</div>
+          <h2 class="section-title">About</h2>
           <p>With 14+ years of experience in software and cloud engineering, I design and lead platform initiatives that improve developer productivity, strengthen security posture, and reduce infrastructure spend. I specialize in Azure platform engineering, cloud-native architecture, and DevSecOps automation. Most recently, I led platform engineering at Pickles Auctions and contributed to large-scale digital transformation across auction and post-sale systems.</p>
+          <div style="margin-top:12px"><a class="navlink" href="/about/">Read full profile</a></div>
         </div>
 
 
         <div id="experience" class="card">
-          <div class="section-title">💼 Experience</div>
+          <h2 class="section-title">Experience</h2>
           <div class="timeline">
 
             <div class="job" itemscope itemtype="https://schema.org/EmployeeRole">
@@ -776,7 +793,7 @@
 
 
         <div id="skills" class="card">
-          <div class="section-title">🛠️ Skills & Tools</div>
+          <h2 class="section-title">Skills and Tools</h2>
           <div class="skills">
             <div class="skill">C# / .NET Core</div>
             <div class="skill">Azure (Serverless, Functions, Event Grid)</div>
@@ -789,7 +806,7 @@
             <div class="skill">Cost optimization</div>
           </div>
           <div style="margin-top:14px">
-            <div class="section-title">🤝 Soft Skills</div>
+            <h3 class="section-title">Soft Skills</h3>
             <div class="skills">
               <div class="skill">Team leadership (25+ Engineers)</div>
               <div class="skill">Cross-team collaboration</div>
@@ -800,13 +817,13 @@
             </div>
           </div>
           <div style="margin-top:14px">
-            <div class="section-title">🌍 Languages</div>
+            <h3 class="section-title">Languages</h3>
             <div class="skills">
               <div class="skill">English (Fluent)</div>
               <div class="skill">Arabic (Native)</div>
             </div>
             <div style="margin-top:14px">
-              <div class="section-title">🎓 Education</div>
+              <h3 class="section-title">Education</h3>
               <div class="edu">
                 <div itemscope itemtype="https://schema.org/EducationalOccupationalCredential">
                   <strong itemprop="name">Staffordshire University</strong>
@@ -827,7 +844,7 @@
       </section>
       <section class="sections">
         <div class="card">
-          <div class="section-title">🖥️ Open Source & Homelab</div>
+          <h2 class="section-title">Open Source and Homelab</h2>
           <p class="muted">I run a Docker-based homelab with 10+ self-hosted services — Traefik, Pi-hole, Plex, Arr stack, Immich, Home Assistant — with automated backups, secret redaction, and sub-hour disaster recovery. The full config is public on GitHub.</p>
           <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
             <a class="button" href="https://github.com/AnasSemesmieh/homelab" target="_blank" rel="noopener noreferrer">Homelab Repo</a>
@@ -836,7 +853,7 @@
         </div>
 
         <div class="card">
-          <div class="section-title">✍️ Blog</div>
+          <h2 class="section-title">Blog</h2>
           <p class="muted">Practical notes on platform engineering, Azure architecture, DevSecOps, Docker homelab builds, and leadership lessons from scaling teams and infrastructure.</p>
           <ul style="list-style:none;padding:0;margin:8px 0 0">
             <li style="margin-bottom:6px"><a href="/blog/posts/ai-adoption-platform-teams.html" style="color:var(--accent);text-decoration:none">Driving AI Adoption in Platform Teams</a></li>
@@ -849,7 +866,7 @@
         </div>
 
         <div class="card" id="contact">
-          <div class="section-title">📬 Contact</div>
+          <h2 class="section-title">Contact</h2>
           <p class="muted">I am available for Engineering Manager, Head of Platform/Engineering, and Solutions Architect opportunities across Sydney and remote-first teams. If your team is scaling platform capabilities, modernizing cloud delivery, or improving engineering effectiveness, I would be glad to connect.</p>
           <p class="muted">Best way to reach me is email or LinkedIn. I typically respond within 24-48 hours.</p>
           <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
@@ -862,7 +879,7 @@
     </main>
 
     <footer>
-      <div class="muted">©2026 Anas Semesmieh • Built with ❤️ and 🤖 • <a href="/blog/" style="color:var(--accent);text-decoration:none">Read the blog</a></div>
+      <div class="muted">©2026 Anas Semesmieh • <a href="/about/" style="color:var(--accent);text-decoration:none">About</a> • <a href="/blog/" style="color:var(--accent);text-decoration:none">Read the blog</a></div>
     </footer>
 
   </div>

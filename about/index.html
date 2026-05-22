@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>About Anas Semesmieh | Engineering Manager, Solutions Architect, and Platform Engineering Leader</title>
+  <meta name="description"
+    content="Learn about Anas Semesmieh, a Sydney-based Engineering Manager and Solutions Architect with 14+ years of experience in platform engineering, Azure architecture, DevSecOps, cloud cost optimization, and engineering leadership." />
+  <meta name="author" content="Anas Semesmieh" />
+  <link rel="canonical" href="https://anas.semesmieh.com/about/" />
+  <meta property="og:type" content="profile" />
+  <meta property="og:title"
+    content="About Anas Semesmieh | Engineering Manager, Solutions Architect, and Platform Engineering Leader" />
+  <meta property="og:description"
+    content="Sydney-based Engineering Manager and Solutions Architect focused on platform engineering, Azure, DevSecOps, developer productivity, and resilient cloud delivery." />
+  <meta property="og:url" content="https://anas.semesmieh.com/about/" />
+  <meta property="og:image" content="https://anas.semesmieh.com/profile-close.jpg" />
+  <meta property="og:site_name" content="Anas Semesmieh Portfolio" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title"
+    content="About Anas Semesmieh | Engineering Manager, Solutions Architect, and Platform Engineering Leader" />
+  <meta name="twitter:description"
+    content="Sydney-based Engineering Manager and Solutions Architect focused on platform engineering, Azure, DevSecOps, developer productivity, and resilient cloud delivery." />
+  <meta name="twitter:image" content="https://anas.semesmieh.com/profile-close.jpg" />
+  <meta name="theme-color" content="#0b1220" />
+  <link rel="icon" href="/profile.ico" type="image/x-icon" />
+
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #101a2c;
+      --card-hover: #132034;
+      --muted: #8ea0be;
+      --text: #e6eef8;
+      --accent: #22c55e;
+      --accent-soft: rgba(34, 197, 94, 0.12);
+      --heading: #60a5fa;
+      --border: rgba(255, 255, 255, 0.08);
+      --maxw: 1120px;
+      --radius: 18px;
+      --font: "Inter", "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.65;
+      background:
+        radial-gradient(ellipse at 15% 0%, #13203a 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 15%, #0e1a32 0%, transparent 45%),
+        var(--bg);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover { text-decoration: underline; }
+
+    .wrap {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 28px 24px 72px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    .brand {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      color: var(--text);
+    }
+
+    .nav {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .nav a {
+      color: var(--muted);
+      padding: 8px 14px;
+      border-radius: 11px;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .nav a:hover,
+    .nav a[aria-current="page"] {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.05);
+      text-decoration: none;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.9fr);
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: #86efac;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    h1 {
+      font-size: 40px;
+      margin-bottom: 12px;
+      color: var(--heading);
+    }
+
+    h2 {
+      font-size: 27px;
+      margin-bottom: 12px;
+      color: var(--heading);
+    }
+
+    h3 {
+      font-size: 18px;
+      margin-bottom: 8px;
+      color: #93c5fd;
+    }
+
+    p {
+      margin: 0;
+      color: var(--text);
+    }
+
+    .supporting {
+      margin-bottom: 16px;
+      color: var(--muted);
+      font-size: 18px;
+      max-width: 60ch;
+    }
+
+    .hero-copy p + p { margin-top: 14px; }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 22px;
+    }
+
+    .button,
+    .ghost {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 18px;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: transform 0.15s, border-color 0.15s, background 0.15s;
+    }
+
+    .button {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #04110b;
+    }
+
+    .button:hover,
+    .ghost:hover {
+      transform: translateY(-1px);
+      text-decoration: none;
+    }
+
+    .ghost {
+      color: var(--text);
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .profile {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .profile img {
+      width: 152px;
+      max-width: 100%;
+      border-radius: 18px;
+      border: 3px solid rgba(34, 197, 94, 0.25);
+      box-shadow: 0 10px 30px rgba(34, 197, 94, 0.16);
+    }
+
+    .profile .meta {
+      color: var(--muted);
+      display: grid;
+      gap: 8px;
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .grid.two-col {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .facts {
+      display: grid;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .fact {
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .fact-label {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+
+    .fact-value {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .intro {
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 22px;
+    }
+
+    li + li { margin-top: 10px; }
+
+    .expertise-grid,
+    .writing-grid,
+    .link-grid {
+      display: grid;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .expertise-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .writing-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .expertise-item,
+    .feature-card,
+    .link-card,
+    .timeline-item {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      background: rgba(255, 255, 255, 0.025);
+    }
+
+    .feature-card {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      color: inherit;
+      transition: border-color 0.15s, transform 0.15s, background 0.15s;
+    }
+
+    .feature-card:hover {
+      border-color: rgba(34, 197, 94, 0.35);
+      background: var(--card-hover);
+      transform: translateY(-2px);
+      text-decoration: none;
+    }
+
+    .feature-card p,
+    .timeline-item p,
+    .expertise-item p,
+    .link-card p {
+      color: var(--muted);
+    }
+
+    .label-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: #86efac;
+      border: 1px solid rgba(34, 197, 94, 0.24);
+      background: var(--accent-soft);
+    }
+
+    .timeline {
+      display: grid;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .timeline-meta {
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer {
+      margin-top: 20px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer a { color: var(--text); }
+
+    @media (max-width: 920px) {
+      .hero,
+      .grid.two-col,
+      .expertise-grid,
+      .writing-grid {
+        grid-template-columns: 1fr;
+      }
+
+      h1 { font-size: 32px; }
+    }
+
+    @media (max-width: 700px) {
+      .wrap { padding: 18px 14px 48px; }
+      .card { padding: 22px; }
+      .actions { flex-direction: column; align-items: stretch; }
+      .button,
+      .ghost { width: 100%; }
+    }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    "name": "About Anas Semesmieh",
+    "url": "https://anas.semesmieh.com/about/",
+    "description": "Learn about Anas Semesmieh, a Sydney-based Engineering Manager and Solutions Architect with 14+ years of experience in platform engineering, Azure architecture, DevSecOps, cloud cost optimization, and engineering leadership.",
+    "mainEntity": {
+      "@type": "Person",
+      "name": "Anas Semesmieh",
+      "url": "https://anas.semesmieh.com/",
+      "image": "https://anas.semesmieh.com/profile-close.jpg",
+      "jobTitle": "Engineering Manager and Solutions Architect",
+      "description": "Sydney-based Engineering Manager and Solutions Architect focused on platform engineering, Azure, DevSecOps, developer productivity, and resilient cloud delivery.",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Sydney",
+        "addressCountry": "AU"
+      },
+      "sameAs": [
+        "https://www.linkedin.com/in/anassemesmieh",
+        "https://github.com/AnasSemesmieh"
+      ],
+      "knowsAbout": [
+        "Platform Engineering",
+        "Azure Cloud Architecture",
+        "DevSecOps",
+        "Infrastructure as Code",
+        "CI/CD",
+        "Internal Developer Platforms",
+        "Cloud Cost Optimization",
+        "Engineering Leadership",
+        "Self-Hosting"
+      ]
+    }
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://anas.semesmieh.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "About",
+        "item": "https://anas.semesmieh.com/about/"
+      }
+    ]
+  }
+  </script>
+</head>
+
+<body>
+  <div class="wrap">
+    <header class="topbar">
+      <div class="brand"><a href="/" style="color:inherit;text-decoration:none">Anas Semesmieh</a></div>
+      <nav class="nav" aria-label="About navigation">
+        <a href="/">Portfolio</a>
+        <a href="/about/" aria-current="page">About</a>
+        <a href="/blog/">Blog</a>
+        <a href="/#contact">Contact</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="card hero-copy">
+          <p class="eyebrow">About</p>
+          <h1>About Anas Semesmieh</h1>
+          <p class="supporting">Engineering Manager and Solutions Architect focused on platform engineering, Azure, DevSecOps, developer productivity, and resilient cloud delivery.</p>
+          <p>Anas Semesmieh is a Sydney-based Engineering Manager and Solutions Architect with more than 14 years of experience across software engineering, cloud architecture, DevSecOps, and platform engineering. He leads teams and platforms that improve developer productivity, strengthen security, and reduce infrastructure cost, with deep experience in Azure, automation, internal developer platforms, and large-scale delivery.</p>
+          <p>Outside work, he builds and documents a public homelab to stay hands-on with backup automation, self-hosting, disaster recovery, and secure operations.</p>
+          <div class="actions">
+            <a class="button" href="mailto:anas@semesmieh.com?subject=Opportunity%20for%20Anas%20Semesmieh">Contact Anas</a>
+            <a class="ghost" href="/anas-semesmieh-resume.pdf" download>Download Resume</a>
+          </div>
+        </div>
+
+        <aside class="card profile">
+          <img src="/profile-close.jpg" alt="Anas Semesmieh portrait" loading="lazy" />
+          <div class="meta">
+            <div>Sydney, Australia</div>
+            <div>Engineering Manager and Solutions Architect</div>
+            <div>14+ years in software and cloud engineering</div>
+            <div>Open to Engineering Manager, Head of Platform/Engineering, and Solutions Architect opportunities</div>
+          </div>
+          <div class="actions" style="margin-top:0">
+            <a class="ghost" href="https://www.linkedin.com/in/anassemesmieh" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+            <a class="ghost" href="https://github.com/AnasSemesmieh" target="_blank" rel="noopener noreferrer">GitHub</a>
+          </div>
+        </aside>
+      </section>
+
+      <div class="grid two-col">
+        <section class="card">
+          <h2>Quick Facts</h2>
+          <div class="facts">
+            <div class="fact">
+              <div class="fact-label">Location</div>
+              <div class="fact-value">Sydney, Australia</div>
+            </div>
+            <div class="fact">
+              <div class="fact-label">Current Focus</div>
+              <div class="fact-value">Platform engineering, Azure architecture, DevSecOps, and developer productivity</div>
+            </div>
+            <div class="fact">
+              <div class="fact-label">Experience</div>
+              <div class="fact-value">14+ years across software engineering, cloud architecture, operations, and engineering leadership</div>
+            </div>
+            <div class="fact">
+              <div class="fact-label">Public Work</div>
+              <div class="fact-value">Portfolio, technical writing, and a public homelab repository documenting automation, backup, and recovery practices</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Selected Wins</h2>
+          <p class="intro">Across engineering leadership, cloud architecture, and delivery transformation, Anas has focused on making platforms more scalable, secure, and efficient.</p>
+          <ul>
+            <li>Reduced Azure cloud spend by 50 percent through targeted platform and cost-optimization initiatives.</li>
+            <li>Led migration of repositories and pipelines from Azure DevOps to GitHub to improve CI/CD reliability and security.</li>
+            <li>Introduced self-service platform patterns and internal developer portal capabilities to improve developer productivity.</li>
+            <li>Reduced KTLO effort by 30 percent to free capacity for higher-value platform work.</li>
+            <li>Drove practical AI adoption with engineering guardrails to improve team effectiveness.</li>
+          </ul>
+        </section>
+      </div>
+
+      <section class="card grid" style="margin-top:18px">
+        <div>
+          <h2>Core Expertise</h2>
+          <p class="intro">His work sits at the intersection of platform strategy and hands-on technical execution.</p>
+        </div>
+        <div class="expertise-grid">
+          <div class="expertise-item">
+            <h3>Platform Engineering and Developer Productivity</h3>
+            <p>Designing shared platform capabilities, self-service workflows, and delivery standards that help teams ship faster with less operational drag.</p>
+          </div>
+          <div class="expertise-item">
+            <h3>Azure Cloud Architecture and Cloud-Native Delivery</h3>
+            <p>Building resilient Azure platforms and modern application delivery paths that balance velocity, reliability, and operating cost.</p>
+          </div>
+          <div class="expertise-item">
+            <h3>DevSecOps, CI/CD, and Infrastructure as Code</h3>
+            <p>Applying automation, Git-based workflows, and repeatable infrastructure patterns to improve release confidence and security posture.</p>
+          </div>
+          <div class="expertise-item">
+            <h3>Engineering Leadership and Operational Maturity</h3>
+            <p>Leading teams, mentoring engineers, and translating platform work into measurable outcomes such as lower KTLO load, faster delivery, and stronger governance.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" style="margin-top:18px">
+        <h2>Career Snapshot</h2>
+        <p class="intro">Anas has progressed from software engineering and infrastructure roles into architecture and engineering leadership positions across multiple markets.</p>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-meta">2021 - Present · Sydney</div>
+            <h3>Engineering Manager - Platform Engineering at Pickles Auctions</h3>
+            <p>Leads platform engineering initiatives spanning build and release engineering, environment management, Azure cost optimization, and shared platform services.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-meta">2018 - 2021 · Kuala Lumpur</div>
+            <h3>Development Lead at CarZapp</h3>
+            <p>Built cloud-native solutions on Azure, led application delivery across mobile and web, and improved release practices through stronger CI/CD foundations.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-meta">2016 - 2018 · Kuala Lumpur</div>
+            <h3>Solutions Architect / Senior Software Engineer at Strateq Group</h3>
+            <p>Designed IoT and analytics platforms, introduced Infrastructure as Code practices, and delivered enterprise integrations that improved workflow automation.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-meta">2011 - 2016 · Damascus and Kuala Lumpur</div>
+            <h3>Earlier Software Engineering, Operations, and Training Roles</h3>
+            <p>Built a foundation across application development, IT operations, Azure and Office 365 administration, and technical training.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" style="margin-top:18px">
+        <h2>Featured Writing</h2>
+        <p class="intro">Selected articles that reflect Anas's practical approach to automation, resilience, and secure self-hosted platforms.</p>
+        <div class="writing-grid">
+          <a class="feature-card" href="/blog/posts/homelab-backup-automation.html">
+            <h3>Automated Config Backup with Secret Redaction</h3>
+            <p>A practical breakdown of the nightly backup pipeline used to sync configs, redact secrets, scan for leaks, and push sanitized snapshots to GitHub.</p>
+            <div class="label-row">
+              <span class="pill">Homelab</span>
+              <span class="pill">Automation</span>
+              <span class="pill">Security</span>
+            </div>
+          </a>
+          <a class="feature-card" href="/blog/posts/homelab-vaultwarden-self-hosted-passwords.html">
+            <h3>Self-Hosting Vaultwarden</h3>
+            <p>Why Anas replaced a hosted password manager with Vaultwarden to gain full data ownership, lower cost, and secure access across every device.</p>
+            <div class="label-row">
+              <span class="pill">Homelab</span>
+              <span class="pill">Self-Hosting</span>
+              <span class="pill">Security</span>
+            </div>
+          </a>
+          <a class="feature-card" href="/blog/posts/homelab-start-here.html">
+            <h3>My Home Lab Journey: Start Here</h3>
+            <p>An overview of the Docker-based homelab used to keep platform engineering skills sharp through self-hosting, recovery drills, and automation-first operations.</p>
+            <div class="label-row">
+              <span class="pill">Homelab</span>
+              <span class="pill">Docker</span>
+              <span class="pill">Platform Engineering</span>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <div class="grid two-col">
+        <section class="card">
+          <h2>Open Source and Public Work</h2>
+          <p class="intro">The public homelab repository is a practical extension of Anas's platform engineering work.</p>
+          <div class="link-grid">
+            <div class="link-card">
+              <h3>Homelab Repository</h3>
+              <p>Documents backup workflows, restore procedures, Docker Compose services, and supporting scripts for a real self-hosted environment.</p>
+              <div class="actions">
+                <a class="button" href="https://github.com/AnasSemesmieh/homelab" target="_blank" rel="noopener noreferrer">View Repo</a>
+                <a class="ghost" href="/blog/posts/homelab-start-here.html">Read the Series</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" id="connect">
+          <h2>Connect</h2>
+          <p class="intro">For engineering leadership, platform transformation, cloud architecture, or collaboration opportunities, the best way to reach Anas is via email or LinkedIn.</p>
+          <div class="facts">
+            <div class="fact">
+              <div class="fact-label">Email</div>
+              <div class="fact-value"><a href="mailto:anas@semesmieh.com">anas@semesmieh.com</a></div>
+            </div>
+            <div class="fact">
+              <div class="fact-label">LinkedIn</div>
+              <div class="fact-value"><a href="https://www.linkedin.com/in/anassemesmieh" target="_blank" rel="noopener noreferrer">linkedin.com/in/anassemesmieh</a></div>
+            </div>
+            <div class="fact">
+              <div class="fact-label">GitHub</div>
+              <div class="fact-value"><a href="https://github.com/AnasSemesmieh" target="_blank" rel="noopener noreferrer">github.com/AnasSemesmieh</a></div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <p>©2026 <a href="/">Anas Semesmieh</a> · <a href="/blog/">Blog</a> · <a href="/#contact">Contact</a></p>
+    </footer>
+  </div>
+</body>
+
+</html>
