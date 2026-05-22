@@ -69,6 +69,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://anas.semesmieh.com/blog/posts/homelab-vaultwarden-self-hosted-passwords.html</loc>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://anas.semesmieh.com/blog/posts/homelab-secrets-management.html</loc>
     <lastmod>2026-05-10</lastmod>
     <changefreq>monthly</changefreq>

@@ -5,7 +5,15 @@
     <link>https://anas.semesmieh.com/blog/</link>
     <description>Platform engineering, Azure architecture, DevSecOps, and engineering leadership insights.</description>
     <language>en-au</language>
-    <lastBuildDate>Sun, 11 May 2026 12:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 22 May 2026 12:00:00 +0000</lastBuildDate>
+
+    <item>
+      <title>Self-Hosting Vaultwarden: Ditching 1Password for Total Password Ownership</title>
+      <link>https://anas.semesmieh.com/blog/posts/homelab-vaultwarden-self-hosted-passwords.html</link>
+      <guid>https://anas.semesmieh.com/blog/posts/homelab-vaultwarden-self-hosted-passwords.html</guid>
+      <pubDate>Fri, 22 May 2026 12:00:00 +0000</pubDate>
+      <description>How I replaced 1Password with a self-hosted Vaultwarden instance — zero subscription cost, full data ownership, nightly NAS backups, and seamless Bitwarden apps across every device.</description>
+    </item>
 
     <item>
       <title>Single Sign-On for Homelabs: Authentik, Traefik Forward-Auth, and Cloudflare Tunnel</title>
