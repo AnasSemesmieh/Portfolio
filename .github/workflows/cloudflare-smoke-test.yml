@@ -1,0 +1,74 @@
+name: Cloudflare Smoke Test
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BASE_URL: https://anas.semesmieh.com
+    steps:
+      - name: Wait for deploy and verify routes
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          routes=(
+            "/"
+            "/about/"
+            "/blog/"
+            "/blog/categories/"
+            "/blog/tags/"
+            "/blog/posts/homelab-start-here"
+            "/blog/posts/homelab-backup-automation"
+            "/blog/posts/platform-engineering-at-scale"
+          )
+
+          check_route() {
+            local route="$1"
+            local tmp
+            tmp=$(mktemp)
+            local status
+            status=$(curl -sS -o "$tmp" -w "%{http_code}" --max-time 20 "$BASE_URL$route")
+
+            if [ "$status" != "200" ]; then
+              echo "Route failed: $route (status $status)"
+              echo "Body preview:"
+              head -c 400 "$tmp" || true
+              echo
+              rm -f "$tmp"
+              return 1
+            fi
+
+            rm -f "$tmp"
+            return 0
+          }
+
+          for attempt in $(seq 1 30); do
+            echo "Smoke test attempt $attempt/30"
+            failed=0
+
+            for route in "${routes[@]}"; do
+              if ! check_route "$route"; then
+                failed=1
+              fi
+            done
+
+            if [ "$failed" -eq 0 ]; then
+              echo "All smoke test routes returned 200."
+              exit 0
+            fi
+
+            if [ "$attempt" -lt 30 ]; then
+              echo "Deploy not ready yet; retrying in 20 seconds."
+              sleep 20
+            fi
+          done
+
+          echo "Smoke test failed after 30 attempts."
+          exit 1
