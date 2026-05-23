@@ -5,7 +5,7 @@
     <link>https://anas.semesmieh.com/blog/</link>
     <description>Platform engineering, Azure architecture, DevSecOps, and engineering leadership insights.</description>
     <language>en-au</language>
-    <lastBuildDate>Fri, 22 May 2026 12:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 23 May 2026 12:00:00 +0000</lastBuildDate>
 
     <item>
       <title>Self-Hosting Vaultwarden: Ditching 1Password for Total Password Ownership</title>
@@ -40,6 +40,14 @@
     </item>
 
     <item>
+      <title>Platform Engineering Works When Innovation Ships With Guardrails</title>
+      <link>https://anas.semesmieh.com/blog/posts/platform-engineering-innovation-with-guardrails</link>
+      <guid>https://anas.semesmieh.com/blog/posts/platform-engineering-innovation-with-guardrails</guid>
+      <pubDate>Wed, 06 May 2026 11:00:00 +0000</pubDate>
+      <description>Why platform teams create the most value when they turn experimentation into secure, compliant, and self-service operating paths.</description>
+    </item>
+
+    <item>
       <title>Driving AI Adoption in Platform Teams Without Losing Engineering Discipline</title>
       <link>https://anas.semesmieh.com/blog/posts/ai-adoption-platform-teams</link>
       <guid>https://anas.semesmieh.com/blog/posts/ai-adoption-platform-teams</guid>
@@ -64,6 +72,14 @@
     </item>
 
     <item>
+      <title>Leading Through Uncertainty Without Performing False Confidence</title>
+      <link>https://anas.semesmieh.com/blog/posts/leading-through-uncertainty-engineering-teams</link>
+      <guid>https://anas.semesmieh.com/blog/posts/leading-through-uncertainty-engineering-teams</guid>
+      <pubDate>Sat, 18 Apr 2026 11:00:00 +0000</pubDate>
+      <description>Leadership lessons on navigating uncertainty with transparency, team ownership, and enough protection to keep focus intact.</description>
+    </item>
+
+    <item>
       <title>My Home Lab Journey: Start Here</title>
       <link>https://anas.semesmieh.com/blog/posts/homelab-start-here</link>
       <guid>https://anas.semesmieh.com/blog/posts/homelab-start-here</guid>
@@ -80,6 +96,14 @@
     </item>
 
     <item>
+      <title>AI Is an Amplifier, Not a Substitute for Engineering Judgment</title>
+      <link>https://anas.semesmieh.com/blog/posts/ai-amplifier-engineering-judgment</link>
+      <guid>https://anas.semesmieh.com/blog/posts/ai-amplifier-engineering-judgment</guid>
+      <pubDate>Mon, 30 Mar 2026 10:00:00 +0000</pubDate>
+      <description>Practical lessons on using AI to remove repetitive work, raise team capability, and keep engineering judgment at the center.</description>
+    </item>
+
+    <item>
       <title>From Legacy to Immutable: A Practical IaC Maturity Journey</title>
       <link>https://anas.semesmieh.com/blog/posts/immutable-infrastructure-journey</link>
       <guid>https://anas.semesmieh.com/blog/posts/immutable-infrastructure-journey</guid>
@@ -93,6 +117,14 @@
       <guid>https://anas.semesmieh.com/blog/posts/platform-engineering-at-scale</guid>
       <pubDate>Sun, 15 Mar 2026 12:00:00 +0000</pubDate>
       <description>Reducing KTLO effort, enabling IDP self-service, and leveraging automation and AI-assisted workflows.</description>
+    </item>
+
+    <item>
+      <title>SaaS for Wholesale in Automotive: What Good Digital Transformation Looks Like</title>
+      <link>https://anas.semesmieh.com/blog/posts/saas-wholesale-automotive</link>
+      <guid>https://anas.semesmieh.com/blog/posts/saas-wholesale-automotive</guid>
+      <pubDate>Mon, 05 Jan 2026 10:00:00 +0000</pubDate>
+      <description>A practical framework for evaluating SaaS in automotive wholesale, from process fit and integrations to security and rollout.</description>
     </item>
   </channel>
 </rss>
