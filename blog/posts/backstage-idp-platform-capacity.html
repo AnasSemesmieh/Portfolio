@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Ad-Hoc Tax: How Backstage Recovered Platform Capacity for Higher-Value Work | Anas Semesmieh</title>
+  <meta name="description" content="How a Backstage-based internal developer portal reduced platform toil, improved service visibility, and made self-service engineering practical." />
+  <meta name="author" content="Anas Semesmieh" />
+  <link rel="canonical" href="https://anas.semesmieh.com/blog/posts/backstage-idp-platform-capacity" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="The Ad-Hoc Tax: How Backstage Recovered Platform Capacity for Higher-Value Work" />
+  <meta property="og:description" content="A practical case study on using Backstage to reduce platform toil, centralize service visibility, and make self-service engineering real." />
+  <meta property="og:url" content="https://anas.semesmieh.com/blog/posts/backstage-idp-platform-capacity" />
+  <meta property="og:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="The Ad-Hoc Tax: How Backstage Recovered Platform Capacity for Higher-Value Work" />
+  <meta name="twitter:description" content="A practical case study on using Backstage to reduce platform toil, centralize service visibility, and make self-service engineering real." />
+  <meta name="twitter:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <style>
+    :root {
+      --bg: #0b1220; --card: #101a2c; --muted: #8ea0be; --text: #e6eef8;
+      --accent: #22c55e; --heading: #60a5fa; --border: rgba(255,255,255,0.07);
+      --maxw: 860px; --radius: 16px;
+      --font: "Inter","IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; }
+    body { color:var(--text); font-family:var(--font); line-height:1.75;
+      background: radial-gradient(ellipse at 15% 0%,#13203a 0%,transparent 50%),radial-gradient(ellipse at 85% 15%,#0e1a32 0%,transparent 45%),var(--bg);
+      -webkit-font-smoothing: antialiased; }
+    .wrap { max-width:var(--maxw); margin:0 auto; padding:32px 24px 80px; }
+    .nav { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:24px; }
+    .nav a { text-decoration:none; color:var(--muted); padding:7px 13px; border-radius:10px; font-size:14px; transition: color 0.15s, background 0.15s; }
+    .nav a:hover { color:var(--text); background:rgba(255,255,255,0.04); }
+    article { border:1px solid var(--border); border-radius:var(--radius); padding:32px; background:var(--card); }
+    h1 { font-size:36px; line-height:1.2; color: var(--heading); }
+    .meta { color:var(--muted); font-size:14px; margin:10px 0 24px; padding-bottom:20px; border-bottom:1px solid var(--border); }
+    h2 { margin-top:32px; margin-bottom:12px; font-size:24px; color: var(--heading); }
+    p { margin: 10px 0; }
+    .callout { border-left:3px solid var(--accent); padding:12px 16px; background:rgba(34,197,94,0.07); border-radius:10px; margin:20px 0; }
+    a { color: var(--accent); text-decoration:none; }
+    a:hover { text-decoration: underline; }
+    @media (max-width:700px) { .wrap { padding:16px 14px 48px; } h1 { font-size:28px; } article { padding:20px; } }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "The Ad-Hoc Tax: How Backstage Recovered Platform Capacity for Higher-Value Work",
+    "datePublished":"2026-05-08",
+    "dateModified":"2026-05-08",
+    "author": {
+      "@type": "Person",
+      "name": "Anas Semesmieh",
+      "url": "https://anas.semesmieh.com/about/"
+    },
+    "publisher": {
+      "@type": "Person",
+      "name": "Anas Semesmieh"
+    },
+    "mainEntityOfPage": "https://anas.semesmieh.com/blog/posts/backstage-idp-platform-capacity",
+    "image": "https://anas.semesmieh.com/profile-wide.jpg",
+    "description": "How a Backstage-based internal developer portal reduced platform toil, improved service visibility, and made self-service engineering practical."
+  }
+  </script>
+</head>
+
+<body>
+  <div class="wrap">
+    <nav class="nav" aria-label="Post navigation">
+      <a href="/">Portfolio</a>
+      <a href="/blog/">All Posts</a>
+      <a href="/blog/categories/">Categories</a>
+      <a href="/blog/rss.xml">RSS</a>
+    </nav>
+
+    <article>
+      <h1>The Ad-Hoc Tax: How Backstage Recovered Platform Capacity for Higher-Value Work</h1>
+      <p class="meta">By <a href="/about/">Anas Semesmieh</a> · May 8, 2026 · IDP, Developer Experience</p>
+
+      <p>Platform teams usually know they are overloaded long before anyone measures it. The signs are obvious: onboarding questions arrive through chat, service ownership is hard to trace, runtime details live in three different places, and every request that should be self-service quietly becomes another interruption for the same small group of people.</p>
+
+      <div class="callout">
+        The most expensive platform work is often the work that should never have required a platform engineer in the first place.
+      </div>
+
+      <p>The Backstage proposal behind this post is useful because it treats an internal developer portal as a capacity problem, not just a developer experience initiative. That framing is sharper. Better experience matters, but the strategic benefit comes from turning repeated manual requests into reusable platform behavior.</p>
+
+      <h2>1. The ad-hoc tax is a real operating cost</h2>
+      <p>The source document starts from a problem many platform teams recognize immediately: too much energy was being spent on repeated operational support instead of higher-value platform work. That kind of toil is easy to normalize because each request looks small on its own. In aggregate, it becomes a tax on focus, delivery planning, and long-term architecture improvement.</p>
+
+      <p>What makes this particularly damaging is the context switching. A platform team that spends large portions of its time answering one-off questions, locating service details, or helping teams navigate scattered systems cannot sustain product thinking. It becomes a routing layer for knowledge that should already be encoded into the platform.</p>
+
+      <p>That is why the document's framing around automation maturity matters. The issue is not simply that people asked for help. The issue is that the system kept requiring handoffs for work that should have become self-service once it repeated enough times.</p>
+
+      <h2>2. Scattered tools create visibility gaps even when the data exists</h2>
+      <p>One of the strongest themes in the proposal is that information was available, but not coherently available. Service details, runtime context, event visibility, onboarding knowledge, and platform capabilities were spread across separate tools and manual paths. That creates a strange failure mode: teams technically have observability, but they do not have visibility.</p>
+
+      <p>This is where a portal like Backstage becomes more than a nicer homepage. A service catalog gives teams a stable place to understand what exists and who owns it. Templates and scaffolding reduce the cost of creating new services in a compliant way. Plug-in driven visibility makes it easier to connect operational context back to the thing developers actually think in terms of: the service.</p>
+
+      <p>The practical value here is not centralization for its own sake. It is the removal of search friction. Every minute engineers spend reconstructing service context from scattered systems is a minute the platform is failing to behave like a product.</p>
+
+      <h2>3. Backstage helps when it becomes the front door for platform behavior</h2>
+      <p>The proposal is strongest where it gets specific about what Backstage can consolidate: service discovery, self-service entry points, shared templates, and better visibility into the running estate. That is the implementation angle that keeps this story distinct from more general IDP conversations.</p>
+
+      <p>A portal only matters if it becomes the place where useful action starts. Developers should be able to discover a service, understand its operational context, and trigger the next safe step without opening three other tools first. That is how the portal starts reclaiming platform capacity. It reduces the number of human explanations required to move work forward.</p>
+
+      <p>Backstage is a strong fit for that kind of problem because it encourages structured extensibility. Teams can begin with a catalog and templates, then grow into richer operational views and workflow integrations. That phased depth is important. It lets the portal start solving immediate friction without pretending every capability must arrive at once.</p>
+
+      <h2>4. Phased rollout is what makes self-service believable</h2>
+      <p>The document's phased implementation plan is one of its strongest qualities. The first phase focuses on core foundations. Later phases expand into richer platform capability, better visibility, and a more mature self-service experience. That is the right shape for an IDP rollout because trust has to be earned.</p>
+
+      <p>If teams are asked to depend on a portal before it has reliable service data, useful templates, or clear ownership, they will revert to the old channels immediately. Once that habit returns, adoption becomes much harder. A staged rollout avoids that failure by introducing the portal as a real operating surface, not as an aspirational dashboard.</p>
+
+      <p>This is also how platform teams protect themselves from overreach. Trying to solve onboarding, service inventory, deployment workflows, observability, and work management in a single launch usually produces a thin version of all of them. A phased model makes it easier to create one clearly useful capability at a time.</p>
+
+      <h2>5. The best outcome is recovered attention</h2>
+      <p>The clearest public-safe outcome from the proposal is not any single feature. It is the recovery of platform attention. Once repeated requests move behind templates, catalogs, and structured entry points, the team can spend more time on the architecture and automation work that only the platform team can do.</p>
+
+      <p>That is why I like the phrase ad-hoc tax. It captures the fact that manual support is not just inconvenient. It is a recurring deduction from strategic capacity. A good internal developer portal pays that tax down over time by turning repeated knowledge into platform behavior.</p>
+
+      <p>Seen that way, Backstage is not simply a portal choice. It is a mechanism for changing how platform work gets consumed. Instead of platform engineers acting as the system, the platform starts behaving more like a system on its own.</p>
+
+      <h2>Closing thought</h2>
+      <p>Internal developer platforms create real value when they recover time for the work that cannot be templated away. The right portal is the one that turns repeated requests into safe self-service and gives the platform team its attention back.</p>
+    </article>
+  </div>
+</body>
+
+</html>

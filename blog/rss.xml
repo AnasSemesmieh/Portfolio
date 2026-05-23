@@ -32,6 +32,14 @@
     </item>
 
     <item>
+      <title>The Ad-Hoc Tax: How Backstage Recovered Platform Capacity for Higher-Value Work</title>
+      <link>https://anas.semesmieh.com/blog/posts/backstage-idp-platform-capacity</link>
+      <guid>https://anas.semesmieh.com/blog/posts/backstage-idp-platform-capacity</guid>
+      <pubDate>Fri, 08 May 2026 12:00:00 +0000</pubDate>
+      <description>How a Backstage-based internal developer portal reduced platform toil, improved service visibility, and made self-service engineering practical.</description>
+    </item>
+
+    <item>
       <title>Homelab Disaster Recovery in Under an Hour</title>
       <link>https://anas.semesmieh.com/blog/posts/homelab-disaster-recovery</link>
       <guid>https://anas.semesmieh.com/blog/posts/homelab-disaster-recovery</guid>
@@ -120,11 +128,35 @@
     </item>
 
     <item>
+      <title>The Edge-First Frontend: Standardizing Web Architecture on Cloudflare</title>
+      <link>https://anas.semesmieh.com/blog/posts/cloudflare-frontend-standardization</link>
+      <guid>https://anas.semesmieh.com/blog/posts/cloudflare-frontend-standardization</guid>
+      <pubDate>Thu, 19 Feb 2026 12:00:00 +0000</pubDate>
+      <description>Why an edge-first frontend model on Cloudflare can reduce idle infrastructure cost, improve global performance, and simplify deployment operations.</description>
+    </item>
+
+    <item>
       <title>SaaS for Wholesale in Automotive: What Good Digital Transformation Looks Like</title>
       <link>https://anas.semesmieh.com/blog/posts/saas-wholesale-automotive</link>
       <guid>https://anas.semesmieh.com/blog/posts/saas-wholesale-automotive</guid>
       <pubDate>Mon, 05 Jan 2026 10:00:00 +0000</pubDate>
       <description>A practical framework for evaluating SaaS in automotive wholesale, from process fit and integrations to security and rollout.</description>
+    </item>
+
+    <item>
+      <title>Dependabot Without Pull Request Fatigue: Automating Dependency Hygiene the Right Way</title>
+      <link>https://anas.semesmieh.com/blog/posts/dependabot-dependency-automation</link>
+      <guid>https://anas.semesmieh.com/blog/posts/dependabot-dependency-automation</guid>
+      <pubDate>Thu, 11 Dec 2025 12:00:00 +0000</pubDate>
+      <description>How to use Dependabot to automate dependency updates, reduce security drift, and keep review noise under control with better policy design.</description>
+    </item>
+
+    <item>
+      <title>Git Flow Without the Ceremony Tax: A Practical Branching Strategy for Growing Teams</title>
+      <link>https://anas.semesmieh.com/blog/posts/git-flow-branching-strategy</link>
+      <guid>https://anas.semesmieh.com/blog/posts/git-flow-branching-strategy</guid>
+      <pubDate>Thu, 16 Oct 2025 12:00:00 +0000</pubDate>
+      <description>How a disciplined Git Flow model reduced release friction, improved traceability, and made multi-team delivery easier to scale without adding process theatre.</description>
     </item>
   </channel>
 </rss>
