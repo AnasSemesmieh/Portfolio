@@ -1,3 +1,2 @@
-scripts/serve-static.ps1
-scripts/start-server.ps1
-scripts/stop-server.ps1
+scripts/
+.transcription-work/
