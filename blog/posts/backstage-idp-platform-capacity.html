@@ -37,6 +37,8 @@
     .meta { color:var(--muted); font-size:14px; margin:10px 0 24px; padding-bottom:20px; border-bottom:1px solid var(--border); }
     h2 { margin-top:32px; margin-bottom:12px; font-size:24px; color: var(--heading); }
     p { margin: 10px 0; }
+    ul, ol { margin: 10px 0; padding-left: 22px; }
+    li { margin: 4px 0; }
     .callout { border-left:3px solid var(--accent); padding:12px 16px; background:rgba(34,197,94,0.07); border-radius:10px; margin:20px 0; }
     a { color: var(--accent); text-decoration:none; }
     a:hover { text-decoration: underline; }
@@ -79,51 +81,98 @@
       <h1>The Ad-Hoc Tax: How Backstage Recovered Platform Capacity for Higher-Value Work</h1>
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> · May 8, 2026 · IDP, Developer Experience</p>
 
-      <p>Platform teams usually know they are overloaded long before anyone measures it. The signs are obvious: onboarding questions arrive through chat, service ownership is hard to trace, runtime details live in three different places, and every request that should be self-service quietly becomes another interruption for the same small group of people.</p>
+      <p>The original Backstage proposal was much more concrete than this article initially made it sound. It was not a generic internal-developer-platform argument. It documented a platform team spending roughly half of its workload on ad-hoc support, alongside specific developer pain points: new service creation, onboarding, scattered runtime visibility, difficult Kafka topic observability, and fragmented access to deployment and platform tools.</p>
 
       <div class="callout">
-        The most expensive platform work is often the work that should never have required a platform engineer in the first place.
+        The source document treated Backstage as a capacity-recovery program: reduce manual platform handoffs, centralize service metadata, and make routine developer tasks executable through platform workflows instead of chat requests.
       </div>
 
-      <p>The Backstage proposal behind this post is useful because it treats an internal developer portal as a capacity problem, not just a developer experience initiative. That framing is sharper. Better experience matters, but the strategic benefit comes from turning repeated manual requests into reusable platform behavior.</p>
+      <p>That framing matters because the effort in the document is architectural and operational. It defines the developer problems, the portal capabilities, the target runtime for Backstage itself, the rollout phases, the quality gates, and the success criteria. That is what should have been carried into the post from the start.</p>
 
-      <h2>1. The ad-hoc tax is a real operating cost</h2>
-      <p>The source document starts from a problem many platform teams recognize immediately: too much energy was being spent on repeated operational support instead of higher-value platform work. That kind of toil is easy to normalize because each request looks small on its own. In aggregate, it becomes a tax on focus, delivery planning, and long-term architecture improvement.</p>
+      <h2>1. The proposal starts with a specific platform failure mode</h2>
+      <p>The background section in the source doc is detailed. The platform team was spending about 50 percent of its workload on ad-hoc requests. That is not just a morale issue. It means the platform is failing to encode repeated work into reusable capability. The document also lists the exact developer problems that justified an IDP rollout:</p>
 
-      <p>What makes this particularly damaging is the context switching. A platform team that spends large portions of its time answering one-off questions, locating service details, or helping teams navigate scattered systems cannot sustain product thinking. It becomes a routing layer for knowledge that should already be encoded into the platform.</p>
+      <ul>
+        <li>Navigating disparate tools and services across multiple teams.</li>
+        <li>Slow onboarding for new engineers.</li>
+        <li>Friction around new service creation and deployment.</li>
+        <li>Poor observability for events and Kafka topics.</li>
+        <li>Scattered runtime visibility for configs, app versions, and topic usage.</li>
+      </ul>
 
-      <p>That is why the document's framing around automation maturity matters. The issue is not simply that people asked for help. The issue is that the system kept requiring handoffs for work that should have become self-service once it repeated enough times.</p>
+      <p>This is more technical than a broad statement about developer experience. The document is effectively saying: service metadata, deployment state, event topology, and onboarding guidance exist, but the system does not expose them through one coherent surface. That is why developers keep falling back to manual requests.</p>
 
-      <h2>2. Scattered tools create visibility gaps even when the data exists</h2>
-      <p>One of the strongest themes in the proposal is that information was available, but not coherently available. Service details, runtime context, event visibility, onboarding knowledge, and platform capabilities were spread across separate tools and manual paths. That creates a strange failure mode: teams technically have observability, but they do not have visibility.</p>
+      <p>The proposal also ties this to automation maturity, targeting a meaningful shift away from manual intervention and toward portal-driven workflows. That is the first concrete problem being solved: ad-hoc support had become a structural property of the platform, not an exception.</p>
 
-      <p>This is where a portal like Backstage becomes more than a nicer homepage. A service catalog gives teams a stable place to understand what exists and who owns it. Templates and scaffolding reduce the cost of creating new services in a compliant way. Plug-in driven visibility makes it easier to connect operational context back to the thing developers actually think in terms of: the service.</p>
+      <h2>2. The solution approach was a capability map, not just a portal homepage</h2>
+      <p>The objectives section in the source doc is where the implementation effort really shows. Backstage was being positioned as a platform surface that could aggregate and expose several specific capability sets:</p>
 
-      <p>The practical value here is not centralization for its own sake. It is the removal of search friction. Every minute engineers spend reconstructing service context from scattered systems is a minute the platform is failing to behave like a product.</p>
+      <ul>
+        <li>Technical OKR visibility such as code quality and security posture.</li>
+        <li>Deployment and scaffolding workflows.</li>
+        <li>Config management and events management.</li>
+        <li>Developer task management such as pending PRs, assigned issues, and approval flow visibility.</li>
+        <li>Runtime observability for configs, versions, Kafka topics, and topic consumption.</li>
+        <li>Aggregation of platform services that were previously scattered across separate internal tools.</li>
+      </ul>
 
-      <h2>3. Backstage helps when it becomes the front door for platform behavior</h2>
-      <p>The proposal is strongest where it gets specific about what Backstage can consolidate: service discovery, self-service entry points, shared templates, and better visibility into the running estate. That is the implementation angle that keeps this story distinct from more general IDP conversations.</p>
+      <p>This is why the source doc kept naming artifacts such as Service Catalog, API Catalog, Events Catalog, Resource Catalog, Config Management, and Developer Dashboard. Those are not marketing phrases. They are the actual product surfaces the platform team intended to build and ship.</p>
 
-      <p>A portal only matters if it becomes the place where useful action starts. Developers should be able to discover a service, understand its operational context, and trigger the next safe step without opening three other tools first. That is how the portal starts reclaiming platform capacity. It reduces the number of human explanations required to move work forward.</p>
+      <p>Official Backstage documentation mirrors this capability model. The <a href="https://backstage.io/docs/features/software-catalog/software-catalog-overview">Software Catalog</a> and <a href="https://backstage.io/docs/features/software-templates/">Software Templates</a> are relevant references here because they map directly to what the source proposal was trying to institutionalize: discoverability, scaffolding, and workflow standardization.</p>
 
-      <p>Backstage is a strong fit for that kind of problem because it encourages structured extensibility. Teams can begin with a catalog and templates, then grow into richer operational views and workflow integrations. That phased depth is important. It lets the portal start solving immediate friction without pretending every capability must arrive at once.</p>
+      <h2>3. The architecture section defines how Backstage would actually run</h2>
+      <p>The proposed architecture section in the document is also more detailed than the original post captured. It identifies the Backstage Framework on Node.js and TypeScript, with GitHub repositories and GitHub Actions as the primary integration surface. It also defines an infrastructure path for the portal itself:</p>
 
-      <h2>4. Phased rollout is what makes self-service believable</h2>
-      <p>The document's phased implementation plan is one of its strongest qualities. The first phase focuses on core foundations. Later phases expand into richer platform capability, better visibility, and a more mature self-service experience. That is the right shape for an IDP rollout because trust has to be earned.</p>
+      <ul>
+        <li>An MVP footprint using separate web and API app services with PostgreSQL.</li>
+        <li>A production-oriented target with isolated lower and production environments and dedicated PostgreSQL instances.</li>
+        <li>Placement inside shared platform infrastructure for longer-term operation.</li>
+      </ul>
 
-      <p>If teams are asked to depend on a portal before it has reliable service data, useful templates, or clear ownership, they will revert to the old channels immediately. Once that habit returns, adoption becomes much harder. A staged rollout avoids that failure by introducing the portal as a real operating surface, not as an aspirational dashboard.</p>
+      <p>That is an important part of the technical effort. The proposal was not only about portal UX. It was also about deciding where Backstage itself lives, how it integrates into delivery pipelines, and how much environment separation the platform team wanted before calling it production-ready.</p>
 
-      <p>This is also how platform teams protect themselves from overreach. Trying to solve onboarding, service inventory, deployment workflows, observability, and work management in a single launch usually produces a thin version of all of them. A phased model makes it easier to create one clearly useful capability at a time.</p>
+      <p>It also clarifies why Backstage was chosen instead of a thinner internal UI. The document explicitly leans on Backstage's plugin model and its ability to aggregate catalog data, scaffolding, deployments, and observability into a single surface rather than requiring separate custom tools for each concern. The official <a href="https://backstage.io/docs/overview/what-is-backstage">Backstage overview</a> is relevant here because the proposal is clearly using Backstage as a platform framework, not just a developer portal skin.</p>
 
-      <h2>5. The best outcome is recovered attention</h2>
-      <p>The clearest public-safe outcome from the proposal is not any single feature. It is the recovery of platform attention. Once repeated requests move behind templates, catalogs, and structured entry points, the team can spend more time on the architecture and automation work that only the platform team can do.</p>
+      <h2>4. The implementation plan is technical, phased, and measurable</h2>
+      <p>The rollout in the source doc is not vague. It defines three phases with concrete capability increments:</p>
 
-      <p>That is why I like the phrase ad-hoc tax. It captures the fact that manual support is not just inconvenient. It is a recurring deduction from strategic capacity. A good internal developer portal pays that tax down over time by turning repeated knowledge into platform behavior.</p>
+      <ul>
+        <li><strong>Phase 1:</strong> Backstage platform scaffolding, Service Catalog, API Catalog, Okta SSO, deployments, microservice scaffolding, and config management.</li>
+        <li><strong>Phase 2:</strong> production readiness, Events Catalog, Resource Catalog, bulk deployment support, and deeper platform integration.</li>
+        <li><strong>Phase 3:</strong> work management, personalized developer dashboards, service quality views, and SRE-facing dashboards.</li>
+      </ul>
 
-      <p>Seen that way, Backstage is not simply a portal choice. It is a mechanism for changing how platform work gets consumed. Instead of platform engineers acting as the system, the platform starts behaving more like a system on its own.</p>
+      <p>The testing and validation section matters too. The document calls out selective developer trials with users both familiar and unfamiliar with Backstage, and it pairs the rollout with SonarCloud, unit testing, and Dependabot on every merge. That shows the portal was being treated like production platform software, not just an internal utility page.</p>
+
+      <p>This is the second place where the earlier post was too abstract. The effort was not merely "phased rollout." It was a concrete backlog of platform capabilities with environment, identity, deployment, catalog, and quality-gate implications.</p>
+
+      <h2>5. The evaluation criteria show what success was supposed to look like</h2>
+      <p>The source doc does not stop at implementation. It defines how the team intended to measure whether the portal was working:</p>
+
+      <ul>
+        <li>Deployment efficiency from PR approval to deployment.</li>
+        <li>Deployment frequency improvements.</li>
+        <li>Platform responsiveness, reliability, latency, and error rates.</li>
+        <li>Reduction in ad-hoc support time.</li>
+        <li>Adoption of service catalog, templates, and documentation features.</li>
+        <li>Growth in number of services onboarded.</li>
+        <li>User satisfaction and onboarding feedback.</li>
+        <li>Documentation coverage and cross-team contribution patterns.</li>
+      </ul>
+
+      <p>That is what makes the proposal credible as engineering work. It is not only describing a desired platform state. It is defining how to prove the platform is reducing toil and improving delivery outcomes. The official Backstage docs on <a href="https://backstage.io/docs/auth/">authentication</a> and <a href="https://backstage.io/docs/features/software-catalog/descriptor-format">catalog descriptor format</a> are relevant because they show the operational depth available once the portal moves from concept to actual adoption.</p>
+
+      <h2>References</h2>
+      <ul>
+        <li><a href="https://backstage.io/docs/overview/what-is-backstage">Backstage: What is Backstage?</a></li>
+        <li><a href="https://backstage.io/docs/features/software-catalog/software-catalog-overview">Backstage Software Catalog</a></li>
+        <li><a href="https://backstage.io/docs/features/software-catalog/descriptor-format">Backstage catalog descriptor format</a></li>
+        <li><a href="https://backstage.io/docs/features/software-templates/">Backstage Software Templates</a></li>
+        <li><a href="https://backstage.io/docs/auth/">Backstage authentication docs</a></li>
+      </ul>
 
       <h2>Closing thought</h2>
-      <p>Internal developer platforms create real value when they recover time for the work that cannot be templated away. The right portal is the one that turns repeated requests into safe self-service and gives the platform team its attention back.</p>
+      <p>The technical weight of the original proposal was in the specifics: service catalog, API catalog, deployment orchestration, event visibility, config management, phased rollout, and measurable adoption criteria. That is why Backstage was worth proposing. It was not a nicer dashboard. It was a structured plan to turn platform knowledge into platform software.</p>
     </article>
   </div>
 </body>
