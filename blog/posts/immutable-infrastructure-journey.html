@@ -5,17 +5,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>From Legacy to Immutable: A Practical IaC Maturity Journey | Anas Semesmieh</title>
-  <meta name="description" content="A practical approach to driving Infrastructure as Code maturity and moving toward immutable infrastructure across legacy and modern environments." />
+  <meta name="description" content="A developer-focused look at immutable infrastructure maturity, with concrete restore workflows, Git-backed config snapshots, and rebuild-first examples." />
   <meta name="author" content="Anas Semesmieh" />
   <link rel="canonical" href="https://anas.semesmieh.com/blog/posts/immutable-infrastructure-journey" />
   <meta property="og:type" content="article" />
   <meta property="og:title" content="From Legacy to Immutable: A Practical IaC Maturity Journey" />
-  <meta property="og:description" content="How to mature IaC standards and move toward immutable infrastructure while supporting legacy and modern estates." />
+  <meta property="og:description" content="How to mature IaC standards with concrete restore jobs, config allowlists, and rebuild-first operational patterns." />
   <meta property="og:url" content="https://anas.semesmieh.com/blog/posts/immutable-infrastructure-journey" />
   <meta property="og:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="From Legacy to Immutable: A Practical IaC Maturity Journey" />
-  <meta name="twitter:description" content="How to mature IaC standards and move toward immutable infrastructure while supporting legacy and modern estates." />
+  <meta name="twitter:description" content="How to mature IaC standards with concrete restore jobs, config allowlists, and rebuild-first operational patterns." />
   <meta name="twitter:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
   <style>
     :root {
@@ -60,7 +60,7 @@
     "@type": "BlogPosting",
     "headline": "From Legacy to Immutable: A Practical IaC Maturity Journey",
     "datePublished":"2026-03-24",
-    "dateModified":"2026-03-24",
+    "dateModified":"2026-05-24",
     "author": {
       "@type": "Person",
       "name": "Anas Semesmieh",
@@ -72,7 +72,7 @@
     },
     "mainEntityOfPage": "https://anas.semesmieh.com/blog/posts/immutable-infrastructure-journey",
     "image": "https://anas.semesmieh.com/profile-wide.jpg",
-    "description": "A practical approach to driving Infrastructure as Code maturity and moving toward immutable infrastructure across legacy and modern environments."
+    "description": "A developer-focused look at immutable infrastructure maturity, with concrete restore workflows, Git-backed config snapshots, and rebuild-first examples."
   }
   </script>
 </head>
@@ -90,26 +90,187 @@
       <h1>From Legacy to Immutable: A Practical IaC Maturity Journey</h1>
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> · March 24, 2026 · IaC, Cloud Architecture</p>
 
-      <p>Infrastructure maturity is rarely a clean restart. Most teams must modernize while supporting legacy systems that still run critical workloads. The goal is to improve consistency and confidence without introducing delivery risk.</p>
+      <p>Immutable infrastructure is easy to praise and easy to misapply. In practice, most teams do not jump straight from long-lived mutable servers to golden images, short-lived nodes, and full replacement rollouts. They inherit live systems, handwritten fixes, environment drift, and a backlog of undocumented assumptions. The real journey is not from bad to perfect. It is from undocumented mutation to controlled replacement.</p>
 
       <div class="callout">
-        Immutable infrastructure is a direction, not a one-time milestone. Teams make progress when standards and workflows are upgraded incrementally and repeatedly.
+        A system becomes meaningfully more immutable when three things are true: desired state is small and explicit, restore is automated, and operational changes flow back through versioned code instead of staying trapped on the host.
       </div>
 
-      <h2>1. Set a clear baseline</h2>
-      <p>Start by identifying which parts of the estate are already codified and which still rely on manual changes. This baseline helps prioritize where IaC maturity will reduce risk fastest.</p>
+      <p>I have found that the best way to explain the idea is with real code rather than architecture slogans. In my public homelab repo, the goal is not to pretend the host is stateless. The goal is to make the host <em>rebuildable</em>: configurations are tracked, secrets are intentionally excluded, restore steps are scripted, and service bring-up follows a documented order. That is already much closer to immutable operations than "SSH in and fix it later."</p>
 
-      <h2>2. Standardize deployment patterns</h2>
-      <p>Define reusable modules and enforce naming, tagging, and policy controls. Shared patterns reduce drift and make platform changes predictable across environments.</p>
+      <h2>1. Start by shrinking the definition of desired state</h2>
+      <p>The first mistake teams make is trying to version-control the whole machine. That usually fails because runtime state, logs, downloaded media, database files, and ad hoc secrets do not belong in the same lifecycle as declarative config. If everything is "state," nothing is safely replaceable.</p>
 
-      <h2>3. Move from mutable to immutable operations</h2>
-      <p>Replace in-place changes with rebuild-and-replace workflows where practical. This improves rollback confidence and supports better auditability and security controls.</p>
+      <p>The homelab repo solves that with an explicit allowlist in <code>inventory/include-paths.txt</code>. Only restore-worthy configuration files are tracked. That is a small design choice with big consequences: it forces a clean boundary between declarative state and runtime state.</p>
 
-      <h2>4. Balance legacy and modern platforms</h2>
-      <p>Not every system can be modernized at the same speed. Use platform roadmaps that protect current business operations while steadily increasing modernized footprint.</p>
+      <pre><code>setup-repo.sh
+arrstack/docker-compose.yml
+homeassistant/config/configuration.yaml
+homepage/config/services.yaml
+traefik/docker-compose.yml
+traefik/dynamic/tls.yaml
+vaultwarden/docker-compose.yml
+vaultwarden/backup-to-nas.sh</code></pre>
+
+      <p>This is the kind of detail that makes immutability practical. A machine is not immutable because you say it is. It becomes replaceable when you can point to the specific files that define its behavior and say: these are the inputs required to rebuild service configuration, and everything else is either generated, cached, or backed up through a different path.</p>
+
+      <p>That is also why the repository README explicitly excludes media, logs, databases, raw credentials, and other runtime artifacts. Developers often skip that boundary and then wonder why their so-called infrastructure repo is impossible to restore cleanly.</p>
+
+      <h2>2. The restore path is the real immutability test</h2>
+      <p>A surprising amount of "immutable infrastructure" discussion never shows the rebuild path. That is a problem. If you cannot recreate the system from a repo plus a bounded set of secrets, you do not have an immutable practice. You have a theory.</p>
+
+      <p>In this repo, restore is not a wiki-only procedure. It is a containerized workflow. The helper stack in <code>restore/docker-compose.restore.yml</code> runs a purpose-built restore job against the tracked config set:</p>
+
+      <pre><code>services:
+  restore-configs:
+    image: alpine:3.20
+    user: "0:0"
+    working_dir: /repo
+    command: ["/bin/sh", "/repo/restore/apply-configs.sh"]
+    environment:
+      TARGET_HOME: ${TARGET_HOME:-/home/anas}
+      DRY_RUN: ${DRY_RUN:-true}
+      OVERWRITE: ${OVERWRITE:-false}
+    volumes:
+      - ..:/repo:ro
+      - /:/host</code></pre>
+
+      <p>That is developer-friendly for two reasons. First, the repo is mounted read-only, which protects the source of truth during restore. Second, the runtime behavior is controlled by explicit flags. The default mode is a dry run, not destructive copy. That is exactly the kind of safety rail mature IaC workflows need.</p>
+
+      <p>The restore script itself, <code>restore/apply-configs.sh</code>, is deliberately simple and that simplicity is a strength:</p>
+
+      <pre><code>echo "[info] restore job starting"
+echo "[info] target home: ${TARGET_HOME}"
+echo "[info] dry run: ${DRY_RUN}"
+
+while IFS= read -r rel; do
+  src="${SRC_ROOT}/${rel}"
+  dest="/host${TARGET_HOME}/${rel}"
+
+  if [ "${DRY_RUN}" = "true" ]; then
+    echo "[dry-run] copy ${src} -&gt; ${dest}"
+    continue
+  fi
+
+  mkdir -p "$(dirname "${dest}")"
+  cp -f "${src}" "${dest}"
+done &lt; "${INCLUDE_FILE}"</code></pre>
+
+      <p>The important part is not the shell syntax. It is the control flow. The script iterates only over the allowlisted file set, derives a deterministic destination, previews before applying, and supports explicit overwrite behavior. That is the kind of operational contract developers can trust during recovery.</p>
+
+      <pre><code>cd ~/homelab-backup/restore
+docker compose -f docker-compose.restore.yml run --rm \
+  -e TARGET_HOME=/home/anas \
+  -e DRY_RUN=true \
+  restore-configs</code></pre>
+
+      <p>If you can run that preview on a fresh host and see exactly what will be restored, you are no longer depending on tribal memory. You are operating from codified intent.</p>
+
+      <h2>3. Mutable changes still happen, so capture them before they become snowflakes</h2>
+      <p>This is where many teams get stuck. They know the right answer is to rebuild rather than patch in place, but real systems still need updates, token refreshes, config changes, and operational fixes. If those changes happen on the host and never flow back into the repo, the infrastructure starts drifting immediately.</p>
+
+      <p>The backup pipeline in <code>scripts/backup-and-push.sh</code> is a useful bridge pattern between mutable reality and immutable goals:</p>
+
+      <pre><code>LOCK_FILE="${REPO_ROOT}/.backup.lock"
+
+./scripts/sync-configs.sh
+./scripts/redact-secrets.sh
+./scripts/scan-secrets.sh
+
+git add -A
+
+if git diff --cached --quiet; then
+  echo "[info] no changes to commit"
+  exit 0
+fi
+
+commit_msg="backup: automated snapshot $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+git commit -m "${commit_msg}"
+git pull --rebase --autostash origin main
+git push origin main</code></pre>
+
+      <p>There are several strong engineering choices in that short script:</p>
+
+      <ul>
+        <li>A lock file prevents overlapping backup jobs from corrupting the workflow.</li>
+        <li>Config sync happens before redaction and secret scanning, so repo state is sanitized before commit.</li>
+        <li>The job is idempotent when nothing changed.</li>
+        <li>The rebase step reduces divergence between local automation and remote history.</li>
+      </ul>
+
+      <p>No, that is not full image-based immutability. But it is a disciplined anti-drift mechanism. It shortens the gap between "the server changed" and "the desired state repo reflects the change," which is exactly how teams mature toward more replaceable systems.</p>
+
+      <h2>4. Secrets and data are where immature immutable stories usually fall apart</h2>
+      <p>Another common failure mode is pretending secrets and persistent data will somehow solve themselves later. They will not. Strong immutable design depends on being explicit about what gets rebuilt, what gets restored, and what gets rehydrated.</p>
+
+      <p>The restore runbook in <code>docs/RESTORE.md</code> makes this boundary visible. The repo is cloned, an optional weekly snapshot tag can be checked out, then secrets are re-injected into the sanitized configs before any services are brought online. For example, redacted placeholders in tracked files are replaced only on the recovery target:</p>
+
+      <pre><code>source ~/.homelab-secrets.env
+
+sed -i "s|WIREGUARD_PRIVATE_KEY: REDACTED|WIREGUARD_PRIVATE_KEY: $WIREGUARD_PRIVATE_KEY|g" \
+  configs/arrstack/docker-compose.yml
+
+sed -i "s|^AUTHENTIK_SECRET_KEY=REDACTED|AUTHENTIK_SECRET_KEY=$AUTHENTIK_SECRET_KEY|" \
+  configs/authentik/.env</code></pre>
+
+      <p>That pattern is worth calling out because it demonstrates real maturity. The repo is safe to publish and clone, but still precise enough to restore the system once local secrets are rehydrated. Immutable infrastructure is not about ignoring sensitive state. It is about making the boundary between tracked configuration and sensitive runtime inputs explicit and automatable.</p>
+
+      <p>The same principle applies to persistent data. Databases and media are not treated as if they belong in the config snapshot. They use separate backup flows. That separation is what keeps the config restore path simple and predictable.</p>
+
+      <h2>5. Rebuild-first thinking is more important than any one tool</h2>
+      <p>The phrase immutable infrastructure often gets reduced to tooling debates: Packer versus Docker, Terraform versus Pulumi, VM images versus Kubernetes, cloud-init versus Ansible. Those choices matter, but they are not the first maturity milestone. The first milestone is whether engineers optimize for in-place repair or for reproducible replacement.</p>
+
+      <p>A practical maturity ladder looks more like this:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Stage</th>
+            <th>Behavior</th>
+            <th>Risk</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Mutable Ops</td>
+            <td>SSH, patch, edit live files, hope nothing important was forgotten</td>
+            <td>High drift, weak recovery, poor auditability</td>
+          </tr>
+          <tr>
+            <td>Tracked Config</td>
+            <td>Version controlled compose files, config files, and setup scripts</td>
+            <td>Better visibility, but rebuild path may still be manual</td>
+          </tr>
+          <tr>
+            <td>Scripted Restore</td>
+            <td>Dry-run restore jobs and documented bring-up order</td>
+            <td>Lower recovery risk and clearer change boundaries</td>
+          </tr>
+          <tr>
+            <td>Rebuild First</td>
+            <td>Replace hosts or workloads from codified inputs whenever practical</td>
+            <td>Low drift and stronger rollback confidence</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>That is why I like the term journey in the title. Most environments are hybrid for a long time. Some parts are rebuilt from code, some are restored from snapshots, and some legacy components still need careful in-place handling. The win is not ideological purity. The win is steadily reducing the amount of infrastructure whose behavior depends on undocumented mutation.</p>
+
+      <h2>6. What developers should take from this</h2>
+      <p>If you are building or operating services, the practical question is not "are we immutable yet?" The better question is: <em>what would I need, in Git, to recreate this safely on a new host?</em> That question tends to force the right engineering decisions:</p>
+
+      <ul>
+        <li>Separate config from runtime data.</li>
+        <li>Track only the files that define service behavior.</li>
+        <li>Make restore executable and previewable.</li>
+        <li>Rehydrate secrets outside the public source of truth.</li>
+        <li>Continuously pull host changes back into version control until rebuild-only workflows are possible.</li>
+      </ul>
+
+      <p>That is how teams move from "pets" to something closer to cattle without pretending their current systems are already there. Good immutable practice is usually a series of smaller engineering choices that make replacement safer than repair.</p>
 
       <h2>Closing thought</h2>
-      <p>IaC maturity is ultimately a leadership discipline as much as a technical one. Teams that invest in standards, ownership, and repeatable workflows create durable delivery advantages.</p>
+      <p>Immutable infrastructure is not a slogan about never logging into servers. It is a discipline of reducing hidden state, codifying restore, and making replacement the default recovery path. The more your system can be rebuilt from a small, explicit, versioned definition plus a controlled secret set, the more operational confidence you gain.</p>
     </article>
   </div>
 </body>

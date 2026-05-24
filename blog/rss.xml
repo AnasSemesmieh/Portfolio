@@ -5,7 +5,7 @@
     <link>https://anas.semesmieh.com/blog/</link>
     <description>Platform engineering, Azure architecture, DevSecOps, and engineering leadership insights.</description>
     <language>en-au</language>
-    <lastBuildDate>Sat, 23 May 2026 12:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 24 May 2026 12:00:00 +0000</lastBuildDate>
 
     <item>
       <title>Self-Hosting Vaultwarden: Ditching 1Password for Total Password Ownership</title>
@@ -60,7 +60,7 @@
       <link>https://anas.semesmieh.com/blog/posts/ai-adoption-platform-teams</link>
       <guid>https://anas.semesmieh.com/blog/posts/ai-adoption-platform-teams</guid>
       <pubDate>Sun, 03 May 2026 11:00:00 +0000</pubDate>
-      <description>A practical framework for adopting AI in platform engineering with guardrails, measurable outcomes, and team-wide enablement.</description>
+      <description>How to make AI genuinely useful for developers with grounded internal context, prompt patterns, review guardrails, and a practical reference architecture.</description>
     </item>
 
     <item>
@@ -100,7 +100,7 @@
       <link>https://anas.semesmieh.com/blog/posts/idp-self-service-playbook</link>
       <guid>https://anas.semesmieh.com/blog/posts/idp-self-service-playbook</guid>
       <pubDate>Thu, 02 Apr 2026 09:00:00 +0000</pubDate>
-      <description>A practical playbook for rolling out an internal developer portal, increasing adoption, and enabling safe self-service engineering workflows.</description>
+      <description>How to make Backstage self-service real with software catalogs, golden-path templates, and developer workflows teams actually want to use.</description>
     </item>
 
     <item>
@@ -116,7 +116,7 @@
       <link>https://anas.semesmieh.com/blog/posts/immutable-infrastructure-journey</link>
       <guid>https://anas.semesmieh.com/blog/posts/immutable-infrastructure-journey</guid>
       <pubDate>Tue, 24 Mar 2026 10:00:00 +0000</pubDate>
-      <description>A practical approach to driving Infrastructure as Code maturity and moving toward immutable infrastructure across legacy and modern environments.</description>
+      <description>How to move from ad hoc server changes to rebuildable systems with config allowlists, dry-run restore workflows, and Git-backed anti-drift automation.</description>
     </item>
 
     <item>
@@ -124,7 +124,7 @@
       <link>https://anas.semesmieh.com/blog/posts/platform-engineering-at-scale</link>
       <guid>https://anas.semesmieh.com/blog/posts/platform-engineering-at-scale</guid>
       <pubDate>Sun, 15 Mar 2026 12:00:00 +0000</pubDate>
-      <description>Reducing KTLO effort, enabling IDP self-service, and leveraging automation and AI-assisted workflows.</description>
+      <description>How platform teams reclaim engineering capacity through self-service, automation, guardrails, and pragmatic AI adoption that reduces KTLO and coordination drag.</description>
     </item>
 
     <item>

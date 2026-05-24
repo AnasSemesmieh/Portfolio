@@ -5,17 +5,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Designing an Internal Developer Portal That Teams Actually Use | Anas Semesmieh</title>
-  <meta name="description" content="A practical playbook for rolling out an internal developer portal, increasing adoption, and enabling safe self-service engineering workflows." />
+  <meta name="description" content="A developer-focused playbook for internal developer portals, with Backstage catalog and template examples that make self-service real." />
   <meta name="author" content="Anas Semesmieh" />
   <link rel="canonical" href="https://anas.semesmieh.com/blog/posts/idp-self-service-playbook" />
   <meta property="og:type" content="article" />
   <meta property="og:title" content="Designing an Internal Developer Portal That Teams Actually Use" />
-  <meta property="og:description" content="How to design self-service workflows that reduce platform bottlenecks and improve developer experience." />
+  <meta property="og:description" content="How to use Backstage catalogs, templates, and docs workflows to make developer self-service concrete and adoption-worthy." />
   <meta property="og:url" content="https://anas.semesmieh.com/blog/posts/idp-self-service-playbook" />
   <meta property="og:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Designing an Internal Developer Portal That Teams Actually Use" />
-  <meta name="twitter:description" content="How to design self-service workflows that reduce platform bottlenecks and improve developer experience." />
+  <meta name="twitter:description" content="How to use Backstage catalogs, templates, and docs workflows to make developer self-service concrete and adoption-worthy." />
   <meta name="twitter:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
   <style>
     :root {
@@ -60,7 +60,7 @@
     "@type": "BlogPosting",
     "headline": "Designing an Internal Developer Portal That Teams Actually Use",
     "datePublished":"2026-04-02",
-    "dateModified":"2026-04-02",
+    "dateModified":"2026-05-24",
     "author": {
       "@type": "Person",
       "name": "Anas Semesmieh",
@@ -72,7 +72,7 @@
     },
     "mainEntityOfPage": "https://anas.semesmieh.com/blog/posts/idp-self-service-playbook",
     "image": "https://anas.semesmieh.com/profile-wide.jpg",
-    "description": "A practical playbook for rolling out an internal developer portal, increasing adoption, and enabling safe self-service engineering workflows."
+    "description": "A developer-focused playbook for internal developer portals, with Backstage catalog and template examples that make self-service real."
   }
   </script>
 </head>
@@ -90,26 +90,171 @@
       <h1>Designing an Internal Developer Portal That Teams Actually Use</h1>
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> · April 2, 2026 · IDP, Developer Experience</p>
 
-      <p>An Internal Developer Portal can either become the team entry point for delivery or just another dashboard no one opens. Adoption depends on solving real pain points and embedding portal workflows into daily engineering operations.</p>
+      <p>Most internal developer portal articles still describe the portal as a destination. Developers do not care about destinations. They care about flow. Can they create a new service, inherit the right standards, register ownership, find the APIs they depend on, read docs close to the code, and recover from a failed workflow without asking the platform team to do it for them? If the answer is no, then the portal is still just another tab.</p>
 
       <div class="callout">
-        The best IDP strategy starts with high-frequency workflows where delays are visible and costly.
+        A portal becomes real self-service only when it turns repeated engineering tasks into executable workflows with ownership, metadata, and reviewable outputs.
       </div>
 
-      <h2>1. Start with tasks teams already repeat</h2>
-      <p>Prioritize workflows such as environment provisioning, service onboarding, and release checks. If the portal simplifies work teams already do weekly, adoption follows naturally.</p>
+      <p>That is why Backstage is worth naming directly in this discussion. Backstage describes itself as an open source framework for building developer portals, powered by a centralized software catalog. That framing is much more useful than the vague portal language many teams use internally, because it starts with the things developers actually need: cataloged software, templates, documentation, plugins, and one place to understand the system they are changing.</p>
 
-      <h2>2. Make platform standards easy to consume</h2>
-      <p>Bundle policy checks, templates, and secure defaults into guided workflows. This raises quality and reduces cognitive load without requiring every team to become platform experts.</p>
+      <h2>1. Start with the developer path, not the portal homepage</h2>
+      <p>The first mistake in IDP work is beginning with navigation instead of outcomes. The developer path is more concrete. A healthy first self-service flow often looks like this:</p>
 
-      <h2>3. Define service ownership and support paths</h2>
-      <p>Clear ownership and response expectations build trust. Teams need to know who owns each workflow, how to get help, and what service levels to expect.</p>
+      <ol>
+        <li>Choose a golden-path template for a new service or library.</li>
+        <li>Provide a small set of parameters: service name, owner, repo location, runtime, tier.</li>
+        <li>Generate the repository skeleton, CI wiring, docs stubs, and catalog metadata.</li>
+        <li>Register the component in the portal automatically.</li>
+        <li>Expose ownership, dependencies, APIs, docs, and operational links in one place.</li>
+      </ol>
 
-      <h2>4. Measure outcomes, not just clicks</h2>
-      <p>Track lead-time reduction, request turnaround, and reduction in manual platform tickets. These metrics show whether the portal is driving strategic value, not just usage activity.</p>
+      <p>If an engineer still has to open a ticket to get basic metadata, ownership, documentation, or bootstrap conventions wired correctly, then the portal has not removed the bottleneck. It has only rebranded it.</p>
+
+      <pre><code>Developer
+   |
+   v
+Backstage /create
+   |
+   v
+Scaffolder template
+   |- generates repo skeleton
+   |- injects CI / docs / metadata
+   |- publishes to Git provider
+   |- registers catalog entity
+   v
+Catalog + docs + links + ownership + APIs
+   |
+   v
+Normal PR, review, and deployment flow</code></pre>
+
+      <h2>2. The software catalog is where self-service stops being hand-wavy</h2>
+      <p>The Backstage software catalog matters because it gives developers an explicit data model for software instead of leaving ownership and relationships implicit. A service is not just a repo URL and a team memory. In Backstage, a component can carry a type, lifecycle, owner, system, APIs, and dependencies. That is a much stronger foundation for self-service than a wiki page and a naming convention.</p>
+
+      <p>Backstage recommends using a <code>catalog-info.yaml</code> descriptor, and the core entity envelope is explicit: <code>apiVersion</code>, <code>kind</code>, <code>metadata</code>, and <code>spec</code>. That is the kind of structure developers can reason about and automate against.</p>
+
+      <pre><code>apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: payments-service
+  description: Handles payment capture and settlement
+  tags:
+    - java
+    - grpc
+spec:
+  type: service
+  lifecycle: production
+  owner: group:default/payments-platform
+  system: checkout
+  providesApis:
+    - api:default/payments-public
+  dependsOn:
+    - resource:default/payments-db</code></pre>
+
+      <p>This is developer-oriented self-service in practice. The component has a declared owner. It belongs to a system. It can advertise the APIs it provides and the resources it depends on. That is much more useful than a portal that only tells you a service exists. It tells you how to navigate the software estate without guessing.</p>
+
+      <p>It also improves failure response. When a service breaks, developers should not have to reconstruct ownership and dependency context from Slack messages, dashboards, and tribal memory. The portal should already know.</p>
+
+      <h2>3. Templates are where platform standards become executable</h2>
+      <p>Backstage Software Templates are one of the clearest examples of what makes an IDP developer-friendly. Templates do not just document the happy path. They execute it. Backstage's template model supports parameters rendered in the frontend, followed by backend steps that fetch a skeleton, publish it, and register the result in the catalog. That is a concrete self-service flow, not just a portal link.</p>
+
+      <pre><code>apiVersion: backstage.io/v1beta2
+kind: Template
+metadata:
+  name: service-golden-path
+  title: Create a Backend Service
+  description: Bootstraps a production-ready service
+spec:
+  owner: group:default/platform-engineering
+  type: service
+  parameters:
+    - title: Service details
+      required:
+        - name
+        - owner
+        - repoUrl
+      properties:
+        name:
+          type: string
+          title: Service name
+        owner:
+          type: string
+          title: Owning team
+        repoUrl:
+          type: string
+          title: Repository location
+  steps:
+    - id: fetchBase
+      name: Fetch skeleton
+      action: fetch:template
+      input:
+        url: ./skeleton
+        values:
+          name: ${{ parameters.name }}
+          owner: ${{ parameters.owner }}
+    - id: publishRepo
+      name: Publish repository
+      action: publish:github
+      input:
+        repoUrl: ${{ parameters.repoUrl }}
+    - id: registerCatalog
+      name: Register in catalog
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps.publishRepo.output.repoContentsUrl }}
+        catalogInfoPath: /catalog-info.yaml</code></pre>
+
+      <p>The important point is not the YAML itself. It is what the YAML represents. Templates let a platform team encode secure defaults, folder structure, CI standards, initial documentation, and service metadata into an actual workflow. Developers stop asking, “What do I need to create?” and start from a generated baseline that already matches the operating model.</p>
+
+      <p>Backstage's own docs also make a subtle but important product point: the template flow includes input collection, a review page before execution, step logs on failure, and task history for reruns. Developers trust self-service more when failure is inspectable. If a scaffolding flow breaks and the only answer is “ask platform,” the portal is not mature yet.</p>
+
+      <h2>4. Docs, APIs, and ownership need to live beside the component</h2>
+      <p>Developers rarely need a portal just to create repositories. They need a place where the living context around a service stays connected: who owns it, what API it exposes, what docs explain it, and what other systems it belongs to. Backstage's model is useful here because a component can relate to APIs, systems, groups, resources, and docs instead of existing as an isolated tile.</p>
+
+      <p>This is why Backstage is stronger than a custom internal landing page that only aggregates links. The catalog model gives the portal semantics. A system is a collection of components and resources. A domain groups systems that belong together. A group models the owning team. Those relationships create navigable architecture rather than static navigation.</p>
+
+      <p>For developers, that means faster answers to questions like:</p>
+
+      <ul>
+        <li>Who owns this component?</li>
+        <li>Which API does it provide or consume?</li>
+        <li>What resource does it depend on?</li>
+        <li>Which broader system is it part of?</li>
+        <li>Where is the documentation I need before I change it?</li>
+      </ul>
+
+      <p>If a portal cannot answer those questions faster than a well-connected engineer on chat, it will struggle to become daily developer infrastructure.</p>
+
+      <h2>5. Self-service still needs boundaries, ownership, and support paths</h2>
+      <p>Developer-oriented does not mean anything goes. Good self-service narrows the choice space. That means owning teams are explicit, template owners are visible, and platform standards are embedded into the workflows rather than added later as review comments. Backstage reinforces that by making owner fields central across components, templates, systems, resources, and APIs.</p>
+
+      <p>That consistency matters. A golden path should not just create code. It should create accountability. If ownership is optional or stale, the portal will eventually mirror the same organizational ambiguity it was meant to fix.</p>
+
+      <p>It also means support needs to be productized. Developers need to know which templates are platform-supported, what happens when scaffolding fails, and who maintains the workflow. The template itself is not the product. The maintained workflow is.</p>
+
+      <h2>6. Measure the outcomes developers actually feel</h2>
+      <p>The current version of this post talked about usage activity, but that is still too abstract. The more useful metrics are the ones that developers and platform teams both experience directly:</p>
+
+      <ul>
+        <li>Time to create a new production-ready service from zero.</li>
+        <li>Percentage of services with a valid owner, lifecycle, and system mapping.</li>
+        <li>Percentage of services with discoverable documentation and API metadata.</li>
+        <li>Reduction in platform tickets for bootstrap, registration, and ownership clarification.</li>
+        <li>Onboarding time until a new developer can navigate ownership and service context without help.</li>
+      </ul>
+
+      <p>Those metrics are harder to fake than clicks. They tell you whether the portal is reducing cognitive load and handoffs, which is the real reason developers keep coming back to it.</p>
+
+      <h2>References</h2>
+      <ul>
+        <li><a href="https://backstage.io/docs/overview/what-is-backstage">Backstage: What is Backstage?</a></li>
+        <li><a href="https://backstage.io/docs/features/software-templates/">Backstage Software Templates</a></li>
+        <li><a href="https://backstage.io/docs/features/software-catalog/descriptor-format">Backstage Descriptor Format of Catalog Entities</a></li>
+        <li><a href="https://backstage.io/docs/features/software-catalog/">Backstage Software Catalog</a></li>
+      </ul>
 
       <h2>Closing thought</h2>
-      <p>A successful IDP is a product. It improves developer experience while scaling consistency, security, and delivery speed across the engineering organization.</p>
+      <p>A successful IDP is not a dashboard strategy. It is a workflow strategy. Backstage is useful because it gives that strategy concrete building blocks: a software catalog, executable templates, explicit ownership, and a model for connecting services, APIs, resources, and documentation. That is what makes self-service feel real to developers instead of aspirational to platform teams.</p>
     </article>
   </div>
 </body>
