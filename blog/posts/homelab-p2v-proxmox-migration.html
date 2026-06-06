@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bare-Metal to VM: A Pragmatic P2V Migration to Proxmox | Anas Semesmieh</title>
+  <meta name="description" content="How I migrated a bare-metal homelab server to Proxmox using direct SSD passthrough, bypassing failed Clonezilla imaging. Covers dual-interface configuration, jumbo frame optimization, NFS automounts, automated backups, and the architecture strategy this unlocks." />
+  <meta name="author" content="Anas Semesmieh" />
+  <link rel="canonical" href="https://anas.semesmieh.com/blog/posts/homelab-p2v-proxmox-migration" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Bare-Metal to VM: A Pragmatic P2V Migration to Proxmox" />
+  <meta property="og:description" content="How I migrated a bare-metal homelab server to Proxmox using direct SSD passthrough, bypassing failed Clonezilla imaging. Covers dual-interface networking, jumbo frames, NFS automounts, and automated backups." />
+  <meta property="og:url" content="https://anas.semesmieh.com/blog/posts/homelab-p2v-proxmox-migration" />
+  <meta property="og:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Bare-Metal to VM: A Pragmatic P2V Migration to Proxmox" />
+  <meta name="twitter:description" content="How I migrated a bare-metal homelab server to Proxmox using direct SSD passthrough, bypassing failed Clonezilla imaging. Covers dual-interface networking, jumbo frames, NFS automounts, and automated backups." />
+  <meta name="twitter:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #101a2c;
+      --muted: #8ea0be;
+      --text: #e6eef8;
+      --accent: #22c55e;
+      --heading: #60a5fa;
+      --border: rgba(255, 255, 255, 0.07);
+      --maxw: 860px;
+      --radius: 16px;
+      --font: "Inter", "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+    }
+
+    body {
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.75;
+      background:
+        radial-gradient(ellipse at 15% 0%, #13203a 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 15%, #0e1a32 0%, transparent 45%),
+        var(--bg);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+    }
+
+    .nav {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: var(--muted);
+      padding: 7px 13px;
+      border-radius: 10px;
+      font-size: 14px;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .nav a:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    article {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      background: var(--card);
+    }
+
+    h1 {
+      font-size: 36px;
+      line-height: 1.2;
+      color: var(--heading);
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 14px;
+      margin: 10px 0 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h2 {
+      margin-top: 32px;
+      margin-bottom: 12px;
+      font-size: 24px;
+      color: var(--heading);
+    }
+
+    h3 {
+      margin-top: 24px;
+      margin-bottom: 8px;
+      color: #86efac;
+      font-size: 18px;
+    }
+
+    p {
+      margin: 10px 0;
+    }
+
+    ul,
+    ol {
+      margin: 10px 0;
+      padding-left: 22px;
+    }
+
+    li {
+      margin: 4px 0;
+    }
+
+    .callout {
+      border-left: 3px solid var(--accent);
+      padding: 12px 16px;
+      background: rgba(34, 197, 94, 0.07);
+      border-radius: 10px;
+      margin: 20px 0;
+    }
+
+    code {
+      background: rgba(255, 255, 255, 0.07);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13.5px;
+    }
+
+    pre {
+      background: rgba(0, 0, 0, 0.35);
+      padding: 16px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.55;
+      color: #e6eef8;
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0;
+      font-size: 14px;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .series-nav {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .series-nav a {
+      display: inline-block;
+      margin-right: 12px;
+    }
+
+    @media (max-width: 700px) {
+      .wrap {
+        padding: 16px 14px 48px;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+
+      article {
+        padding: 20px;
+      }
+    }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"BlogPosting",
+    "headline":"Bare-Metal to VM: A Pragmatic P2V Migration to Proxmox",
+    "datePublished":"2026-06-07",
+    "dateModified":"2026-06-07",
+    "author":{"@type":"Person","name":"Anas Semesmieh","url":"https://anas.semesmieh.com/about/"},
+    "publisher":{"@type":"Person","name":"Anas Semesmieh"},
+    "mainEntityOfPage":"https://anas.semesmieh.com/blog/posts/homelab-p2v-proxmox-migration",
+    "image":"https://anas.semesmieh.com/profile-wide.jpg",
+    "description":"How I migrated a bare-metal homelab server to Proxmox using direct SSD passthrough, bypassing failed Clonezilla imaging. Covers dual-interface configuration, jumbo frame optimization, NFS automounts, automated backups, and the architecture strategy this unlocks."
+  }
+  </script>
+</head>
+
+<body>
+  <div class="wrap">
+    <nav class="nav" aria-label="Post navigation">
+      <a href="/">Portfolio</a>
+      <a href="/blog/">All Posts</a>
+      <a href="/blog/categories/">Categories</a>
+      <a href="/blog/tags/">Tags</a>
+      <a href="/blog/rss.xml">RSS</a>
+    </nav>
+
+    <article>
+      <h1>Bare-Metal to VM: A Pragmatic P2V Migration to Proxmox</h1>
+      <p class="meta">By <a href="/about/">Anas Semesmieh</a> &middot; June 7, 2026 &middot; Homelab, Proxmox, Networking, Self-Hosting</p>
+
+      <p>My homelab runs 24+ Docker services on a single Samsung 870 EVO 500 GB SSD &mdash; reverse proxies, DNS, SSO, password management, monitoring, media, and more. All of it on bare metal, one kernel panic away from a full outage with no isolation between workloads. This post is about how I moved that entire stack into a Proxmox VE virtual machine without downtime, and why the migration itself is just the beginning of a larger architecture shift.</p>
+
+      <div class="callout">
+        This wasn't a clean-room reinstall. The goal was to lift the running system &mdash; disk, services, networking &mdash; into a VM with zero rebuilds. Pragmatism over perfection.
+      </div>
+
+      <h2>The Failed Plan: Clonezilla Cold-Clone</h2>
+
+      <p>The original approach was textbook: boot Clonezilla, image the SSD to an NFS target on the Synology NAS, then restore into a fresh VM disk. Simple in theory.</p>
+
+      <pre><code># Clonezilla boot parameters
+ocs-live-restore restoredisk ask_user sda
+# Target: NFS share on Synology
+mount -t nfs 10.0.0.10:/volume1/docker/clonezilla-images /home/partimag</code></pre>
+
+      <p>It failed immediately. The NFS export permissions on the Synology blocked Clonezilla's write attempts &mdash; the squashfs live environment runs as a UID that doesn't map cleanly to Synology's NFS permission model. I could have debugged the NFS <code>all_squash</code> and <code>anonuid</code> mappings, but that was a rabbit hole with no guaranteed outcome and a server sitting offline.</p>
+
+      <p>Time to pivot.</p>
+
+      <h2>The Pivot: Direct SSD Passthrough</h2>
+
+      <p>Instead of imaging and restoring, I passed the physical SSD directly to the VM using its stable <code>/dev/disk/by-id/</code> path. The existing Ubuntu installation boots as-is &mdash; no cloning, no filesystem copy, no intermediate image.</p>
+
+      <pre><code># Create OVMF (UEFI) VM with q35 chipset
+qm create 100 --name homelab-recovery --memory 14336 --cores 8 \
+  --bios ovmf --machine q35 \
+  --efidisk0 local-lvm:1,efitype=4m,pre-enrolled-keys=0 \
+  --ostype l26 --cpu host
+
+# Attach the physical SSD by stable disk ID
+qm set 100 --sata0 /dev/disk/by-id/ata-Samsung_SSD_870_EVO_500GB_S6PXNX0W614894K
+
+# Set boot order
+qm set 100 --boot order=sata0
+
+# Start the VM
+qm start 100</code></pre>
+
+      <p>The VM booted into the existing Ubuntu 26.04 LTS installation on first try. All Docker containers, systemd services, and configs were intact. The kernel (<code>7.0.0-22-generic</code>) came up cleanly under QEMU/KVM with no driver issues.</p>
+
+      <h2>Preparing Proxmox: IOMMU, Networking, and Repository Cleanup</h2>
+
+      <p>Before creating the VM, the Proxmox VE 9.2.3 host (kernel <code>6.8.12-9-pve</code> → upgraded to <code>7.0.6-2-pve</code>) needed a few preparations.</p>
+
+      <h3>IOMMU Passthrough</h3>
+      <p>Enabled IOMMU in GRUB for potential future PCIe passthrough:</p>
+
+      <pre><code># /etc/default/grub
+GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on iommu=pt"</code></pre>
+
+      <pre><code>update-grub &amp;&amp; reboot</code></pre>
+
+      <h3>Enterprise Repository Cleanup</h3>
+      <p>Proxmox 9.x uses deb822 <code>.sources</code> format. Disabled the enterprise repos that require a subscription:</p>
+
+      <pre><code># Disable enterprise repos (no subscription)
+mv /etc/apt/sources.list.d/pve-enterprise.sources \
+   /etc/apt/sources.list.d/pve-enterprise.sources.disabled
+
+mv /etc/apt/sources.list.d/ceph.sources \
+   /etc/apt/sources.list.d/ceph.sources.disabled
+
+# Full system upgrade
+apt update &amp;&amp; apt dist-upgrade -y</code></pre>
+
+      <h2>Dual-Interface Architecture</h2>
+
+      <p>The homelab needs two isolated networks: a LAN for service traffic and a dedicated NAS link for storage I/O. On bare metal this was two physical NICs. Under Proxmox, it becomes two Linux bridges.</p>
+
+      <h3>Host Bridge Configuration</h3>
+
+      <pre><code># /etc/network/interfaces (Proxmox host)
+auto vmbr0
+iface vmbr0 inet static
+    address 192.168.20.99/24
+    gateway 192.168.20.1
+    bridge-ports lan
+    bridge-stp off
+    bridge-fd 0
+
+auto vmbr1
+iface vmbr1 inet static
+    address 10.0.0.30/24
+    bridge-ports usbcadptr
+    bridge-stp off
+    bridge-fd 0
+    mtu 9000</code></pre>
+
+      <h3>VM NIC Assignment</h3>
+
+      <pre><code># Attach both networks to VM 100
+qm set 100 --net0 virtio=BC:24:11:49:0F:83,bridge=vmbr0
+qm set 100 --net1 virtio=BC:24:11:DD:1D:74,bridge=vmbr1,mtu=9000</code></pre>
+
+      <h3>Guest Netplan (Ubuntu)</h3>
+
+      <pre><code># /etc/netplan/00-installer-config.yaml
+network:
+  version: 2
+  ethernets:
+    ens18:
+      match:
+        macaddress: "bc:24:11:49:0f:83"
+      addresses:
+        - 192.168.20.69/24
+      routes:
+        - to: default
+          via: 192.168.20.1
+      nameservers:
+        addresses: [1.1.1.1, 9.9.9.9]
+    ens19:
+      match:
+        macaddress: "bc:24:11:dd:1d:74"
+      addresses:
+        - 10.0.0.20/24
+      mtu: 9000</code></pre>
+
+      <p>MAC-matching in netplan ensures interface names stay predictable regardless of PCI slot ordering. The guest sees <code>ens18</code> for LAN and <code>ens19</code> for NAS without needing fragile <code>set-name</code> rules.</p>
+
+      <h2>Jumbo Frame Optimization</h2>
+
+      <p>The NAS link runs at MTU 9000 end-to-end: physical NIC → host bridge → virtio tap → guest interface → NFS client. This reduces per-packet overhead for large sequential transfers (backups, media streaming, bulk reads).</p>
+
+      <p>Critical detail: the virtio NIC must have <code>mtu=9000</code> set explicitly in the QEMU device config. Without it, the guest interface caps at 1500 even if netplan requests 9000:</p>
+
+      <pre><code># This is what made it work — MTU in the QEMU NIC definition
+qm set 100 --net1 virtio=BC:24:11:DD:1D:74,bridge=vmbr1,mtu=9000</code></pre>
+
+      <p>Verification from inside the guest:</p>
+
+      <pre><code># Confirm MTU 9000 is active on ens19
+ip link show ens19 | grep mtu
+# 3: ens19: &lt;BROADCAST,MULTICAST,UP&gt; mtu 9000 qdisc fq_codel state UP
+
+# Verify end-to-end jumbo frame path to NAS (8972 + 28 byte header = 9000)
+ping -M do -s 8972 -c 3 10.0.0.10
+# PING 10.0.0.10 (10.0.0.10) 8972(9000) bytes of data.
+# 8980 bytes from 10.0.0.10: icmp_seq=1 ttl=64 time=0.284 ms</code></pre>
+
+      <h2>NFS Automount Strategy</h2>
+
+      <p>The guest mounts four NFS shares from the Synology NAS at <code>10.0.0.10</code>. On bare metal these were hard mounts in <code>/etc/fstab</code>, which caused boot hangs when the NAS interface wasn't ready in time. Under virtualization, the timing problem got worse &mdash; the guest's NAS NIC initializes after the mount targets are evaluated.</p>
+
+      <p>The fix: <code>x-systemd.automount</code>. The kernel creates the mount point immediately (satisfying any service dependencies), but the actual NFS connection happens lazily on first access.</p>
+
+      <pre><code># /etc/fstab — NFS mounts with systemd automount
+10.0.0.10:/volume1/docker    /mnt/nas/docker    nfs4 x-systemd.automount,x-systemd.idle-timeout=600,nofail,_netdev,rsize=1048576,wsize=1048576 0 0
+10.0.0.10:/volume1/media     /mnt/nas/media     nfs4 x-systemd.automount,x-systemd.idle-timeout=600,nofail,_netdev,rsize=1048576,wsize=1048576 0 0
+10.0.0.10:/volume1/backups   /mnt/nas/backups   nfs4 x-systemd.automount,x-systemd.idle-timeout=600,nofail,_netdev,rsize=1048576,wsize=1048576 0 0
+10.0.0.10:/volume1/personal  /mnt/nas/personal  nfs4 x-systemd.automount,x-systemd.idle-timeout=600,nofail,_netdev,rsize=1048576,wsize=1048576 0 0</code></pre>
+
+      <pre><code># Verify automounts are registered
+systemctl list-automounts
+# UNIT                        LOAD   ACTIVE SUB     DESCRIPTION
+# mnt-nas-docker.automount    loaded active waiting /mnt/nas/docker
+# mnt-nas-media.automount     loaded active waiting /mnt/nas/media
+# mnt-nas-backups.automount   loaded active waiting /mnt/nas/backups
+# mnt-nas-personal.automount  loaded active waiting /mnt/nas/personal</code></pre>
+
+      <p>The <code>nofail</code> flag prevents boot failure if the NAS is offline. The <code>_netdev</code> flag ensures systemd waits for network-online before attempting the mount. Combined with automount, this is a robust pattern for NFS in virtualized environments.</p>
+
+      <h2>Automated Backups: vzdump to NAS</h2>
+
+      <p>With the VM running, Proxmox's built-in backup scheduler handles full VM-level backups. The backup target is an NFS share on the Synology, accessed over the dedicated 10 GbE NAS bridge.</p>
+
+      <h3>Storage Backend</h3>
+
+      <pre><code># /etc/pve/storage.cfg (relevant section)
+nfs: nas-backups
+    export /volume1/docker/proxmox-backups
+    path /mnt/pve/nas-backups
+    server 10.0.0.10
+    content backup
+    prune-backups keep-last=7</code></pre>
+
+      <h3>Scheduled Job</h3>
+
+      <pre><code># /etc/pve/jobs.cfg
+vzdump: backup-homelab
+    enabled 1
+    schedule 0 2 * * *
+    storage nas-backups
+    vmid 100
+    mode suspend
+    compress zstd
+    prune-backups keep-last=7
+    mailnotification failure
+    notes-template {{guestname}}-{{node}}-{{vmid}}</code></pre>
+
+      <p>Every day at 02:00, the VM is briefly suspended (typically &lt;30 seconds for a 500 GB disk with zstd), a consistent snapshot is written to the NAS, and old backups beyond the last 7 are pruned automatically. Manual runs work identically:</p>
+
+      <pre><code># Manual backup (same parameters as the scheduled job)
+vzdump 100 --mode suspend --compress zstd --storage nas-backups</code></pre>
+
+      <p>The <code>suspend</code> mode guarantees filesystem consistency without requiring a guest agent. Combined with NAS-level snapshots on the Synology side, this provides two independent recovery paths.</p>
+
+      <h2>What This Unlocks: The Road Ahead</h2>
+
+      <p>This migration is not the end state &mdash; it's the <strong>foundation</strong>. Running on bare metal meant every service shared one kernel, one failure domain, and one recovery path. Now that the homelab lives inside Proxmox, the architecture can evolve properly.</p>
+
+      <h3>Per-Service Migration Analysis</h3>
+      <p>Every one of the 24+ hosted applications will be analyzed individually and migrated to its optimal runtime environment:</p>
+
+      <ul>
+        <li><strong>Lightweight services</strong> (AdGuard, Unbound, monitoring exporters) → dedicated LXC containers with minimal overhead</li>
+        <li><strong>Isolation-critical workloads</strong> (SSO, Vaultwarden, databases) → separate KVM VMs with independent kernels</li>
+        <li><strong>Stateless app tiers</strong> (media frontends, dashboards) → remain in Docker Compose within purpose-built VMs</li>
+      </ul>
+
+      <h3>Minimal Blast Radius</h3>
+      <p>The driving principle: <strong>one failure should never cascade</strong>. When a reverse proxy crashes, it shouldn't take down the password manager. When a database OOMs, DNS should keep resolving. Proxmox gives this through hard VM/CT boundaries, independent resource limits via <code>cgroups</code>, and separate kernel namespaces.</p>
+
+      <pre><code># Future: per-VM resource capping
+qm set 101 --cpulimit 2 --memory 2048 --balloon 1024
+qm set 102 --cpulimit 4 --memory 4096 --swap 0</code></pre>
+
+      <h3>Maximum Recoverability</h3>
+      <p>With NAS-backed storage, recovery is no longer theoretical &mdash; it's guaranteed and tested:</p>
+
+      <ul>
+        <li><strong>VM-level backups</strong> via vzdump → full restore in minutes to any previous daily state</li>
+        <li><strong>Proxmox snapshots</strong> → instant rollback before risky changes (<code>qm snapshot 100 --name pre-upgrade</code>)</li>
+        <li><strong>NAS-side snapshots</strong> → Synology's Btrfs snapshots protect the backup store itself</li>
+        <li><strong>Per-service volume backups</strong> → Docker volume exports to NAS for granular recovery</li>
+      </ul>
+
+      <pre><code># Snapshot before any risky operation
+qm snapshot 100 --name pre-upgrade --description "Before kernel upgrade"
+
+# If something breaks — instant rollback
+qm rollback 100 --snapname pre-upgrade
+
+# List all available recovery points
+qm listsnapshot 100</code></pre>
+
+      <p>Three layers of backup (vzdump daily, on-demand snapshots, NAS-level protection) mean that no single failure &mdash; disk, VM, or operator error &mdash; results in permanent data loss. The NAS storage makes this sustainable: 7 daily backups of a 500 GB VM compress to roughly 200 GB with zstd, well within the available capacity.</p>
+
+      <h3>Future Architecture Targets</h3>
+      <ul>
+        <li>Live migration readiness when a second node is added</li>
+        <li>Terraform/OpenTofu provisioning of VM and CT definitions</li>
+        <li>Centralized logging (Loki + Alloy) with per-VM log streams</li>
+        <li>Network segmentation via VLANs replacing flat bridge topology</li>
+      </ul>
+
+      <h2>Lessons Learned</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Lesson</th>
+            <th>Detail</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Pragmatism wins</td>
+            <td>Direct SSD passthrough was faster, safer, and more reversible than any imaging approach. The server was back online in under 30 minutes.</td>
+          </tr>
+          <tr>
+            <td>Plan for rollback</td>
+            <td>The physical SSD is untouched. If the VM fails catastrophically, plug it back into bare metal and boot. Zero-risk migration.</td>
+          </tr>
+          <tr>
+            <td>MTU must be explicit everywhere</td>
+            <td>Jumbo frames silently fail if any single hop in the chain defaults to 1500. Verify with <code>ping -M do</code> end-to-end.</td>
+          </tr>
+          <tr>
+            <td>Automount solves timing</td>
+            <td>Hard NFS mounts in VMs are a race condition. <code>x-systemd.automount</code> decouples mount availability from boot ordering.</td>
+          </tr>
+          <tr>
+            <td>Start monolithic, decompose later</td>
+            <td>Migrating the whole system first preserves uptime. Decomposing into smaller VMs/CTs is the next phase &mdash; done safely with snapshots at every step.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Closing Thought</h2>
+
+      <p>A P2V migration doesn't have to be a multi-day project with imaging tools and careful partition math. Sometimes the right answer is passing a disk straight through and letting the existing OS boot where it lands. The real value isn't in the migration itself &mdash; it's in what comes after: isolation, recoverability, and the freedom to evolve each service independently without risking the whole stack.</p>
+
+      <p>The server is no longer a single point of failure. It's a platform.</p>
+
+      <div class="series-nav">
+        <strong>Homelab Series:</strong>
+        <a href="/blog/posts/homelab-start-here">Start Here</a>
+        <a href="/blog/posts/homelab-docker-compose-stack">Docker Compose Stack</a>
+        <a href="/blog/posts/homelab-sso-authentik">SSO with Authentik</a>
+        <a href="/blog/posts/homelab-backup-automation">Backup Automation</a>
+        <a href="/blog/posts/homelab-disaster-recovery">Disaster Recovery</a>
+        <a href="/blog/posts/homelab-xcaddy-cloudflare-tunnel-adguard">Xcaddy + Tunnel + AdGuard</a>
+        <a href="/blog/posts/homelab-p2v-proxmox-migration"><strong>P2V Migration (this post)</strong></a>
+      </div>
+    </article>
+  </div>
+</body>
+
+</html>

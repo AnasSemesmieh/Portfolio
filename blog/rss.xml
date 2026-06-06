@@ -5,7 +5,15 @@
     <link>https://anas.semesmieh.com/blog/</link>
     <description>Platform engineering, Azure architecture, DevSecOps, and engineering leadership insights.</description>
     <language>en-au</language>
-    <lastBuildDate>Sat, 06 Jun 2026 12:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 07 Jun 2026 12:00:00 +0000</lastBuildDate>
+
+    <item>
+      <title>Bare-Metal to VM: A Pragmatic P2V Migration to Proxmox</title>
+      <link>https://anas.semesmieh.com/blog/posts/homelab-p2v-proxmox-migration</link>
+      <guid>https://anas.semesmieh.com/blog/posts/homelab-p2v-proxmox-migration</guid>
+      <pubDate>Sat, 07 Jun 2026 12:00:00 +0000</pubDate>
+      <description>How I migrated a bare-metal homelab server to Proxmox using direct SSD passthrough, bypassing failed Clonezilla imaging. Covers dual-interface networking, jumbo frames, NFS automounts, automated backups, and the architecture strategy this unlocks.</description>
+    </item>
 
     <item>
       <title>Xcaddy + Cloudflare Tunnel + AdGuard Home: A Simpler Homelab Edge</title>
