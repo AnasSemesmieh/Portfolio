@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Xcaddy + Cloudflare Tunnel + AdGuard Home: A Simpler Homelab Edge | Anas Semesmieh</title>
+  <meta name="description" content="How I simplified homelab ingress and DNS with native Xcaddy, Cloudflare Tunnel, and AdGuard Home for cleaner config, safer exposure, and faster operations." />
+  <meta name="author" content="Anas Semesmieh" />
+  <link rel="canonical" href="https://anas.semesmieh.com/blog/posts/homelab-xcaddy-cloudflare-tunnel-adguard" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Xcaddy + Cloudflare Tunnel + AdGuard Home: A Simpler Homelab Edge" />
+  <meta property="og:description" content="How I replaced label-heavy Traefik and legacy Pi-hole workflows with native Caddy and AdGuard Home for cleaner ingress and DNS operations." />
+  <meta property="og:url" content="https://anas.semesmieh.com/blog/posts/homelab-xcaddy-cloudflare-tunnel-adguard" />
+  <meta property="og:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Xcaddy + Cloudflare Tunnel + AdGuard Home: A Simpler Homelab Edge" />
+  <meta name="twitter:description" content="How I replaced label-heavy Traefik and legacy Pi-hole workflows with native Caddy and AdGuard Home for cleaner ingress and DNS operations." />
+  <meta name="twitter:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #101a2c;
+      --muted: #8ea0be;
+      --text: #e6eef8;
+      --accent: #22c55e;
+      --heading: #60a5fa;
+      --border: rgba(255, 255, 255, 0.07);
+      --maxw: 860px;
+      --radius: 16px;
+      --font: "Inter", "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+    }
+
+    body {
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.75;
+      background:
+        radial-gradient(ellipse at 15% 0%, #13203a 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 15%, #0e1a32 0%, transparent 45%),
+        var(--bg);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+    }
+
+    .nav {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: var(--muted);
+      padding: 7px 13px;
+      border-radius: 10px;
+      font-size: 14px;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .nav a:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    article {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      background: var(--card);
+    }
+
+    h1 {
+      font-size: 36px;
+      line-height: 1.2;
+      color: var(--heading);
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 14px;
+      margin: 10px 0 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h2 {
+      margin-top: 32px;
+      margin-bottom: 12px;
+      font-size: 24px;
+      color: var(--heading);
+    }
+
+    h3 {
+      margin-top: 24px;
+      margin-bottom: 8px;
+      color: #86efac;
+      font-size: 18px;
+    }
+
+    p {
+      margin: 10px 0;
+    }
+
+    ul,
+    ol {
+      margin: 10px 0;
+      padding-left: 22px;
+    }
+
+    li {
+      margin: 4px 0;
+    }
+
+    .callout {
+      border-left: 3px solid var(--accent);
+      padding: 12px 16px;
+      background: rgba(34, 197, 94, 0.07);
+      border-radius: 10px;
+      margin: 20px 0;
+    }
+
+    code {
+      background: rgba(255, 255, 255, 0.07);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13.5px;
+    }
+
+    pre {
+      background: rgba(0, 0, 0, 0.35);
+      padding: 16px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.55;
+      color: #e6eef8;
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0;
+      font-size: 14px;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .series-nav {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .series-nav a {
+      display: inline-block;
+      margin-right: 12px;
+    }
+
+    @media (max-width: 700px) {
+      .wrap {
+        padding: 16px 14px 48px;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+
+      article {
+        padding: 20px;
+      }
+    }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"BlogPosting",
+    "headline":"Xcaddy + Cloudflare Tunnel + AdGuard Home: A Simpler Homelab Edge",
+    "datePublished":"2026-06-06",
+    "dateModified":"2026-06-06",
+    "author":{"@type":"Person","name":"Anas Semesmieh","url":"https://anas.semesmieh.com/about/"},
+    "publisher":{"@type":"Person","name":"Anas Semesmieh"},
+    "mainEntityOfPage":"https://anas.semesmieh.com/blog/posts/homelab-xcaddy-cloudflare-tunnel-adguard",
+    "image":"https://anas.semesmieh.com/profile-wide.jpg",
+    "description":"How I simplified homelab ingress and DNS with native Xcaddy, Cloudflare Tunnel, and AdGuard Home for cleaner config, safer exposure, and faster operations."
+  }
+  </script>
+</head>
+
+<body>
+  <div class="wrap">
+    <nav class="nav" aria-label="Post navigation">
+      <a href="/">Portfolio</a>
+      <a href="/blog/">All Posts</a>
+      <a href="/blog/categories/">Categories</a>
+      <a href="/blog/tags/">Tags</a>
+      <a href="/blog/rss.xml">RSS</a>
+    </nav>
+
+    <article>
+      <h1>Xcaddy + Cloudflare Tunnel + AdGuard Home: A Simpler Homelab Edge</h1>
+      <p class="meta">By <a href="/about/">Anas Semesmieh</a> &middot; June 6, 2026 &middot; Homelab, Security, Automation</p>
+
+      <p>I run a lot of services at home. Over time, my ingress and DNS setup became harder to reason about than the apps themselves. Traefik labels multiplied across compose files, per-service routing rules became noisy, and small changes required jumping between containers and dynamic files.</p>
+
+      <p>I wanted one place to read, one place to debug, and one policy for local and remote access. The stack I ended up with is native <strong>Caddy (built via Xcaddy)</strong> + <strong>Cloudflare Tunnel</strong> + <strong>AdGuard Home</strong>. This post is the architecture, why I moved, and exactly what changed.</p>
+
+      <div class="callout">
+        This migration was not just "different tooling." It was an operability decision: fewer moving parts, cleaner config ownership, and faster troubleshooting under pressure.
+      </div>
+
+      <h2>Why I Moved Away from Traefik Labels and Pi-hole</h2>
+
+      <p>Traefik worked, but label-driven routing became expensive to maintain at scale. A single service often required router, middleware, entrypoint, TLS, and service-port labels. Repeating that pattern across many stacks increased cognitive load and made reviews harder.</p>
+
+      <p>Caddy gave me a single-file model in <code>/etc/caddy/Caddyfile</code>. Each hostname is a readable block, and per-service tweaks live beside the route they affect. That reduced context switching immediately.</p>
+
+      <p>I also moved away from Pi-hole to AdGuard Home. The AdGuard UI is cleaner for daily operations, and its built-in filter ecosystem and rewrite workflow are smoother for my use case.</p>
+
+      <h2>Architecture Overview</h2>
+
+      <h3>Core Components</h3>
+      <ul>
+        <li><strong>Xcaddy-built Caddy</strong> as reverse proxy and TLS control plane</li>
+        <li><strong>Cloudflare Tunnel</strong> for explicit remote exposure without inbound port forwarding</li>
+        <li><strong>AdGuard Home</strong> for LAN DNS, rewrites, filtering, and policy controls</li>
+      </ul>
+
+      <h3>Local Flow</h3>
+      <ol>
+        <li>Client resolves service hostname using AdGuard Home</li>
+        <li>AdGuard rewrite returns LAN endpoint</li>
+        <li>Caddy handles HTTPS and proxies to the target service</li>
+      </ol>
+
+      <h3>Remote Flow</h3>
+      <ol>
+        <li>Client reaches Cloudflare edge</li>
+        <li>Cloudflare Tunnel forwards approved hostnames only</li>
+        <li>Caddy routes request internally to upstream service</li>
+      </ol>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Path</th>
+            <th>Entry Point</th>
+            <th>Name Resolution</th>
+            <th>Exposure Model</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Local</td>
+            <td>Caddy on LAN</td>
+            <td>AdGuard rewrites</td>
+            <td>Private by default</td>
+          </tr>
+          <tr>
+            <td>Remote</td>
+            <td>Cloudflare edge + Tunnel</td>
+            <td>Cloudflare DNS/hostname policy</td>
+            <td>Explicit opt-in per hostname</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Caddy in One File: What Simplified Operations</h2>
+
+      <p>My current Caddy config starts with Cloudflare ACME DNS integration and then declares host routes in one place:</p>
+
+      <pre><code>{
+	acme_dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+}
+
+home.semesmieh.com {
+	reverse_proxy 192.168.20.69:3000
+}
+
+code.semesmieh.com {
+	reverse_proxy http://192.168.20.69:8443
+}</code></pre>
+
+      <p>For edge cases, behavior stays close to the route. Example: self-signed upstreams use local transport overrides where needed:</p>
+
+      <pre><code>portainer.semesmieh.com {
+	reverse_proxy https://192.168.20.69:9443 {
+		transport http {
+			tls_insecure_skip_verify
+		}
+	}
+}</code></pre>
+
+      <p>That single-file readability is the main reason this became easier to operate than label-heavy dynamic wiring.</p>
+
+      <h2>AdGuard Home: Cleaner DNS and Filter Management</h2>
+
+      <p>AdGuard now handles DNS and filtering directly from the host config at <code>/opt/AdGuardHome/AdGuardHome.yaml</code>.</p>
+
+      <ul>
+        <li><strong>DNS service:</strong> <code>dns.port: 53</code></li>
+        <li><strong>Admin UI:</strong> <code>http.address: 0.0.0.0:8888</code></li>
+        <li><strong>Upstream DNS:</strong> Quad9 DoH endpoints</li>
+        <li><strong>Rewrites:</strong> service hostnames mapped to LAN targets under <code>filtering.rewrites</code></li>
+      </ul>
+
+      <p>Example rewrite set from the running config:</p>
+
+      <pre><code>filtering:
+  rewrites:
+    - domain: home.semesmieh.com
+      answer: 192.168.20.69
+      enabled: true
+    - domain: code.semesmieh.com
+      answer: 192.168.20.69
+      enabled: true
+    - domain: nvr.semesmieh.com
+      answer: 192.168.20.69
+      enabled: true</code></pre>
+
+      <p>The built-in filter integrations were another practical win. Instead of maintaining fragmented external list workflows, I can manage a large set of curated feeds directly in AdGuard with better day-to-day visibility.</p>
+
+      <h2>Why I Run Caddy and AdGuard Natively (Not Docker)</h2>
+
+      <p>I deliberately run both as host-native services. In my environment, this improves responsiveness and reduces runtime overhead around critical network paths.</p>
+
+      <ul>
+        <li>Fewer container dependencies in the ingress and DNS control path</li>
+        <li>More direct service management for two foundational components</li>
+        <li>Less indirection during incidents and faster troubleshooting loops</li>
+      </ul>
+
+      <p>Containers still make sense for many app workloads. For edge and DNS, native services gave me a cleaner operational model.</p>
+
+      <h2>What I Lost and What I Gained</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Area</th>
+            <th>Lost</th>
+            <th>Gained</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Ingress management</td>
+            <td>Label-driven service discovery convenience</td>
+            <td>Single-file config clarity and lower cognitive overhead</td>
+          </tr>
+          <tr>
+            <td>DNS operations</td>
+            <td>Pi-hole familiarity and legacy setup</td>
+            <td>Cleaner UI, richer integrated filter workflow, simpler rewrites</td>
+          </tr>
+          <tr>
+            <td>Runtime model</td>
+            <td>Uniform container pattern for everything</td>
+            <td>Native performance and simpler control for edge services</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Official Documentation</h2>
+
+      <ul>
+        <li><a href="https://github.com/caddyserver/xcaddy" target="_blank" rel="noopener noreferrer">Xcaddy (official GitHub)</a></li>
+        <li><a href="https://caddyserver.com/docs/modules/" target="_blank" rel="noopener noreferrer">Caddy Modules Documentation</a></li>
+        <li><a href="https://github.com/caddy-dns/cloudflare" target="_blank" rel="noopener noreferrer">Caddy Cloudflare DNS Module</a></li>
+        <li><a href="https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/" target="_blank" rel="noopener noreferrer">Cloudflare Tunnel Documentation</a></li>
+        <li><a href="https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/use-cases/" target="_blank" rel="noopener noreferrer">Cloudflare Tunnel Use Cases</a></li>
+        <li><a href="https://adguard-dns.io/kb/adguard-home/" target="_blank" rel="noopener noreferrer">AdGuard Home Documentation</a></li>
+      </ul>
+
+      <h2>Closing Thought</h2>
+
+      <p>This migration was less about chasing new tools and more about reducing operational drag. Caddy gave me a one-file ingress model, AdGuard gave me cleaner DNS operations, and native deployment kept critical paths fast and straightforward.</p>
+
+      <p>If your homelab is growing and your edge stack feels harder to reason about than your actual apps, this pattern is worth a look.</p>
+
+      <div class="series-nav">
+        <strong>Homelab Series:</strong>
+        <a href="/blog/posts/homelab-start-here">Start Here</a>
+        <a href="/blog/posts/homelab-docker-compose-stack">Docker Compose Stack</a>
+        <a href="/blog/posts/homelab-sso-authentik">SSO with Authentik</a>
+        <a href="/blog/posts/homelab-backup-automation">Backup Automation</a>
+        <a href="/blog/posts/homelab-disaster-recovery">Disaster Recovery</a>
+      </div>
+    </article>
+  </div>
+</body>
+
+</html>

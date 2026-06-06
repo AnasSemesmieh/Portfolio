@@ -5,7 +5,15 @@
     <link>https://anas.semesmieh.com/blog/</link>
     <description>Platform engineering, Azure architecture, DevSecOps, and engineering leadership insights.</description>
     <language>en-au</language>
-    <lastBuildDate>Sun, 24 May 2026 12:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 06 Jun 2026 12:00:00 +0000</lastBuildDate>
+
+    <item>
+      <title>Xcaddy + Cloudflare Tunnel + AdGuard Home: A Simpler Homelab Edge</title>
+      <link>https://anas.semesmieh.com/blog/posts/homelab-xcaddy-cloudflare-tunnel-adguard</link>
+      <guid>https://anas.semesmieh.com/blog/posts/homelab-xcaddy-cloudflare-tunnel-adguard</guid>
+      <pubDate>Sat, 06 Jun 2026 12:00:00 +0000</pubDate>
+      <description>How I replaced label-heavy Traefik and legacy Pi-hole workflows with native Caddy and AdGuard Home for cleaner config ownership, safer exposure, and faster operations.</description>
+    </item>
 
     <item>
       <title>Self-Hosting Vaultwarden: Ditching 1Password for Total Password Ownership</title>
