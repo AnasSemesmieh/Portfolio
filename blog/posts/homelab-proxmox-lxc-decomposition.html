@@ -1,0 +1,666 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Decomposing the Monolith: Per-Service LXCs on Proxmox | Anas Semesmieh</title>
+  <meta name="description" content="How I decomposed a monolith homelab VM into dedicated Proxmox LXCs for AdGuard Home, Caddy with Cloudflare Tunnels, and Plex with iGPU passthrough — plus hardening an Intel e1000e NIC that started dropping under load." />
+  <meta name="author" content="Anas Semesmieh" />
+  <link rel="canonical" href="https://anas.semesmieh.com/blog/posts/homelab-proxmox-lxc-decomposition" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Decomposing the Monolith: Per-Service LXCs on Proxmox" />
+  <meta property="og:description" content="How I decomposed a monolith homelab VM into dedicated Proxmox LXCs for AdGuard Home, Caddy with Cloudflare Tunnels, and Plex with iGPU passthrough — plus hardening an Intel e1000e NIC." />
+  <meta property="og:url" content="https://anas.semesmieh.com/blog/posts/homelab-proxmox-lxc-decomposition" />
+  <meta property="og:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Decomposing the Monolith: Per-Service LXCs on Proxmox" />
+  <meta name="twitter:description" content="How I decomposed a monolith homelab VM into dedicated Proxmox LXCs for AdGuard Home, Caddy with Cloudflare Tunnels, and Plex with iGPU passthrough — plus hardening an Intel e1000e NIC." />
+  <meta name="twitter:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #101a2c;
+      --muted: #8ea0be;
+      --text: #e6eef8;
+      --accent: #22c55e;
+      --heading: #60a5fa;
+      --border: rgba(255, 255, 255, 0.07);
+      --maxw: 860px;
+      --radius: 16px;
+      --font: "Inter", "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+    }
+
+    body {
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.75;
+      background:
+        radial-gradient(ellipse at 15% 0%, #13203a 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 15%, #0e1a32 0%, transparent 45%),
+        var(--bg);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+    }
+
+    .nav {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: var(--muted);
+      padding: 7px 13px;
+      border-radius: 10px;
+      font-size: 14px;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .nav a:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    article {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      background: var(--card);
+    }
+
+    h1 {
+      font-size: 36px;
+      line-height: 1.2;
+      color: var(--heading);
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 14px;
+      margin: 10px 0 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h2 {
+      margin-top: 32px;
+      margin-bottom: 12px;
+      font-size: 24px;
+      color: var(--heading);
+    }
+
+    h3 {
+      margin-top: 24px;
+      margin-bottom: 8px;
+      color: #86efac;
+      font-size: 18px;
+    }
+
+    p {
+      margin: 10px 0;
+    }
+
+    ul,
+    ol {
+      margin: 10px 0;
+      padding-left: 22px;
+    }
+
+    li {
+      margin: 4px 0;
+    }
+
+    .callout {
+      border-left: 3px solid var(--accent);
+      padding: 12px 16px;
+      background: rgba(34, 197, 94, 0.07);
+      border-radius: 10px;
+      margin: 20px 0;
+    }
+
+    code {
+      background: rgba(255, 255, 255, 0.07);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13.5px;
+    }
+
+    pre {
+      background: rgba(0, 0, 0, 0.35);
+      padding: 16px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.55;
+      color: #e6eef8;
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0;
+      font-size: 14px;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .series-nav {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .series-nav a {
+      display: inline-block;
+      margin-right: 12px;
+    }
+
+    @media (max-width: 700px) {
+      .wrap {
+        padding: 16px 14px 48px;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+
+      article {
+        padding: 20px;
+      }
+    }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"BlogPosting",
+    "headline":"Decomposing the Monolith: Per-Service LXCs on Proxmox",
+    "datePublished":"2026-06-08",
+    "dateModified":"2026-06-08",
+    "author":{"@type":"Person","name":"Anas Semesmieh","url":"https://anas.semesmieh.com/about/"},
+    "publisher":{"@type":"Person","name":"Anas Semesmieh"},
+    "mainEntityOfPage":"https://anas.semesmieh.com/blog/posts/homelab-proxmox-lxc-decomposition",
+    "image":"https://anas.semesmieh.com/profile-wide.jpg",
+    "description":"How I decomposed a monolith homelab VM into dedicated Proxmox LXCs for AdGuard Home, Caddy with Cloudflare Tunnels, and Plex with iGPU passthrough — plus hardening an Intel e1000e NIC that started dropping under load."
+  }
+  </script>
+</head>
+
+<body>
+  <div class="wrap">
+    <nav class="nav" aria-label="Post navigation">
+      <a href="/">Portfolio</a>
+      <a href="/blog/">All Posts</a>
+      <a href="/blog/categories/">Categories</a>
+      <a href="/blog/tags/">Tags</a>
+      <a href="/blog/rss.xml">RSS</a>
+    </nav>
+
+    <article>
+      <h1>Decomposing the Monolith: Per-Service LXCs on Proxmox</h1>
+      <p class="meta">By <a href="/about/">Anas Semesmieh</a> &middot; June 8, 2026 &middot; Homelab, Proxmox, Networking, Self-Hosting</p>
+
+      <p>Twelve hours into the migration, the NIC dropped. SSH sessions froze, containers went dark, and <code>dmesg</code> filled with <code>e1000e: Detected Hardware Unit Hang</code>. Not the best welcome for a freshly decomposed architecture &mdash; but I'm getting ahead of myself.</p>
+
+      <p>The <a href="/blog/posts/homelab-p2v-proxmox-migration">previous post</a> covered moving the bare-metal homelab into a Proxmox VM via direct SSD passthrough. That got everything running under a hypervisor, but the monolith pattern remained: one VM, one SSD, one blast radius. This post covers the next step &mdash; extracting four services into dedicated LXC containers on NVMe storage, right-sizing the legacy VM, and hardening a flaky Intel NIC that tried to take the whole stack down on day one.</p>
+
+      <h2>Why Decompose</h2>
+
+      <p>The P2V migration preserved uptime, but it also preserved every problem the bare-metal setup had:</p>
+
+      <ul>
+        <li><strong>Single disk</strong> &mdash; all services share one aging Samsung SSD. A disk failure takes everything.</li>
+        <li><strong>Single blast radius</strong> &mdash; a bad <code>apt upgrade</code> or misconfigured service can cascade to everything else on the same OS.</li>
+        <li><strong>Over-provisioned</strong> &mdash; the VM was allocated 14 GB RAM and 8 cores to cover peak Plex transcoding, even though most services idle at near zero.</li>
+        <li><strong>No independent snapshots</strong> &mdash; you can snapshot the whole VM, but you can't roll back just AdGuard or just Plex.</li>
+      </ul>
+
+      <p>The goal: extract each non-Docker service into its own LXC container on NVMe, with independent lifecycle, independent snapshots, and right-sized resources. The Docker stacks stay on VM100 for now &mdash; they're a future phase.</p>
+
+      <h2>The Target Architecture</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>IP</th>
+            <th>Service</th>
+            <th>Deployment</th>
+            <th>Storage</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>192.168.20.70</td>
+            <td>AdGuard Home</td>
+            <td>LXC CT 101</td>
+            <td>NVMe (local-lvm)</td>
+          </tr>
+          <tr>
+            <td>192.168.20.71</td>
+            <td>Caddy + cloudflared</td>
+            <td>LXC CT 102</td>
+            <td>NVMe (local-lvm)</td>
+          </tr>
+          <tr>
+            <td>192.168.20.72</td>
+            <td>Plex Media Server</td>
+            <td>LXC CT 103</td>
+            <td>NVMe (local-lvm)</td>
+          </tr>
+          <tr>
+            <td>(host)</td>
+            <td>Tailscale subnet router</td>
+            <td>Proxmox host native</td>
+            <td>NVMe (host root)</td>
+          </tr>
+          <tr>
+            <td>192.168.20.69</td>
+            <td>Docker stacks (interim)</td>
+            <td>VM 100</td>
+            <td>Samsung SSD 870</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>LXC containers share the host kernel, start in under a second, and use a fraction of the memory a full VM would need. On Proxmox's LVM-thin storage, snapshots are copy-on-write &mdash; they cost nearly zero space until blocks change. This makes per-service containers the right tool for services that don't need their own kernel.</p>
+
+      <h2>Phase 1 &mdash; AdGuard Home (CT 101)</h2>
+
+      <p>DNS is the most critical service in the stack. Everything depends on it, nothing depends on everything else. That makes it the natural first candidate.</p>
+
+      <p>Fresh Debian 12 LXC: 1024 MB RAM, 1 vCPU, 4 GB disk, static IP <code>192.168.20.70</code>. AdGuard Home installed via the official one-liner, then the YAML config imported from VM100.</p>
+
+      <pre><code># Key sections from AdGuardHome.yaml
+dns:
+  bind_hosts:
+    - 0.0.0.0
+  port: 53
+  upstream_dns:
+    - https://dns.quad9.net/dns-query
+  bootstrap_dns:
+    - 9.9.9.10
+
+http:
+  address: 0.0.0.0:8888</code></pre>
+
+      <p>Verification from another host:</p>
+
+      <pre><code>dig @192.168.20.70 google.com +short
+# 142.250.80.46</code></pre>
+
+      <div class="callout">
+        The LXC was originally provisioned with 512 MB. That worked for about ten minutes &mdash; then I noticed heavy swapping. AdGuard loads 3.5 million filter rules at startup, which takes real memory and ~45&ndash;60 seconds of CPU-bound parsing before DNS port 53 is ready. Bumped to 1024 MB and the problem disappeared.
+      </div>
+
+      <p>After confirming resolution on <code>.70</code>, the router's DHCP was updated to advertise the new DNS. The old AdGuard instance on VM100 was stopped and disabled.</p>
+
+      <h2>Phase 2 &mdash; Tailscale on the Proxmox Host</h2>
+
+      <p>Tailscale provides remote access to the LAN and NAS networks via subnet routing. It runs on the Proxmox host directly rather than in an LXC &mdash; subnet routing needs the cleanest possible L3 path without an extra network namespace in the way.</p>
+
+      <pre><code># Enable IP forwarding
+echo 'net.ipv4.ip_forward=1' &gt;&gt; /etc/sysctl.d/99-tailscale.conf
+sysctl -p /etc/sysctl.d/99-tailscale.conf
+
+# Start with subnet routes, don't override host DNS
+tailscale up --advertise-routes=192.168.20.0/24,10.0.0.0/24 --accept-dns=false</code></pre>
+
+      <p>This is a hard cutover &mdash; two Tailscale nodes advertising the same subnet routes will conflict. The old Tailscale on VM100 has to be stopped <em>before</em> the new one starts. No parallel-run here.</p>
+
+      <p>The subtle gotcha: Tailscale's admin console had the global DNS resolver pointed at VM100's tailnet IP (<code>100.108.11.76</code>). After stopping Tailscale on VM100, every tailnet device lost DNS resolution. The fix: update the Tailscale admin console to use <code>192.168.20.70</code> (the new AdGuard LXC) as the global nameserver, with split DNS for <code>semesmieh.com</code>.</p>
+
+      <h2>Phase 3 &mdash; Caddy + cloudflared (CT 102)</h2>
+
+      <p>Caddy handles TLS termination and reverse proxying for all <code>*.semesmieh.com</code> subdomains. Cloudflared runs a Cloudflare Tunnel alongside it, providing external access without opening firewall ports.</p>
+
+      <p>Fresh Debian 12 LXC: 512 MB RAM, 1 vCPU, 8 GB disk, static IP <code>192.168.20.71</code>. Caddy was built from source with the Cloudflare DNS module using <code>xcaddy</code>:</p>
+
+      <pre><code>xcaddy build --with github.com/caddy-dns/cloudflare --output /usr/local/bin/caddy</code></pre>
+
+      <p>The Caddyfile was imported from VM100 with backend IPs adjusted. A few representative blocks:</p>
+
+      <pre><code>{
+    acme_dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+}
+
+home.semesmieh.com {
+    reverse_proxy 192.168.20.69:3000
+}
+
+plex.semesmieh.com {
+    reverse_proxy http://192.168.20.72:32400 {
+        header_down Location http:// https://
+    }
+}
+
+pve.semesmieh.com {
+    reverse_proxy https://192.168.20.99:8006 {
+        transport http {
+            tls_insecure_skip_verify
+        }
+    }
+}</code></pre>
+
+      <p>The Cloudflare API token is stored in <code>/etc/caddy/environment</code> (mode <code>0600</code>, owned by the <code>caddy</code> user) and loaded via the systemd unit's <code>EnvironmentFile</code> directive. Cloudflared runs as a separate systemd service with the tunnel token passed on the command line.</p>
+
+      <p>One gotcha: building Caddy with Go required more disk than the original 4 GB allocation. I expanded the container to 8 GB during the build, then cleaned up Go and xcaddy afterwards &mdash; the container settled at 756 MB used.</p>
+
+      <h2>Phase 4 &mdash; Plex with iGPU Passthrough (CT 103)</h2>
+
+      <p>Plex is the most resource-intensive migration: large metadata directory, hardware transcoding via Intel iGPU, and dual-network access to both LAN clients and NAS storage.</p>
+
+      <p>Fresh Debian 12 LXC: 8 GB RAM, 4 vCPUs, 100 GB disk, static IP <code>192.168.20.72</code> on LAN, <code>10.0.0.40</code> on the NAS network. Privileged container to simplify <code>/dev/dri</code> passthrough.</p>
+
+      <h3>iGPU Passthrough</h3>
+
+      <p>Two lines in <code>/etc/pve/lxc/103.conf</code>:</p>
+
+      <pre><code>lxc.cgroup2.devices.allow: c 226:* rwm
+lxc.mount.entry: /dev/dri dev/dri none bind,optional,create=dir</code></pre>
+
+      <p>After starting the container, <code>vainfo</code> confirms the Intel iHD driver with full encode/decode profile support:</p>
+
+      <pre><code>vainfo
+# libva info: VA-API version 1.20.0
+# libva info: va_openDriver() returns 0
+# vainfo: Driver version: Intel iHD driver - 24.1.0</code></pre>
+
+      <h3>NFS Media Mounts</h3>
+
+      <p>The container's second NIC (<code>eth1</code>) connects to the NAS bridge (<code>vmbr1</code>) with a static IP of <code>10.0.0.40</code>. NFS shares are mounted via <code>/etc/fstab</code>:</p>
+
+      <pre><code>10.0.0.10:/volume1/media   /mnt/media   nfs defaults,nofail 0 0
+10.0.0.10:/volume1/movies  /mnt/movies  nfs defaults,nofail 0 0
+10.0.0.10:/volume1/series  /mnt/series  nfs defaults,nofail 0 0</code></pre>
+
+      <h3>Data Migration</h3>
+
+      <p>Plex metadata (watch history, posters, thumbnails, database) is 19 GB. Rather than tarring and transferring, I used rsync directly from the Proxmox host into the container's rootfs:</p>
+
+      <pre><code># Stop Plex on VM100 first — two servers with the same identity will conflict
+ssh anas@192.168.20.69 "sudo systemctl disable --now plexmediaserver"
+
+# Rsync metadata from VM100 into CT 103's rootfs
+rsync -aP --numeric-ids anas@192.168.20.69:/var/lib/plexmediaserver/ \
+  /var/lib/lxc/103/rootfs/var/lib/plexmediaserver/
+
+# Fix ownership inside the container
+pct exec 103 -- chown -R plex:plex /var/lib/plexmediaserver/</code></pre>
+
+      <p>After starting Plex, the web UI shows the setup wizard with <code>claimed="0"</code>. This is expected &mdash; the server IP changed, so Plex needs a manual re-claim via the web UI. Libraries and metadata appear intact once claimed.</p>
+
+      <h2>The Coexistence Dance</h2>
+
+      <p>Not every service can run in parallel during migration. I found two patterns:</p>
+
+      <ul>
+        <li><strong>Parallel-safe:</strong> AdGuard Home and Caddy run on different IPs with no shared state. Both old and new instances can serve traffic simultaneously during cutover. This is the safest &mdash; validate the new one fully before disabling the old.</li>
+        <li><strong>Hard-cutover:</strong> Tailscale (two subnet routers advertising the same routes will conflict) and Plex (two servers claiming the same identity confuse clients and break account linking). These require stop-old-then-start-new with a brief gap.</li>
+      </ul>
+
+      <p>The migration order matters because of this. DNS goes first (everything depends on it, and it's parallel-safe). Tailscale goes second (remote access to manage remaining steps). Caddy goes third (ingress depends on backends being reachable). Plex goes last (largest data transfer, most complex setup).</p>
+
+      <h2>Day-One Surprise &mdash; Intel e1000e NIC Drops</h2>
+
+      <p>Midway through the Plex migration, the Proxmox host's NIC started dropping. SSH sessions hung, all containers became unreachable, and <code>dmesg</code> showed the telltale error:</p>
+
+      <pre><code>e1000e 0000:00:1f.6 lan: Detected Hardware Unit Hang:
+  TDH                  &lt;0&gt;
+  TDT                  &lt;1&gt;
+  next_to_use          &lt;1&gt;
+  next_to_clean        &lt;0&gt;</code></pre>
+
+      <p>The root cause: EEE (Energy Efficient Ethernet) negotiation between the Intel I219-LM NIC and an unmanaged switch. The NIC enters low-power states that the switch can't properly handle, causing PHY resets that cascade into full network loss. Since the switch is unmanaged, all tuning has to be host-side.</p>
+
+      <h3>The Hardening Stack</h3>
+
+      <p>Three layers address the problem at different points in the boot sequence:</p>
+
+      <p><strong>1. Kernel module options</strong> &mdash; applied at driver load via <code>/etc/modprobe.d/e1000e.conf</code>:</p>
+
+      <pre><code># Disable Energy Efficient Ethernet at the driver level
+options e1000e SmartPowerDownEnable=0
+
+# Adaptive interrupt throttle rate (balances latency vs CPU)
+options e1000e InterruptThrottleRate=3</code></pre>
+
+      <p><strong>2. Boot-time tuning</strong> &mdash; a systemd oneshot service runs <code>ethtool</code> before networking comes up:</p>
+
+      <pre><code>#!/bin/bash
+# /usr/local/bin/disable-eee.sh
+IFACE=lan
+
+# Disable EEE
+ethtool --set-eee "$IFACE" eee off 2&gt;/dev/null || true
+
+# Disable flow control (can interact with EEE to cause hangs)
+ethtool -A "$IFACE" rx off tx off 2&gt;/dev/null || true
+
+# Disable TSO/GSO/GRO (known to cause issues with e1000e under load)
+ethtool -K "$IFACE" tso off gso off gro off 2&gt;/dev/null || true</code></pre>
+
+      <p><strong>3. Runtime health check</strong> &mdash; a systemd timer runs every 60 seconds, pinging the gateway and watching for hang messages in <code>dmesg</code>. Three consecutive failures trigger an automatic NIC restart with EEE re-disable:</p>
+
+      <pre><code># /etc/systemd/system/e1000e-health-check.timer
+[Timer]
+OnBootSec=30
+OnUnitActiveSec=60
+AccuracySec=5
+Persistent=true</code></pre>
+
+      <p>The health check script monitors link state, carrier, gateway reachability, and dmesg for <code>Hardware Unit Hang</code> messages. If the NIC locks up, it brings the interface down and back up, re-applies all EEE and offload disables, and verifies recovery &mdash; all without human intervention.</p>
+
+      <h3>Deploying It</h3>
+
+      <p>The hardening files are packaged as a self-contained directory with a deploy script:</p>
+
+      <pre><code># Copy to host and run
+scp -r e1000e-hardening/ root@192.168.20.99:/tmp/
+ssh root@192.168.20.99 "bash /tmp/e1000e-hardening/deploy-e1000e-hardening.sh"</code></pre>
+
+      <p>Verify:</p>
+
+      <pre><code># EEE should show "disabled"
+ethtool --show-eee lan
+
+# Timer should be active
+systemctl status e1000e-health-check.timer
+
+# Watch health checks in real time
+journalctl -t e1000e-health -f</code></pre>
+
+      <p>Since deploying this stack, the NIC has been stable with zero hangs.</p>
+
+      <h2>Resource Rightsizing</h2>
+
+      <p>With AdGuard and Plex extracted from VM100, the legacy VM no longer needs its original allocation. The results after reducing VM100 from 14 GB / 8 cores to 8 GB / 4 cores:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Before</th>
+            <th>After</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>VM100 RAM</td>
+            <td>14 GB</td>
+            <td>8 GB</td>
+          </tr>
+          <tr>
+            <td>VM100 cores</td>
+            <td>8</td>
+            <td>4</td>
+          </tr>
+          <tr>
+            <td>Host RAM free</td>
+            <td>430 MB</td>
+            <td>12 GB</td>
+          </tr>
+          <tr>
+            <td>Host swap used</td>
+            <td>4.2 GB</td>
+            <td>0</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>The monolith was hoarding resources its remaining services didn't need. After decomposition, VM100's Docker stacks run comfortably in 8 GB &mdash; with the host finally having headroom for the three new LXCs and future workloads.</p>
+
+      <h2>Backup Strategy</h2>
+
+      <p>Two tiers protect the new containers:</p>
+
+      <p><strong>Local LVM-thin snapshots</strong> &mdash; instant, copy-on-write, named <code>zero-day</code> for each container. These cost nearly zero space and provide immediate rollback if a configuration change goes wrong.</p>
+
+      <p><strong>Compressed backups to NAS</strong> &mdash; full <code>vzdump</code> archives with zstd compression, stored on the Synology NAS via NFS:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Container</th>
+            <th>Service</th>
+            <th>Archive Size</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>CT 101</td>
+            <td>AdGuard Home</td>
+            <td>229 MB</td>
+          </tr>
+          <tr>
+            <td>CT 102</td>
+            <td>Caddy + cloudflared</td>
+            <td>245 MB</td>
+          </tr>
+          <tr>
+            <td>CT 103</td>
+            <td>Plex Media Server</td>
+            <td>16.6 GB</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>A scheduled <code>vzdump</code> job runs weekly on Wednesday at 2 AM, retaining the last three backups. Between scheduled runs, the local thin snapshots provide instant protection.</p>
+
+      <h2>What's Still on VM100</h2>
+
+      <p>The Docker stacks remain on VM100 until a future migration phase:</p>
+
+      <ul>
+        <li><strong>Jellyfin</strong> &mdash; media server (secondary to Plex)</li>
+        <li><strong>Immich</strong> &mdash; photo backup with ML-powered search</li>
+        <li><strong>Sonarr, Radarr, Prowlarr</strong> &mdash; media acquisition pipeline</li>
+        <li><strong>qBittorrent + Gluetun</strong> &mdash; download client with VPN</li>
+        <li><strong>Scrypted</strong> &mdash; camera/HomeKit bridge</li>
+        <li><strong>Home Assistant</strong> &mdash; home automation</li>
+        <li><strong>Vaultwarden</strong> &mdash; password manager</li>
+        <li><strong>Homepage</strong> &mdash; dashboard</li>
+        <li><strong>Tautulli, Jellystat</strong> &mdash; analytics</li>
+      </ul>
+
+      <p>These are all containerized via Docker Compose and can be migrated to a new VM or set of LXCs independently. The SSD stays in the system until they're moved.</p>
+
+      <h2>Lessons Learned</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Lesson</th>
+            <th>Detail</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>DNS is always the last thing you check</td>
+            <td>Tailscale admin console DNS, AdGuard DNS rewrites, and router DHCP all needed updating separately. Each pointed to a different IP from a different era of the setup.</td>
+          </tr>
+          <tr>
+            <td>Filter lists have a memory cost</td>
+            <td>3.5 million AdGuard filter rules need real RAM. The 512 MB default was fine for the binary but not for the dataset it loads at startup.</td>
+          </tr>
+          <tr>
+            <td>iGPU passthrough is trivial in privileged LXCs</td>
+            <td>Two lines in the LXC config and an <code>intel-media-driver</code> install. No IOMMU group wrangling, no VFIO stubbing. Privileged containers just bind-mount <code>/dev/dri</code>.</td>
+          </tr>
+          <tr>
+            <td>EEE + unmanaged switch = silent killer</td>
+            <td>The Intel I219-LM will negotiate EEE by default. If the switch can't handle the low-power transitions, the NIC hangs silently. Disable EEE proactively on e1000e NICs behind unmanaged switches.</td>
+          </tr>
+          <tr>
+            <td>Snapshot before you touch anything</td>
+            <td>Local thin snapshots are instant and free. Taking a <code>zero-day</code> snapshot of every container before the first production workload means you never have to care about "what if the initial setup was wrong."</td>
+          </tr>
+          <tr>
+            <td>Right-size after decomposition</td>
+            <td>The monolith VM was allocated for peak load across all services. After extracting 40% of its workload, it was over-provisioned by 6 GB of RAM and 4 cores. The host was swapping for no reason.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Closing Thought</h2>
+
+      <p>Each container is now independently snapshotable, restorable, and upgradeable. AdGuard can be rolled back without touching Plex. Caddy can be rebuilt from scratch without losing a single DNS record. The NIC hardening means the host survives hardware quirks without waiting for someone to notice and SSH in.</p>
+
+      <p>The SSD is still in the chassis, serving Docker stacks that haven't moved yet. Once they do, it comes out &mdash; and the entire homelab runs on a single NVMe drive, decomposed into purpose-built containers with backup coverage at every layer.</p>
+
+      <div class="series-nav">
+        <strong>Homelab Series:</strong>
+        <a href="/blog/posts/homelab-start-here">Start Here</a>
+        <a href="/blog/posts/homelab-docker-compose-stack">Docker Compose Stack</a>
+        <a href="/blog/posts/homelab-sso-authentik">SSO with Authentik</a>
+        <a href="/blog/posts/homelab-backup-automation">Backup Automation</a>
+        <a href="/blog/posts/homelab-disaster-recovery">Disaster Recovery</a>
+        <a href="/blog/posts/homelab-xcaddy-cloudflare-tunnel-adguard">Xcaddy + Tunnel + AdGuard</a>
+        <a href="/blog/posts/homelab-p2v-proxmox-migration">P2V Migration</a>
+        <a href="/blog/posts/homelab-proxmox-lxc-decomposition"><strong>LXC Decomposition (this post)</strong></a>
+      </div>
+    </article>
+  </div>
+</body>
+
+</html>
