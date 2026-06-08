@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Finishing the Decomposition: Every Service Gets Its Own Container | Anas Semesmieh</title>
+  <meta name="description" content="Completing the VM100 decomposition: migrating Jellyfin, Scrypted, the full Arrstack, and Homepage into dedicated Proxmox LXCs — then decommissioning the monolith for good." />
+  <meta name="author" content="Anas Semesmieh" />
+  <link rel="canonical" href="https://anas.semesmieh.com/blog/posts/homelab-full-lxc-migration" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Finishing the Decomposition: Every Service Gets Its Own Container" />
+  <meta property="og:description" content="Completing the VM100 decomposition: migrating Jellyfin, Scrypted, the full Arrstack, and Homepage into dedicated Proxmox LXCs." />
+  <meta property="og:url" content="https://anas.semesmieh.com/blog/posts/homelab-full-lxc-migration" />
+  <meta property="og:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Finishing the Decomposition: Every Service Gets Its Own Container" />
+  <meta name="twitter:description" content="Completing the VM100 decomposition: migrating Jellyfin, Scrypted, the full Arrstack, and Homepage into dedicated Proxmox LXCs." />
+  <meta name="twitter:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #101a2c;
+      --muted: #8ea0be;
+      --text: #e6eef8;
+      --accent: #22c55e;
+      --heading: #60a5fa;
+      --border: rgba(255, 255, 255, 0.07);
+      --maxw: 860px;
+      --radius: 16px;
+      --font: "Inter", "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+    }
+
+    body {
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.75;
+      background:
+        radial-gradient(ellipse at 15% 0%, #13203a 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 15%, #0e1a32 0%, transparent 45%),
+        var(--bg);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+    }
+
+    .nav {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: var(--muted);
+      padding: 7px 13px;
+      border-radius: 10px;
+      font-size: 14px;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .nav a:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    article {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      background: var(--card);
+    }
+
+    h1 {
+      font-size: 36px;
+      line-height: 1.2;
+      color: var(--heading);
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 14px;
+      margin: 10px 0 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h2 {
+      margin-top: 32px;
+      margin-bottom: 12px;
+      font-size: 24px;
+      color: var(--heading);
+    }
+
+    h3 {
+      margin-top: 24px;
+      margin-bottom: 8px;
+      color: #86efac;
+      font-size: 18px;
+    }
+
+    p {
+      margin: 10px 0;
+    }
+
+    ul,
+    ol {
+      margin: 10px 0;
+      padding-left: 22px;
+    }
+
+    li {
+      margin: 4px 0;
+    }
+
+    .callout {
+      border-left: 3px solid var(--accent);
+      padding: 12px 16px;
+      background: rgba(34, 197, 94, 0.07);
+      border-radius: 10px;
+      margin: 20px 0;
+    }
+
+    code {
+      background: rgba(255, 255, 255, 0.07);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13.5px;
+    }
+
+    pre {
+      background: rgba(0, 0, 0, 0.35);
+      padding: 16px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.55;
+      color: #e6eef8;
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0;
+      font-size: 14px;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .series-nav {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .series-nav a {
+      display: inline-block;
+      margin-right: 12px;
+    }
+
+    .diagram {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 20px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-family: "JetBrains Mono", "Fira Code", monospace;
+      font-size: 12px;
+      line-height: 1.4;
+      color: #86efac;
+      margin: 20px 0;
+    }
+
+    @media (max-width: 700px) {
+      .wrap {
+        padding: 16px 14px 48px;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+
+      article {
+        padding: 20px;
+      }
+    }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"BlogPosting",
+    "headline":"Finishing the Decomposition: Every Service Gets Its Own Container",
+    "datePublished":"2026-06-08",
+    "dateModified":"2026-06-08",
+    "author":{"@type":"Person","name":"Anas Semesmieh","url":"https://anas.semesmieh.com/about/"},
+    "publisher":{"@type":"Person","name":"Anas Semesmieh"},
+    "mainEntityOfPage":"https://anas.semesmieh.com/blog/posts/homelab-full-lxc-migration",
+    "image":"https://anas.semesmieh.com/profile-wide.jpg",
+    "description":"Completing the VM100 decomposition: migrating Jellyfin, Scrypted, the full Arrstack, and Homepage into dedicated Proxmox LXCs — then decommissioning the monolith for good."
+  }
+  </script>
+</head>
+
+<body>
+  <div class="wrap">
+    <nav class="nav" aria-label="Post navigation">
+      <a href="/">Portfolio</a>
+      <a href="/blog/">All Posts</a>
+      <a href="/blog/categories/">Categories</a>
+      <a href="/blog/tags/">Tags</a>
+      <a href="/blog/rss.xml">RSS</a>
+    </nav>
+
+    <article>
+      <h1>Finishing the Decomposition: Every Service Gets Its Own Container</h1>
+      <p class="meta">By <a href="/about/">Anas Semesmieh</a> &middot; June 8, 2026 &middot; Homelab, Docker, Proxmox, Self-Hosting, Automation</p>
+
+      <p>The <a href="/blog/posts/homelab-proxmox-lxc-decomposition">previous post</a> ended with a promise: &ldquo;Docker stacks stay on VM100 for now &mdash; they&rsquo;re a future phase.&rdquo; That future phase happened the next day. Twelve services, five new LXC containers, one decommissioned VM. The Samsung SSD is cold storage now, and the entire homelab runs on a single NVMe drive at 31% memory utilization.</p>
+
+      <h2>The Remaining Targets</h2>
+
+      <p>After extracting AdGuard, Caddy, and Plex into their own LXCs, VM100 still hosted ten Docker containers across five logical stacks. Each needed a new home:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Service</th>
+            <th>CT</th>
+            <th>IP</th>
+            <th>Resources</th>
+            <th>Key Requirement</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Vaultwarden</td>
+            <td>104</td>
+            <td>.73</td>
+            <td>1 core, 512 MB, 4 GB</td>
+            <td>Minimal footprint, standalone</td>
+          </tr>
+          <tr>
+            <td>Jellyfin + Tautulli + Jellystat</td>
+            <td>103</td>
+            <td>.72</td>
+            <td>4 cores, 8 GB, 100 GB</td>
+            <td>iGPU shared with Plex, NFS media, dual NIC</td>
+          </tr>
+          <tr>
+            <td>Scrypted</td>
+            <td>106</td>
+            <td>.76</td>
+            <td>2 cores, 2 GB, 8 GB</td>
+            <td>iGPU for video analysis, host networking</td>
+          </tr>
+          <tr>
+            <td>Arrstack (8 containers)</td>
+            <td>107</td>
+            <td>.77</td>
+            <td>2 cores, 4 GB, 20 GB</td>
+            <td>/dev/net/tun for VPN, dual NIC for NFS</td>
+          </tr>
+          <tr>
+            <td>Homepage + Dockhand</td>
+            <td>108</td>
+            <td>.78</td>
+            <td>1 core, 1 GB, 4 GB</td>
+            <td>Docker socket access to all hosts</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>CT 105 was intentionally left empty &mdash; reserved for future use. The numbering isn&rsquo;t sequential because good planning accounts for growth.</p>
+
+      <h2>The Migration Pattern</h2>
+
+      <p>Every migration followed the same five-step pattern. Once it worked for Vaultwarden, the rest were variations on a theme:</p>
+
+      <ol>
+        <li><strong>Create privileged LXC</strong> &mdash; right-sized resources, static IP on vmbr0 (and vmbr1 for NFS-dependent services). Privileged because <code>/dev/dri</code> and <code>/dev/net/tun</code> passthrough is trivial in privileged mode.</li>
+        <li><strong>Install Docker + Compose</strong> &mdash; standard Docker CE install from the official repo. Took ~90 seconds per container.</li>
+        <li><strong>Stage data from Proxmox host</strong> &mdash; all VM100 data was pre-staged to <code>/root/migration/</code> on the Proxmox host during the P2V phase. SCP from host into the new CT.</li>
+        <li><strong>Deploy Compose stack</strong> &mdash; adapted <code>docker-compose.yml</code> for the new environment (updated IPs, switched named volumes to bind mounts, removed cross-stack network dependencies).</li>
+        <li><strong>Update Caddy routes and reload</strong> &mdash; <code>sed</code> the backend IP in the Caddyfile, <code>systemctl reload caddy</code>. Zero-downtime cutover.</li>
+      </ol>
+
+      <p>Total time from empty LXC to verified service: ~5 minutes for simple stacks (Vaultwarden), ~15 minutes for complex ones (Arrstack with 8 containers and VPN tunneling).</p>
+
+      <h2>Sharing an iGPU Across Three Containers</h2>
+
+      <p>CT 103 runs native Plex and Dockerized Jellyfin. CT 106 runs Scrypted for camera analytics. All three services need hardware video encode/decode via the Intel iGPU. The common misconception: you need one GPU per consumer. Intel iGPUs support concurrent access &mdash; multiple processes (even across containers) can use VA-API simultaneously without exclusive locks.</p>
+
+      <p>The LXC config is identical for both containers:</p>
+
+      <pre><code>lxc.cgroup2.devices.allow: c 226:* rwm
+lxc.mount.entry: /dev/dri dev/dri none bind,optional,create=dir</code></pre>
+
+      <p>For Jellyfin running inside Docker on CT 103, the Compose file passes the device through one more layer:</p>
+
+      <pre><code>devices:
+  - /dev/dri:/dev/dri</code></pre>
+
+      <p>Scrypted uses host networking and the same device passthrough. Three concurrent iGPU consumers, zero contention in normal operation. The Intel i5&rsquo;s integrated UHD graphics handles it without breaking a sweat.</p>
+
+      <h2>VPN-Tunneled Downloads in an LXC</h2>
+
+      <p>The Arrstack is the most architecturally interesting container. Eight services form a dependency chain, with Gluetun at the base providing a WireGuard tunnel to NordVPN. Every service that needs anonymized traffic routes through Gluetun&rsquo;s network namespace via <code>network_mode: service:gluetun</code>.</p>
+
+      <p>The challenge: Gluetun needs <code>/dev/net/tun</code>, which doesn&rsquo;t exist in LXC containers by default. Two lines in <code>/etc/pve/lxc/107.conf</code> fix that:</p>
+
+      <pre><code>lxc.cgroup2.devices.allow: c 10:200 rwm
+lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file</code></pre>
+
+      <p>The dependency chain matters for startup order:</p>
+
+      <pre><code>gluetun (WireGuard tunnel, owns the network namespace)
+  &larr; qbittorrent (network_mode: service:gluetun)
+  &larr; prowlarr (network_mode: service:gluetun)
+  &larr; flaresolverr (network_mode: service:gluetun)
+radarr, sonarr, seerr (own network, connect to gluetun-hosted ports)
+deunhealth (restarts unhealthy containers)</code></pre>
+
+      <p>If Gluetun goes down, everything behind it loses network. The <code>deunhealth</code> container watches for this and triggers automatic restarts. It&rsquo;s a self-healing loop.</p>
+
+      <p>The container also gets a second NIC on vmbr1 (10.0.0.x) for direct NFS access to the NAS &mdash; download traffic goes through the VPN, but media file access goes over the dedicated 10GbE-capable NAS bridge at MTU 9000.</p>
+
+      <h2>What Couldn&rsquo;t Be Migrated</h2>
+
+      <p>Two services lost their state during migration: Seerr and Dockhand. Both used Docker <strong>named volumes</strong> &mdash; the kind declared in the <code>volumes:</code> section of a Compose file. Named volumes live inside Docker&rsquo;s internal storage driver, not on the filesystem. You can&rsquo;t <code>scp</code> them. You can&rsquo;t even see them without <code>docker volume inspect</code>.</p>
+
+      <p>When VM100 shuts down, those volumes become inaccessible.</p>
+
+      <p>The fix going forward: every new Compose file uses <strong>bind mounts</strong> exclusively. <code>./seerr:/app/config</code> instead of <code>seerr_data:/app/config</code>. The data lives on the filesystem where it can be backed up, staged, and migrated like everything else.</p>
+
+      <div class="callout">
+        Lesson learned: named volumes are convenient for development but a liability for migration. If you can&rsquo;t <code>ls</code> the data directory from the host, you can&rsquo;t migrate it without the running Docker daemon.
+      </div>
+
+      <h2>Connecting the Dashboard</h2>
+
+      <p>Homepage shows container status (running, stopped, health) for services across all hosts. But it runs on CT 108 &mdash; it only has access to its own Docker socket. To see containers on CT 103, 106, and 107, those hosts need to expose their Docker API.</p>
+
+      <p>A systemd drop-in override on each CT enables Docker&rsquo;s TCP listener:</p>
+
+      <pre><code># /etc/systemd/system/docker.service.d/tcp.conf
+[Service]
+ExecStart=
+ExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:2375 --containerd=/run/containerd/containerd.sock</code></pre>
+
+      <p>Homepage&rsquo;s <code>docker.yaml</code> then connects to all four hosts:</p>
+
+      <pre><code>local:
+  socket: /var/run/docker.sock
+
+media:
+  host: 192.168.20.72
+  port: 2375
+
+scrypted:
+  host: 192.168.20.76
+  port: 2375
+
+arrstack:
+  host: 192.168.20.77
+  port: 2375</code></pre>
+
+      <p>Each service in <code>services.yaml</code> references its <code>server:</code> and <code>container:</code> name, giving Homepage real-time status indicators across the entire fleet.</p>
+
+      <div class="callout">
+        Port 2375 is unauthenticated Docker API access. This is acceptable on a trusted LAN with no internet exposure &mdash; the containers sit behind Caddy and Cloudflare Tunnel, never directly reachable from outside. For anything beyond a homelab, use mutual TLS or a socket proxy.
+      </div>
+
+      <h2>Cleaning Up the Monolith</h2>
+
+      <p>With all services migrated, the cleanup phase was satisfying:</p>
+
+      <ul>
+        <li><strong>Dead Caddy routes removed</strong> &mdash; code-server, Home Assistant, Cockpit, Tunarr, and Portainer were all services that died long before the migration. Their ghost routes were still in the Caddyfile, proxying to an IP that no longer responds. Purged.</li>
+        <li><strong>Day-One snapshots</strong> &mdash; every LXC got a named snapshot (<code>Day-One</code>) marking the verified baseline. Instant rollback points, copy-on-write, zero space cost until blocks diverge.</li>
+        <li><strong>Scheduled backups</strong> &mdash; a <code>vzdump</code> job runs every Wednesday at noon, compressing all seven containers with zstd and shipping them to the Synology NAS via NFS. Keep-last-3 retention.</li>
+        <li><strong>VM100 SSD</strong> &mdash; registered as <code>vm100-ssd</code> cold storage in Proxmox. It stays in the chassis as insurance until confidence is absolute, then it comes out.</li>
+      </ul>
+
+      <pre><code># /etc/pve/jobs.cfg
+vzdump: backup-homelab
+    enabled 1
+    schedule 0 12 * * 3
+    storage nas-backups
+    vmid 101,102,103,104,106,107,108
+    mode snapshot
+    compress zstd
+    prune-backups keep-last=3</code></pre>
+
+      <h2>The Final Architecture</h2>
+
+      <pre class="diagram">┌──────────────────────────── Proxmox VE (.99) ─────────────────────────────────┐
+│  Intel i5 &middot; 8 cores &middot; 15.4 GiB RAM &middot; 512 GB NVMe &middot; Tailscale subnet router    │
+│                                                                                │
+│  ┌─CT 101──┐  ┌─CT 102───────────┐  ┌─CT 103─────────────────┐  ┌─CT 104──┐  │
+│  │ AdGuard │  │ Caddy+cloudflared │  │ Plex (native)          │  │ Vault-  │  │
+│  │ DNS     │  │ TLS termination   │  │ Jellyfin+Tautulli      │  │ warden  │  │
+│  │ .70     │  │ CF Tunnel &rarr; WAN   │  │ Jellystat (iGPU)       │  │ .73     │  │
+│  └─────────┘  │ .71               │  │ .72                    │  └─────────┘  │
+│               └───────────────────┘  └────────────────────────┘               │
+│                                                                                │
+│  ┌─CT 106────────┐  ┌─CT 107──────────────────┐  ┌─CT 108───────────┐        │
+│  │ Scrypted       │  │ Gluetun &rarr; qBittorrent   │  │ Homepage          │        │
+│  │ NVR (iGPU)     │  │ Radarr, Sonarr, Prowlarr │  │ Dockhand          │        │
+│  │ host network   │  │ Seerr, FlareSolverr      │  │ multi-host Docker │        │
+│  │ .76            │  │ .77                      │  │ .78               │        │
+│  └────────────────┘  └──────────────────────────┘  └───────────────────┘        │
+│                                                                                │
+│  ═══ vmbr0 (LAN 192.168.20.x) ═══════ vmbr1 (NAS 10.0.0.x, MTU 9000) ═════  │
+└────────────────────────────────────────────────────────────────────────────────┘
+         │                                              │
+    Cloudflare Tunnel                          Synology NAS (10.0.0.10)
+    &rarr; *.semesmieh.com                          Media + Downloads via NFS
+                                               Weekly vzdump backups (zstd)</pre>
+
+      <table>
+        <thead>
+          <tr>
+            <th>CT</th>
+            <th>Service</th>
+            <th>Cores</th>
+            <th>RAM</th>
+            <th>Disk</th>
+            <th>Special</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>101</td>
+            <td>AdGuard Home</td>
+            <td>1</td>
+            <td>1 GB</td>
+            <td>4 GB</td>
+            <td>&mdash;</td>
+          </tr>
+          <tr>
+            <td>102</td>
+            <td>Caddy + cloudflared</td>
+            <td>1</td>
+            <td>512 MB</td>
+            <td>8 GB</td>
+            <td>&mdash;</td>
+          </tr>
+          <tr>
+            <td>103</td>
+            <td>Plex + Jellyfin + Tautulli + Jellystat</td>
+            <td>4</td>
+            <td>8 GB</td>
+            <td>100 GB</td>
+            <td>iGPU, dual NIC, NFS</td>
+          </tr>
+          <tr>
+            <td>104</td>
+            <td>Vaultwarden</td>
+            <td>1</td>
+            <td>512 MB</td>
+            <td>4 GB</td>
+            <td>&mdash;</td>
+          </tr>
+          <tr>
+            <td>106</td>
+            <td>Scrypted</td>
+            <td>2</td>
+            <td>2 GB</td>
+            <td>8 GB</td>
+            <td>iGPU, host networking</td>
+          </tr>
+          <tr>
+            <td>107</td>
+            <td>Arrstack (8 containers)</td>
+            <td>2</td>
+            <td>4 GB</td>
+            <td>20 GB</td>
+            <td>/dev/net/tun, dual NIC, NFS</td>
+          </tr>
+          <tr>
+            <td>108</td>
+            <td>Homepage + Dockhand</td>
+            <td>1</td>
+            <td>1 GB</td>
+            <td>4 GB</td>
+            <td>Docker TCP to all hosts</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Lighter Than the Monolith</h2>
+
+      <p>The Proxmox dashboard tells the story better than any argument could. With <em>all</em> services running simultaneously across seven containers:</p>
+
+      <ul>
+        <li><strong>CPU:</strong> 6% of 8 cores</li>
+        <li><strong>Memory:</strong> 4.83 GiB of 15.40 GiB (31%)</li>
+      </ul>
+
+      <p>For context: VM100 alone was allocated 14 GB of RAM and the host was swapping 4.2 GB to disk. Now the entire decomposed architecture &mdash; every service, every container, the Proxmox host overhead included &mdash; uses less than a third of available memory. The host has 10 GB of free RAM with nothing to do.</p>
+
+      <p>Right-sized containers don&rsquo;t hoard headroom. A password manager doesn&rsquo;t need 8 GB of RAM just because it shares a VM with a media transcoder. Decomposition didn&rsquo;t just improve isolation &mdash; it halved total resource consumption.</p>
+
+      <h2>What&rsquo;s Next</h2>
+
+      <p>The decomposition wasn&rsquo;t just about isolation and resource efficiency. It was prerequisite architecture for the next evolution: <strong>a second Proxmox node for high availability</strong>.</p>
+
+      <p>You can&rsquo;t live-migrate a monolith VM with a passthrough SSD &mdash; the disk is physically attached to one host. But you <em>can</em> live-migrate 512 MB LXC containers on shared storage in under a second. With everything decomposed into independent containers on LVM-thin, adding a second node means:</p>
+
+      <ul>
+        <li><strong>Zero-downtime maintenance</strong> &mdash; drain containers off a node, update it, migrate them back</li>
+        <li><strong>Automatic failover</strong> &mdash; if a node dies, containers restart on the surviving node</li>
+        <li><strong>Rolling upgrades</strong> &mdash; Proxmox version bumps without a maintenance window</li>
+      </ul>
+
+      <p>That&rsquo;s the next post. For now, the single node is more than enough &mdash; and the architecture is ready for when it isn&rsquo;t.</p>
+
+      <h2>Closing Thought</h2>
+
+      <p>There&rsquo;s a particular kind of peace that comes from knowing your infrastructure can fail gracefully. Every container has a Day-One snapshot &mdash; an instant rollback to a verified-good state that costs zero space until blocks actually change. Every Wednesday at noon, <code>vzdump</code> compresses the lot and ships it to the NAS &mdash; physically decoupled storage that survives an NVMe failure, a host fire, or a spectacularly bad <code>apt upgrade</code>.</p>
+
+      <p>Two independent recovery paths. Local snapshots for the &ldquo;oops, I broke the config&rdquo; moments &mdash; roll back in seconds, try again. NAS backups for the disaster scenarios &mdash; rebuild from scratch on new hardware, restore, and be running within the hour. The old anxiety of &ldquo;one bad command takes everything down&rdquo; is replaced by the confidence to experiment freely.</p>
+
+      <p>The monolith is gone. The SSD is cold. Every service owns its own lifecycle. And the whole stack &mdash; all twelve containers, all seven LXCs &mdash; uses less memory than the single VM did alone. That&rsquo;s not just an architectural win. That&rsquo;s the kind of result that makes you excited to keep building.</p>
+
+      <div class="series-nav">
+        <strong>Homelab Series:</strong>
+        <a href="/blog/posts/homelab-start-here">Start Here</a>
+        <a href="/blog/posts/homelab-docker-compose-stack">Docker Compose Stack</a>
+        <a href="/blog/posts/homelab-sso-authentik">SSO with Authentik</a>
+        <a href="/blog/posts/homelab-backup-automation">Backup Automation</a>
+        <a href="/blog/posts/homelab-disaster-recovery">Disaster Recovery</a>
+        <a href="/blog/posts/homelab-xcaddy-cloudflare-tunnel-adguard">Xcaddy + Tunnel + AdGuard</a>
+        <a href="/blog/posts/homelab-p2v-proxmox-migration">P2V Migration</a>
+        <a href="/blog/posts/homelab-proxmox-lxc-decomposition">LXC Decomposition</a>
+        <a href="/blog/posts/homelab-full-lxc-migration"><strong>Full Migration (this post)</strong></a>
+      </div>
+    </article>
+  </div>
+</body>
+
+</html>

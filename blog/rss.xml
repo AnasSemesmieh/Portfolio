@@ -5,7 +5,15 @@
     <link>https://anas.semesmieh.com/blog/</link>
     <description>Platform engineering, Azure architecture, DevSecOps, and engineering leadership insights.</description>
     <language>en-au</language>
-    <lastBuildDate>Sat, 07 Jun 2026 12:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 08 Jun 2026 12:00:00 +0000</lastBuildDate>
+
+    <item>
+      <title>Finishing the Decomposition: Every Service Gets Its Own Container</title>
+      <link>https://anas.semesmieh.com/blog/posts/homelab-full-lxc-migration</link>
+      <guid>https://anas.semesmieh.com/blog/posts/homelab-full-lxc-migration</guid>
+      <pubDate>Sun, 08 Jun 2026 12:00:00 +0000</pubDate>
+      <description>Completing the VM100 decomposition: migrating Jellyfin, Scrypted, the full Arrstack, and Homepage into dedicated Proxmox LXCs — then decommissioning the monolith for good.</description>
+    </item>
 
     <item>
       <title>Bare-Metal to VM: A Pragmatic P2V Migration to Proxmox</title>
