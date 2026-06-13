@@ -214,6 +214,69 @@
       margin: 20px 0;
     }
 
+    .lightbox-trigger {
+      cursor: zoom-in;
+      transition: filter 0.15s, transform 0.15s;
+    }
+
+    .lightbox-trigger:hover {
+      filter: brightness(1.1);
+      transform: scale(1.01);
+    }
+
+    .lightbox-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      overflow: auto;
+    }
+
+    .lightbox-modal.active {
+      display: flex;
+    }
+
+    .lightbox-modal img {
+      max-width: 90vw;
+      max-height: 90vh;
+      object-fit: contain;
+      border-radius: 10px;
+    }
+
+    .lightbox-close {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: var(--text);
+      font-size: 32px;
+      width: 50px;
+      height: 50px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background 0.15s;
+      z-index: 1001;
+    }
+
+    .lightbox-close:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .lightbox-modal.active ~ .lightbox-close {
+      display: flex;
+    }
+
     @media (max-width: 700px) {
       .wrap {
         padding: 16px 14px 48px;
@@ -365,7 +428,7 @@ directly
 
       <p>Here&rsquo;s the full workflow visualized &mdash; 25 nodes orchestrating the entire request lifecycle from webhook ingestion through delivery:</p>
 
-      <img src="/media/telegram-workflow-diagram.png" alt="n8n workflow diagram: Telegram bot complete flow with all 25 nodes and connections" style="width:100%;border-radius:10px;margin:20px 0;border:1px solid rgba(255,255,255,0.1)">
+      <img class="lightbox-trigger" src="/media/telegram-workflow-diagram.png" alt="n8n workflow diagram: Telegram bot complete flow with all 25 nodes and connections" style="width:100%;border-radius:10px;margin:20px 0;border:1px solid rgba(255,255,255,0.1);cursor:zoom-in;">
 
       <p>The workflow has 25 nodes. Most of them are simple HTTP Request or Send Message nodes. The interesting ones are the Code nodes that handle session state and routing logic:</p>
 
@@ -490,6 +553,41 @@ const store = $getWorkflowStaticData('global');</code></pre>
       </div>
     </article>
   </div>
+  <div class="lightbox-modal" id="lightboxModal">
+    <img id="lightboxImage" src="" alt="Enlarged image" />
+  </div>
+  <div class="lightbox-close" id="lightboxClose">&times;</div>
+  <script>
+    const lightboxTriggers = document.querySelectorAll('.lightbox-trigger');
+    const lightboxModal = document.getElementById('lightboxModal');
+    const lightboxImage = document.getElementById('lightboxImage');
+    const lightboxClose = document.getElementById('lightboxClose');
+
+    lightboxTriggers.forEach(img => {
+      img.addEventListener('click', function() {
+        lightboxImage.src = this.src;
+        lightboxImage.alt = this.alt;
+        lightboxModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      });
+    });
+
+    function closeLightbox() {
+      lightboxModal.classList.remove('active');
+      document.body.style.overflow = 'auto';
+    }
+
+    lightboxClose.addEventListener('click', closeLightbox);
+    lightboxModal.addEventListener('click', function(e) {
+      if (e.target === this) closeLightbox();
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && lightboxModal.classList.contains('active')) {
+        closeLightbox();
+      }
+    });
+  </script>
 </body>
 
 </html>
