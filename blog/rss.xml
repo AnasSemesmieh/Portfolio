@@ -5,7 +5,15 @@
     <link>https://anas.semesmieh.com/blog/</link>
     <description>Platform engineering, Azure architecture, DevSecOps, and engineering leadership insights.</description>
     <language>en-au</language>
-    <lastBuildDate>Sun, 08 Jun 2026 12:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 14 Jun 2026 12:00:00 +0000</lastBuildDate>
+
+    <item>
+      <title>Challenge Accepted: Self-Hosting a Telegram Video Bot with n8n and yt-dlp</title>
+      <link>https://anas.semesmieh.com/blog/posts/homelab-telegram-yt-dlp-bot</link>
+      <guid>https://anas.semesmieh.com/blog/posts/homelab-telegram-yt-dlp-bot</guid>
+      <pubDate>Sat, 14 Jun 2026 12:00:00 +0000</pubDate>
+      <description>How I built a self-hosted Telegram bot that downloads videos at any quality using n8n, yt-dlp, and FastAPI — and the four n8n quirks that made it harder than expected.</description>
+    </item>
 
     <item>
       <title>Finishing the Decomposition: Every Service Gets Its Own Container</title>

@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Challenge Accepted: Self-Hosting a Telegram Video Bot with n8n and yt-dlp | Anas Semesmieh</title>
+  <meta name="description" content="How I built a self-hosted Telegram bot that downloads videos at any quality using n8n, yt-dlp, and FastAPI — and the four n8n quirks that made it harder than expected." />
+  <meta name="author" content="Anas Semesmieh" />
+  <link rel="canonical" href="https://anas.semesmieh.com/blog/posts/homelab-telegram-yt-dlp-bot" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Challenge Accepted: Self-Hosting a Telegram Video Bot with n8n and yt-dlp" />
+  <meta property="og:description" content="How I built a self-hosted Telegram bot that downloads videos at any quality using n8n, yt-dlp, and FastAPI." />
+  <meta property="og:url" content="https://anas.semesmieh.com/blog/posts/homelab-telegram-yt-dlp-bot" />
+  <meta property="og:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Challenge Accepted: Self-Hosting a Telegram Video Bot with n8n and yt-dlp" />
+  <meta name="twitter:description" content="How I built a self-hosted Telegram bot that downloads videos at any quality using n8n, yt-dlp, and FastAPI." />
+  <meta name="twitter:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #101a2c;
+      --muted: #8ea0be;
+      --text: #e6eef8;
+      --accent: #22c55e;
+      --heading: #60a5fa;
+      --border: rgba(255, 255, 255, 0.07);
+      --maxw: 860px;
+      --radius: 16px;
+      --font: "Inter", "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+    }
+
+    body {
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.75;
+      background:
+        radial-gradient(ellipse at 15% 0%, #13203a 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 15%, #0e1a32 0%, transparent 45%),
+        var(--bg);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+    }
+
+    .nav {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: var(--muted);
+      padding: 7px 13px;
+      border-radius: 10px;
+      font-size: 14px;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .nav a:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    article {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      background: var(--card);
+    }
+
+    h1 {
+      font-size: 36px;
+      line-height: 1.2;
+      color: var(--heading);
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 14px;
+      margin: 10px 0 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h2 {
+      margin-top: 32px;
+      margin-bottom: 12px;
+      font-size: 24px;
+      color: var(--heading);
+    }
+
+    h3 {
+      margin-top: 24px;
+      margin-bottom: 8px;
+      color: #86efac;
+      font-size: 18px;
+    }
+
+    p {
+      margin: 10px 0;
+    }
+
+    ul,
+    ol {
+      margin: 10px 0;
+      padding-left: 22px;
+    }
+
+    li {
+      margin: 4px 0;
+    }
+
+    .callout {
+      border-left: 3px solid var(--accent);
+      padding: 12px 16px;
+      background: rgba(34, 197, 94, 0.07);
+      border-radius: 10px;
+      margin: 20px 0;
+    }
+
+    code {
+      background: rgba(255, 255, 255, 0.07);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13.5px;
+    }
+
+    pre {
+      background: rgba(0, 0, 0, 0.35);
+      padding: 16px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.55;
+      color: #e6eef8;
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0;
+      font-size: 14px;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .series-nav {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .series-nav a {
+      display: inline-block;
+      margin-right: 12px;
+    }
+
+    .diagram {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 20px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-family: "JetBrains Mono", "Fira Code", monospace;
+      font-size: 12px;
+      line-height: 1.4;
+      color: #86efac;
+      margin: 20px 0;
+    }
+
+    video {
+      width: 100%;
+      border-radius: 10px;
+      margin: 20px 0;
+    }
+
+    @media (max-width: 700px) {
+      .wrap {
+        padding: 16px 14px 48px;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+
+      article {
+        padding: 20px;
+      }
+    }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"BlogPosting",
+    "headline":"Challenge Accepted: Self-Hosting a Telegram Video Bot with n8n and yt-dlp",
+    "datePublished":"2026-06-14",
+    "dateModified":"2026-06-14",
+    "author":{"@type":"Person","name":"Anas Semesmieh","url":"https://anas.semesmieh.com/about/"},
+    "publisher":{"@type":"Person","name":"Anas Semesmieh"},
+    "mainEntityOfPage":"https://anas.semesmieh.com/blog/posts/homelab-telegram-yt-dlp-bot",
+    "image":"https://anas.semesmieh.com/profile-wide.jpg",
+    "description":"How I built a self-hosted Telegram bot that downloads videos at any quality using n8n, yt-dlp, and FastAPI — and the four n8n quirks that made it harder than expected."
+  }
+  </script>
+</head>
+
+<body>
+  <div class="wrap">
+    <nav class="nav" aria-label="Post navigation">
+      <a href="/">Portfolio</a>
+      <a href="/blog/">All Posts</a>
+      <a href="/blog/categories/">Categories</a>
+      <a href="/blog/tags/">Tags</a>
+      <a href="/blog/rss.xml">RSS</a>
+    </nav>
+
+    <article>
+      <h1>Challenge Accepted: Self-Hosting a Telegram Video Bot with n8n and yt-dlp</h1>
+      <p class="meta">By <a href="/about/">Anas Semesmieh</a> &middot; June 14, 2026 &middot; Homelab, Docker, Self-Hosting, Automation</p>
+
+      <p>A friend mentioned offhand that he&rsquo;d love a tool that lets you send a video link to a chat and get the file back &mdash; no browser, no app, no ads. I said &ldquo;challenge accepted&rdquo; and went quiet for a day. This is what came out of it.</p>
+
+      <p>The result: a self-hosted Telegram bot that accepts any URL supported by yt-dlp, presents a quality picker (480p / 720p / 1080p / audio only), downloads the file on a dedicated LXC, and either sends it directly in chat or returns a signed expiring download link for larger files. Everything runs on my homelab. Nothing touches a third-party service except the Cloudflare tunnel for ingress.</p>
+
+      <h2>The Stack</h2>
+
+      <p>CT105 is the dedicated container for this &mdash; 4 vCPU, 8 GB RAM, 100 GB local NVMe on Proxmox, sitting at <code>192.168.20.75</code>. Four Docker services run on it, each with a single responsibility:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Service</th>
+            <th>Image</th>
+            <th>Port</th>
+            <th>Role</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>telegram-bot-api</code></td>
+            <td>aiogram/telegram-bot-api</td>
+            <td>8081</td>
+            <td>Local Bot API server (bypasses Telegram&rsquo;s 50 MB upload cap)</td>
+          </tr>
+          <tr>
+            <td><code>ytdlp-worker</code></td>
+            <td>custom FastAPI</td>
+            <td>8090</td>
+            <td>Runs yt-dlp + ffmpeg, exposes <code>POST /download</code> and <code>POST /publish</code></td>
+          </tr>
+          <tr>
+            <td><code>files-api</code></td>
+            <td>custom FastAPI</td>
+            <td>8088</td>
+            <td>Serves files via HMAC-SHA256 signed, expiring URLs</td>
+          </tr>
+          <tr>
+            <td><code>n8n</code></td>
+            <td>n8nio/n8n</td>
+            <td>5678</td>
+            <td>Workflow orchestrator &mdash; the glue between everything</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>The local Bot API server is the key architectural choice. Telegram&rsquo;s public API caps file uploads at 50 MB. Running the server locally removes that cap for outgoing files, which matters a lot for 1080p video. The tradeoff is that Telegram still receives the file &mdash; you just bypass the upload restriction because the local server handles the transfer to Telegram&rsquo;s infrastructure differently.</p>
+
+      <p>n8n is the orchestrator. The whole point of using it here is to avoid writing glue code. The download logic, the delivery decision, the error handling &mdash; all of it lives in a visual workflow rather than a custom Python service that I&rsquo;d have to maintain separately.</p>
+
+      <h2>How It Works</h2>
+
+      <p>The user flow is straightforward, but there are two distinct phases that happen at different times:</p>
+
+      <div class="diagram">
+User sends URL
+       |
+       v
+n8n: Parse webhook &rarr; check allowlist &rarr; validate URL hostname
+       |
+       v
+Send inline keyboard: [480p] [720p] [1080p] [Audio]
+       |
+       v (user taps a button)
+Telegram callback query &rarr; n8n: Answer callback + send "Downloading..."
+       |
+       v
+POST /download to ytdlp-worker (yt-dlp + ffmpeg runs here)
+       |
+      / \
+  &le;50MB   &gt;50MB
+    |          |
+Send file   POST /publish to NAS &rarr; GET signed link &rarr; Send link to user
+directly
+      </div>
+
+      <p>For files under 50 MB, the worker returns the local path and n8n sends it directly via the local Bot API server. For anything larger, the worker publishes it to the NAS and the files-api generates a signed URL that expires after a set window. The user gets a download link instead.</p>
+
+      <p>Here&rsquo;s the bot in action:</p>
+
+      <video controls>
+        <source src="/media/Anees.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+
+      <h2>Wiring the Edges</h2>
+
+      <p>Three infrastructure pieces connect the bot to the outside world:</p>
+
+      <p><strong>AdGuard DNS rewrite</strong> &mdash; <code>hook.semesmieh.com</code> and <code>n8n.semesmieh.com</code> resolve internally to CT102 (Caddy) at <code>192.168.20.71</code>. The same names resolve externally via Cloudflare.</p>
+
+      <p><strong>Caddy on CT102</strong> &mdash; reverse-proxies <code>hook.semesmieh.com</code> and <code>n8n.semesmieh.com</code> to <code>http://192.168.20.75:5678</code>, with automatic TLS via the Cloudflare DNS plugin. The Caddyfile entries are minimal &mdash; one <code>reverse_proxy</code> directive each.</p>
+
+      <p><strong>Cloudflare tunnel</strong> &mdash; each public hostname points directly at <code>http://192.168.20.75:5678</code>. This matters: early in the build I had the tunnel pointing at <code>https://192.168.20.71</code> (Caddy). That caused TLS handshake failures because the tunnel was trying to verify Caddy&rsquo;s internal cert. Pointing it straight at n8n over plain HTTP removed the problem entirely.</p>
+
+      <p>Webhook registration is a one-time curl call:</p>
+
+      <pre><code>curl -X POST "https://api.telegram.org/bot${BOT_TOKEN}/setWebhook" \
+  -d "url=https://hook.semesmieh.com/webhook/telegram-bot" \
+  -d "secret_token=${TELEGRAM_WEBHOOK_SECRET}"</code></pre>
+
+      <p>After that, every message Telegram delivers to the bot hits n8n directly.</p>
+
+      <h2>The n8n Workflow</h2>
+
+      <p>The workflow has 25 nodes. Most of them are simple HTTP Request or Send Message nodes. The interesting ones are the Code nodes that handle session state and routing logic:</p>
+
+      <ul>
+        <li><strong>Parse Update</strong> &mdash; extracts <code>chatId</code>, <code>messageId</code>, <code>text</code>, and <code>callbackData</code> from the raw Telegram payload. Also surfaces the webhook secret for the auth check.</li>
+        <li><strong>IF Authorized</strong> &mdash; compares the incoming secret against <code>$env.TELEGRAM_WEBHOOK_SECRET</code> and checks the sender&rsquo;s user ID against <code>$env.TELEGRAM_ALLOWED_USER_IDS</code>. Unauthorized requests get a 403 and stop.</li>
+        <li><strong>Process Message</strong> &mdash; validates the URL and stores <code>{ chatId, url, jobId }</code> in workflow static data so the callback handler can retrieve it later.</li>
+        <li><strong>Process Callback</strong> &mdash; reads the stored session, pairs it with the chosen quality, and hands everything downstream.</li>
+        <li><strong>Call yt-dlp Worker</strong> &mdash; POSTs to <code>http://192.168.20.75:8090/download</code> with the URL, quality, and job ID. Waits for completion (synchronous for now).</li>
+        <li><strong>IF Size OK</strong> &mdash; routes based on file size. Under 50 MB: send directly. Over: publish and sign.</li>
+        <li><strong>Generate Signed Link</strong> &mdash; calls the files-api with <code>$env.FILES_SIGNING_SECRET</code> to produce a time-limited URL. Uses the Node.js <code>crypto</code> module (enabled via <code>NODE_FUNCTION_ALLOW_BUILTIN=crypto</code> in the compose env).</li>
+        <li><strong>Send Worker Error / Send Direct Error</strong> &mdash; dedicated error nodes so no path through the workflow ends silently. More on this below.</li>
+      </ul>
+
+      <h2>Four Things That Fought Back</h2>
+
+      <p>The infrastructure setup was mechanical. The workflow debugging was not. Four specific n8n behaviours caused most of the pain.</p>
+
+      <h3>1. The Code Node Sandbox Blocks More Than You Think</h3>
+
+      <p>n8n runs Code nodes in a V8 isolate. Two things I reached for instinctively were blocked:</p>
+
+      <p><code>process.env</code> throws inside Code nodes by default. The fix is either adding <code>N8N_BLOCK_ENV_ACCESS_IN_NODE=false</code> to the environment, or &mdash; better &mdash; using <code>$env.VARIABLE_NAME</code> inside IF node expressions, which runs outside the sandbox. I moved all secret comparisons to IF nodes and only kept <code>$env</code> in Code nodes where truly needed.</p>
+
+      <p><code>new URL(url).hostname</code> throws silently. There&rsquo;s no error output, no red node &mdash; the expression just returns empty. I spent longer than I&rsquo;d like to admit on this one. The fix is a regex:</p>
+
+      <pre><code>const hostMatch = url.match(/^https?:\/\/([^/?#:]+)/);
+const hostname = hostMatch ? hostMatch[1] : null;</code></pre>
+
+      <p>It&rsquo;s less elegant but it works. The lesson: when a Code node silently produces no output, assume something is throwing &mdash; not that your logic is wrong.</p>
+
+      <h3>2. Context Disappears After HTTP Nodes</h3>
+
+      <p>The workflow calls <code>answerCallbackQuery</code> to dismiss the loading spinner on the Telegram keyboard. That&rsquo;s a Telegram API HTTP call. After it completes, <code>$json</code> in every downstream node becomes <code>{ "ok": true }</code> &mdash; Telegram&rsquo;s response. Every field from Process Callback (<code>chatId</code>, <code>url</code>, <code>quality</code>, <code>jobId</code>) is gone.</p>
+
+      <p>The fix is to stop relying on <code>$json</code> and always reference the upstream node explicitly:</p>
+
+      <pre><code>// Instead of $json.chatId (wrong after any HTTP node)
+$('Process Callback').first().json.chatId</code></pre>
+
+      <p>Every node that runs after <code>Answer Callback Query</code> uses this pattern. It&rsquo;s repetitive but unambiguous &mdash; you always know exactly where the data is coming from.</p>
+
+      <h3>3. Static Data Scope: &lsquo;node&rsquo; vs &lsquo;global&rsquo;</h3>
+
+      <p>I used <code>$getWorkflowStaticData('node')</code> to store session state in Process Message and retrieve it in Process Callback. It returned empty every time. The reason: <code>'node'</code> scope is per-node, so each Code node sees only its own isolated store. Two different nodes writing and reading <code>'node'</code>-scoped data are completely invisible to each other.</p>
+
+      <pre><code>// Wrong — each node sees a different store
+const store = $getWorkflowStaticData('node');
+
+// Correct — shared across the entire workflow
+const store = $getWorkflowStaticData('global');</code></pre>
+
+      <p>This is documented, but it&rsquo;s the kind of thing you only notice when cross-node state silently fails. Both Process Message and Process Callback now use <code>'global'</code>.</p>
+
+      <h3>4. The Cloudflare Tunnel 502</h3>
+
+      <p>After the webhook was registered and verified, the first real messages resulted in 502 Bad Gateway. The tunnel configuration had the origin set to <code>https://192.168.20.71</code> &mdash; the Caddy CT. The tunnel was trying to establish a TLS connection to Caddy, which presented an internal self-signed cert. The tunnel rejected it. Everything backed up silently.</p>
+
+      <p>The fix was to point each Cloudflare tunnel hostname directly at the target service over plain HTTP:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Hostname</th>
+            <th>Old origin</th>
+            <th>New origin</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>hook.semesmieh.com</td>
+            <td>https://192.168.20.71</td>
+            <td>http://192.168.20.75:5678</td>
+          </tr>
+          <tr>
+            <td>n8n.semesmieh.com</td>
+            <td>https://192.168.20.71</td>
+            <td>http://192.168.20.75:5678</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>Caddy still handles TLS for internal access. For the Cloudflare tunnel, the connection is encrypted by Cloudflare on the public side &mdash; the internal hop from the tunnel daemon to n8n can be plain HTTP without any security compromise.</p>
+
+      <h2>Never Go Silent</h2>
+
+      <p>The design principle I kept coming back to: every path through the workflow must send the user a message. A bot that silently fails is worse than useless because you don&rsquo;t know whether to retry or wait.</p>
+
+      <p>Two failure paths were initially silent:</p>
+
+      <p><strong>yt-dlp worker errors</strong> &mdash; when yt-dlp returns an error (403 Forbidden, private video, geo-block), the raw output looks like <code>ERROR: [youtube] abc123: This video is unavailable.</code> The <code>Send Worker Error</code> node strips the prefix and shows the user something readable:</p>
+
+      <pre><code>// In the error message expression
+{{ $json.error.replace(/^ERROR:\s*/, '').replace(/\n$/, '').slice(0, 300) }}</code></pre>
+
+      <p><strong>Direct send failures</strong> &mdash; if the Telegram API rejects the direct file send (size edge case, API error), there was originally no handler. Adding a <code>Send Direct Error</code> node on the false branch of <code>IF Send OK</code> closed that gap. The user gets &ldquo;Could not send file directly &mdash; here&rsquo;s a download link instead&rdquo; and the workflow falls through to the publish path.</p>
+
+      <div class="callout">
+        The rule I settled on: if a node can fail, its failure branch must produce a user-visible message. Logging to n8n&rsquo;s execution history is not a substitute &mdash; the user&rsquo;s chat is the output surface.
+      </div>
+
+      <h2>What It Feels Like to Use</h2>
+
+      <p>You paste a URL. Two seconds later you get an inline keyboard. You tap a quality. You get &ldquo;Downloading&hellip;&rdquo; almost immediately, then the file arrives. For small files it&rsquo;s in the chat itself. For large ones it&rsquo;s a link. The whole interaction feels like a native feature of Telegram rather than a bot you&rsquo;re talking to.</p>
+
+      <p>The challenge turned out to be less about yt-dlp &mdash; that part was half an hour of work. The real challenge was understanding n8n&rsquo;s execution model well enough to trust it. Once you know where context lives, where it disappears, and which scopes are shared, the workflow snaps into place. Before you know those things, you spend a lot of time staring at empty <code>$json</code> objects wondering what went wrong.</p>
+
+      <p>The friend who issued the challenge has been using it since. Challenge: done.</p>
+
+      <div class="series-nav">
+        <strong>Homelab Series:</strong>
+        <a href="/blog/posts/homelab-start-here">Start Here</a>
+        <a href="/blog/posts/homelab-docker-compose-stack">Docker Compose Stack</a>
+        <a href="/blog/posts/homelab-sso-authentik">SSO with Authentik</a>
+        <a href="/blog/posts/homelab-backup-automation">Backup Automation</a>
+        <a href="/blog/posts/homelab-disaster-recovery">Disaster Recovery</a>
+        <a href="/blog/posts/homelab-xcaddy-cloudflare-tunnel-adguard">Xcaddy + Tunnel + AdGuard</a>
+        <a href="/blog/posts/homelab-p2v-proxmox-migration">P2V Migration</a>
+        <a href="/blog/posts/homelab-proxmox-lxc-decomposition">LXC Decomposition</a>
+        <a href="/blog/posts/homelab-full-lxc-migration">Full Migration</a>
+        <a href="/blog/posts/homelab-telegram-yt-dlp-bot"><strong>Telegram Video Bot (this post)</strong></a>
+      </div>
+    </article>
+  </div>
+</body>
+
+</html>
