@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>I Gave My Homelab an AI Brain: Documenting Everything and Wiring It to Telegram with Hermes | Anas Semesmieh</title>
+  <meta name="description" content="How I used Hermes Agent to build a verified knowledge base of my entire homelab, caught real undocumented drift via SSH, and now control Plex, arrstack, and n8n from a Telegram chat." />
+  <meta name="author" content="Anas Semesmieh" />
+  <link rel="canonical" href="https://anas.semesmieh.com/blog/posts/homelab-hermes-ai-agent" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="I Gave My Homelab an AI Brain: Documenting Everything and Wiring It to Telegram with Hermes" />
+  <meta property="og:description" content="How I used Hermes Agent to build a verified knowledge base of my entire homelab, caught real undocumented drift via SSH, and now control Plex, arrstack, and n8n from Telegram." />
+  <meta property="og:url" content="https://anas.semesmieh.com/blog/posts/homelab-hermes-ai-agent" />
+  <meta property="og:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="I Gave My Homelab an AI Brain: Documenting Everything and Wiring It to Telegram with Hermes" />
+  <meta name="twitter:description" content="How I used Hermes Agent to build a verified knowledge base of my entire homelab, caught real undocumented drift via SSH, and now control Plex, arrstack, and n8n from Telegram." />
+  <meta name="twitter:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #101a2c;
+      --muted: #8ea0be;
+      --text: #e6eef8;
+      --accent: #22c55e;
+      --heading: #60a5fa;
+      --border: rgba(255, 255, 255, 0.07);
+      --maxw: 860px;
+      --radius: 16px;
+      --font: "Inter", "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+    }
+
+    body {
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.75;
+      background:
+        radial-gradient(ellipse at 15% 0%, #13203a 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 15%, #0e1a32 0%, transparent 45%),
+        var(--bg);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+    }
+
+    .nav {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: var(--muted);
+      padding: 7px 13px;
+      border-radius: 10px;
+      font-size: 14px;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .nav a:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    article {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      background: var(--card);
+    }
+
+    h1 {
+      font-size: 36px;
+      line-height: 1.2;
+      color: var(--heading);
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 14px;
+      margin: 10px 0 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h2 {
+      margin-top: 32px;
+      margin-bottom: 12px;
+      font-size: 24px;
+      color: var(--heading);
+    }
+
+    h3 {
+      margin-top: 24px;
+      margin-bottom: 8px;
+      color: #86efac;
+      font-size: 18px;
+    }
+
+    p {
+      margin: 10px 0;
+    }
+
+    ul, ol {
+      margin: 10px 0;
+      padding-left: 22px;
+    }
+
+    li {
+      margin: 4px 0;
+    }
+
+    .callout {
+      border-left: 3px solid var(--accent);
+      padding: 12px 16px;
+      background: rgba(34, 197, 94, 0.07);
+      border-radius: 10px;
+      margin: 20px 0;
+    }
+
+    .callout.blue {
+      border-left-color: var(--heading);
+      background: rgba(96, 165, 250, 0.07);
+    }
+
+    code {
+      background: rgba(255, 255, 255, 0.07);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13.5px;
+    }
+
+    pre {
+      background: rgba(0, 0, 0, 0.35);
+      padding: 16px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.55;
+      color: #e6eef8;
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0;
+      font-size: 14px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .series-nav {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .series-nav a {
+      display: inline-block;
+      margin-right: 12px;
+    }
+
+    .diagram {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 20px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-family: "JetBrains Mono", "Fira Code", monospace;
+      font-size: 12px;
+      line-height: 1.4;
+      color: #86efac;
+      margin: 20px 0;
+    }
+
+    .finding-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      margin: 20px 0;
+    }
+
+    .finding-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .finding-card .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .finding-card .value {
+      font-size: 14px;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .finding-card.warn .label { color: #fbbf24; }
+    .finding-card.warn { border-color: rgba(251, 191, 36, 0.2); }
+    .finding-card.ok .label { color: #86efac; }
+    .finding-card.ok { border-color: rgba(134, 239, 172, 0.2); }
+
+    blockquote {
+      margin: 20px 0;
+      padding: 16px 18px;
+      border-left: 3px solid rgba(96, 165, 250, 0.8);
+      background: rgba(96, 165, 250, 0.07);
+      border-radius: 12px;
+      color: #dbeafe;
+      font-style: italic;
+    }
+
+    @media (max-width: 700px) {
+      .wrap { padding: 16px 14px 48px; }
+      h1 { font-size: 28px; }
+      article { padding: 20px; }
+    }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "I Gave My Homelab an AI Brain: Documenting Everything and Wiring It to Telegram with Hermes",
+    "datePublished": "2026-06-19",
+    "dateModified": "2026-06-19",
+    "author": {"@type": "Person", "name": "Anas Semesmieh", "url": "https://anas.semesmieh.com/about/"},
+    "publisher": {"@type": "Person", "name": "Anas Semesmieh"},
+    "mainEntityOfPage": "https://anas.semesmieh.com/blog/posts/homelab-hermes-ai-agent",
+    "image": "https://anas.semesmieh.com/profile-wide.jpg",
+    "description": "How I used Hermes Agent to build a verified knowledge base of my entire homelab, caught real undocumented drift via SSH, and now control Plex, arrstack, and n8n from a Telegram chat."
+  }
+  </script>
+</head>
+
+<body>
+  <div class="wrap">
+    <nav class="nav" aria-label="Post navigation">
+      <a href="/">Portfolio</a>
+      <a href="/blog/">All Posts</a>
+      <a href="/blog/categories/">Categories</a>
+      <a href="/blog/tags/">Tags</a>
+      <a href="/blog/rss.xml">RSS</a>
+    </nav>
+
+    <article>
+      <h1>I Gave My Homelab an AI Brain: Documenting Everything and Wiring It to Telegram with Hermes</h1>
+      <p class="meta">By <a href="/about/">Anas Semesmieh</a> &middot; June 19, 2026 &middot; Homelab, AI, Self-Hosting, Automation, Proxmox</p>
+
+      <p>At some point, every homelab builder reaches the same moment. You&rsquo;re explaining your setup to someone and they ask &ldquo;wait, where does Plex actually run?&rdquo; and you pause for a second longer than you should. The architecture lives in your head &mdash; assembled piece by piece over months of migrations, refactors, and late-night experiments. It works, you know <em>that</em> much. But is what you think is running actually what&rsquo;s running?</p>
+
+      <p>That pause led to a two-day project: using <a href="https://github.com/NousResearch/hermes-agent" target="_blank">Hermes Agent</a> to read every blog post, config file, and note I had, build a structured knowledge base about my homelab, SSH into every container to verify the facts against live state &mdash; and then wire the whole thing to a Telegram bot so I can query, control, and automate it from my phone. This post covers the full journey: the documentation sprint, the real discrepancies that SSH verification surfaced, the Hermes installation, the Telegram gateway setup, and what the AI brain can actually do today.</p>
+
+      <h2>The Documentation Problem</h2>
+
+      <p>After <a href="/blog/posts/homelab-full-lxc-migration">decomposing everything into LXC containers</a>, the homelab was in its best state ever &mdash; architecturally. Nine containers, clean isolation, right-sized resources, daily backups. But the operational knowledge was still fragmented: blog posts described <em>intent</em>, <code>homelab-facts.md</code> had point-in-time snapshots, and reality had quietly drifted from both.</p>
+
+      <p>That&rsquo;s the subtle problem with well-running infrastructure: the better it runs, the less you touch it, and the less you touch it, the less accurate your mental model gets. I needed a living knowledge base &mdash; one that could be queried, cross-referenced, and updated when things change. And I wanted the agent that maintains it to also be the agent that operates the infrastructure on demand.</p>
+
+      <h2>Step 1 &mdash; Building the Knowledge Base</h2>
+
+      <p>Hermes ingested everything: six blog posts documenting the migration history, <code>homelab-facts.md</code>, the arrstack compose files, and the Caddy configuration. From those sources it built a structured wiki at <code>~/Desktop/Homelab/wiki/</code> using the <code>llm-wiki</code> skill format &mdash; YAML-front-matter markdown pages organized into entities, concepts, and queries.</p>
+
+      <p>Each entity page covers a single container or host: its IP, running services, resources, configuration notes, and confidence level. The confidence field matters: it forces explicit tracking of what was documented, what was inferred, and what needed live verification.</p>
+
+      <pre><code># wiki/entities/ct-103-media-servers.md (excerpt)
+---
+title: CT103 — Media Servers
+type: entity
+tags: [lxc, media, igpu, docker, plex, jellyfin]
+confidence: high
+sources: [homelab-facts.md, homelab-full-lxc-migration.html]
+---
+
+## Services
+- Plex Media Server — *method TBC by SSH*
+- Jellyfin (Docker)
+- Tautulli (Docker)
+- Jellystat (Docker)
+
+## iGPU Passthrough
+Both Plex and Jellyfin share the Intel UHD iGPU via:
+  lxc.cgroup2.devices.allow: c 226:* rwm
+  lxc.mount.entry: /dev/dri dev/dri none bind,optional,create=dir</code></pre>
+
+      <p>The wiki took about forty minutes to scaffold. That was the easy part.</p>
+
+      <h2>Step 2 &mdash; SSH Verification: Where the Reality Diverged</h2>
+
+      <p>With the wiki skeleton complete, Hermes SSH&rsquo;d into each container in turn and ran targeted verification commands: checking systemd units, Docker container states, listening ports, disk usage, service versions. The goal was to either confirm every documented fact or flag a discrepancy.</p>
+
+      <p>The discrepancies were more interesting than expected:</p>
+
+      <div class="finding-grid">
+        <div class="finding-card warn">
+          <div class="label">CT103 &mdash; Plex</div>
+          <div class="value">Documented as Docker. Actually runs <strong>natively</strong> via systemd (<code>plexmediaserver.service</code>, v1.43.2). No Plex container exists.</div>
+        </div>
+        <div class="finding-card warn">
+          <div class="label">CT104 &mdash; Vaultwarden</div>
+          <div class="value">Documented as active. Actually <strong>decommissioned</strong>. Migrated to Jarvis. Served via Cloudflare directly &mdash; bypasses Caddy and AdGuard entirely.</div>
+        </div>
+        <div class="finding-card warn">
+          <div class="label">CT107 &mdash; Arrstack</div>
+          <div class="value">Stale directories in <code>/opt/arrstack/</code> from an earlier migration attempt. Live data is in <code>/opt/stacks/arrstack/</code>. Orphaned dirs cleaned up.</div>
+        </div>
+        <div class="finding-card ok">
+          <div class="label">CT102 &mdash; Caddy</div>
+          <div class="value">Dead routes confirmed: code-server, Home Assistant, Portainer, Tunarr &mdash; all ghost entries. Purged from Caddyfile. Caddy reloaded cleanly.</div>
+        </div>
+        <div class="finding-card ok">
+          <div class="label">Jarvis Node</div>
+          <div class="value">Ubuntu 24.04.4 LTS. Tailscale at 100.126.123.7. Runs Gitea, Vaultwarden, and Dockhand. 193 GB disk at 3% used.</div>
+        </div>
+        <div class="finding-card ok">
+          <div class="label">NAS</div>
+          <div class="value">DSM 7.3 build 81180. /volume1 at 63% (3.5 TB). /volume2 at 22% (8.8 TB). NFS exports healthy.</div>
+        </div>
+      </div>
+
+      <p>The Plex finding is the one that would have caused hours of debugging without this verification pass. Plex <em>was</em> running in Docker during earlier phases &mdash; it was migrated to native systemd for better iGPU integration and lower overhead. The blog posts reflected the old state. Any automation that assumed a Docker container named <code>plex</code> would have silently failed. Now it knows to check <code>systemctl status plexmediaserver</code>.</p>
+
+      <div class="callout">
+        The Caddy stale-route cleanup was a side-effect bonus. Eight ghost reverse proxy routes had been accumulating since the first VM100 decomposition. They weren&rsquo;t breaking anything &mdash; Caddy just proxied to IPs that no longer responded &mdash; but they were noise in the config and a future confusion vector. The verification pass caught them all.
+      </div>
+
+      <p>After two days of verification and correction, the wiki reflected actual live state for every container. Confidence levels updated, discrepancies documented, stale config cleaned up. The knowledge base went from &ldquo;probably right&rdquo; to &ldquo;SSH-verified.&rdquo;</p>
+
+      <h2>Step 3 &mdash; Installing Hermes Agent</h2>
+
+      <p>Hermes Agent is an open-source AI agent framework by Nous Research that runs on Linux, macOS, and Windows. It supports any LLM provider, has a multi-platform gateway (Telegram, Discord, Slack, and a dozen others), and crucially: it maintains persistent memory and skills across sessions. That last part is what makes it useful as a homelab brain rather than just a chat tool.</p>
+
+      <h3>Installation</h3>
+
+      <p>On Linux or macOS (also works in Git Bash on Windows):</p>
+
+      <pre><code>curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash</code></pre>
+
+      <p>The installer handles the Python environment, dependencies, and PATH setup. After it completes:</p>
+
+      <pre><code># Interactive setup wizard — model, provider, API keys
+hermes setup
+
+# Verify everything is wired correctly
+hermes doctor</code></pre>
+
+      <p>Hermes supports 20+ providers: OpenRouter, Anthropic, OpenAI, DeepSeek, GitHub Copilot, Google Gemini, and more. For this setup I use GitHub Copilot, which requires the OAuth device code flow &mdash; <code>hermes model</code> handles that interactively. The config lives at <code>~/.hermes/config.yaml</code> and secrets in <code>~/.hermes/.env</code>.</p>
+
+      <h3>Configuring Persistent Memory</h3>
+
+      <p>The agent stores two types of durable knowledge: user profile facts and general memory notes. These are injected into every session, so Hermes walks in already knowing the homelab topology &mdash; no re-explaining required.</p>
+
+      <pre><code># View current memory
+hermes memory status
+
+# Memory is also manageable mid-session via the memory tool
+# The agent saves facts automatically when it discovers something durable:
+# - Container IPs and roles
+# - Service deployment method (native vs Docker)
+# - Verification results and anomalies found</code></pre>
+
+      <p>After the verification sprint, memory contained every verified container fact: CT103 Plex runs native systemd, CT104 is decommissioned, Jarvis is on Tailscale at 100.126.123.7, NAS credentials and path layout, Docker TCP endpoints for Homepage. When a new session starts, the agent is already orientated.</p>
+
+      <h3>Skills &mdash; Reusable Procedures</h3>
+
+      <p>Hermes saves complex workflows as skills &mdash; structured markdown documents with YAML frontmatter that get loaded into future sessions. After the homelab verification sprint, the homelab topology was persisted as a skill. When I ask &ldquo;what&rsquo;s running on CT107?&rdquo; Hermes already knows the arrstack compose path, the VPN dependency chain, and the correct SSH target. It doesn&rsquo;t have to rediscover it.</p>
+
+      <pre><code># List installed skills
+hermes skills list
+
+# Install a skill from the hub
+hermes skills install homelab-facts
+
+# Browse the skills catalog
+hermes skills browse</code></pre>
+
+      <h2>Step 4 &mdash; The Telegram Gateway</h2>
+
+      <p>The CLI is fine for interactive sessions, but the real value is the Telegram gateway &mdash; the agent runs as a background service and receives messages directly from your phone. The same agent, the same tools, the same memory: just a different input surface.</p>
+
+      <h3>Creating the Telegram Bot</h3>
+
+      <ol>
+        <li>Open Telegram and search for <strong>@BotFather</strong></li>
+        <li>Send <code>/newbot</code> &mdash; choose a name and username</li>
+        <li>Copy the bot token (format: <code>1234567890:ABCDEFxxxxxx</code>)</li>
+        <li>Start a chat with your new bot and send any message (so Telegram registers your chat ID)</li>
+      </ol>
+
+      <h3>Configuring the Gateway</h3>
+
+      <pre><code># Interactive gateway setup — select Telegram, paste your bot token
+hermes gateway setup
+
+# Hermes will detect your chat ID automatically on the first message.
+# You can also set it explicitly:
+hermes config set telegram.allowed_users "285978047"  # your Telegram user ID</code></pre>
+
+      <h3>Installing as a Background Service</h3>
+
+      <p>On Windows, Hermes registers a Windows service. On Linux, it uses systemd. Either way, the gateway starts on boot and survives SSH disconnects:</p>
+
+      <pre><code># Install and start the gateway service
+hermes gateway install
+hermes gateway start
+
+# Verify it's running
+hermes gateway status
+
+# Check logs if something's off
+hermes gateway logs --tail 50
+
+# Or directly:
+# Windows: %LOCALAPPDATA%\hermes\logs\gateway.log
+# Linux:   ~/.hermes/logs/gateway.log</code></pre>
+
+      <p>Once the service is up, send a message to your bot on Telegram. The agent responds with full tool access &mdash; the same terminal, browser, SSH, and memory tools available in the CLI. The Telegram-specific addition is the <code>/commands</code> menu, which lists what the bot can do, and the approval flow for destructive commands (a terminal command flagged as potentially dangerous gets a thumbs-up/thumbs-down prompt before it runs).</p>
+
+      <div class="callout">
+        The gateway runs on the Windows desktop machine, not on Proxmox. Hermes connects to the homelab via SSH &mdash; there&rsquo;s no agent running inside the containers. This is intentional: one agent with full context, not nine agents with partial context. The SSH key is loaded into the Windows OpenSSH agent at startup (<code>ssh-add C:\Users\anass\.ssh\id_ed25519</code>), and Hermes uses it transparently.
+      </div>
+
+      <h2>The Architecture: What the Brain Can See</h2>
+
+      <pre class="diagram">Telegram (phone)
+       │
+       ▼
+Hermes Gateway (Windows desktop — always-on service)
+       │
+       ├── SSH ──────────────────────────────────────────────────────┐
+       │    ├── CT101: AdGuard Home (.70) — DNS queries, filter lists │
+       │    ├── CT102: Caddy + cloudflared (.71) — TLS, routes        │
+       │    ├── CT103: Plex (native systemd) + Jellyfin (.72)         │
+       │    ├── CT105: n8n + yt-dlp worker (.75) — workflow triggers  │
+       │    ├── CT106: Scrypted (.76) — camera status                 │
+       │    ├── CT107: Arrstack — Gluetun/qBit/Radarr/Sonarr (.77)   │
+       │    ├── CT108: Homepage + Dockhand (.78) — dashboard          │
+       │    ├── Jarvis: Gitea + Vaultwarden (Tailscale 100.126.123.7) │
+       │    └── NAS: Synology DS416play (10.0.0.10)                  │
+       │                                                              │
+       ├── Plex API ──── http://192.168.20.72:32400/status/sessions   │
+       ├── qBittorrent ── http://192.168.20.77:8080/api/v2/           │
+       ├── n8n webhook ── https://n8n.semesmieh.com/webhook/…         │
+       └── Browser ───── https://home.semesmieh.com (screenshots)    │
+                                                                      │
+              Persistent Knowledge Base (memory + wiki)              │
+              Verified: SSH-confirmed, June 2026 ─────────────────────┘</pre>
+
+      <h2>What the Brain Can Do: Real Examples</h2>
+
+      <h3>Plex Monitoring</h3>
+
+      <p>The most common query. Plex exposes a sessions API at port 32400 that returns active streams, user, quality, progress, and whether transcoding is active. The agent pulls the Plex token from the Preferences XML and queries it directly:</p>
+
+      <pre><code>Me: "Anyone watching Plex?"
+
+Hermes: Checks /status/sessions via the Plex API →
+        "No active sessions right now. Library: 3,549 movies, 190 TV shows."</code></pre>
+
+      <p>When someone <em>is</em> watching, it returns the title, user, resolution, and whether it&rsquo;s direct-playing or transcoding (which matters for CPU load on the i7).</p>
+
+      <h3>Arrstack &mdash; Download Pipeline</h3>
+
+      <p>CT107 runs eight containers behind a WireGuard VPN tunnel. Querying download state used to mean opening the qBittorrent web UI, which requires VPN or LAN access. Now:</p>
+
+      <pre><code>Me: "What's arrstack downloading right now?"
+
+Hermes: SSHs to 192.168.20.77 → queries qBittorrent API →
+        Returns active torrents: name, size, progress %, speed, ETA, seeding ratio</code></pre>
+
+      <p>The same pattern works for Sonarr and Radarr queues &mdash; upcoming releases, missing episodes, failed grabs. The agent reads the API responses and summarizes them in plain language rather than returning raw JSON.</p>
+
+      <h3>n8n Automation Triggers</h3>
+
+      <p>n8n on CT105 runs the homelab&rsquo;s workflow automation layer. One of those workflows is the <a href="/blog/posts/homelab-telegram-yt-dlp-bot">Telegram video bot</a> &mdash; it has an allowlist of Telegram user IDs that are permitted to request downloads. Adding a user previously meant opening the n8n editor, finding the workflow, editing the allowlist variable, and saving. Now:</p>
+
+      <pre><code>Me: "Add user ID 123456789 to the n8n bot allowlist"
+
+Hermes: POSTs to the n8n management webhook → workflow updates the
+        global variable → "Done. User 123456789 added to the allowlist."</code></pre>
+
+      <p>The same approach works for triggering any n8n workflow that exposes a webhook endpoint: backup jobs, media library scans, notification broadcasts. The agent handles the HTTP call and reports the result.</p>
+
+      <h3>Homepage Dashboard Screenshot</h3>
+
+      <pre><code>Me: "Screenshot my homepage"
+
+Hermes: Opens https://home.semesmieh.com in a headless browser →
+        Captures the full dashboard → Returns the screenshot inline in Telegram</code></pre>
+
+      <p>This sounds trivial but it&rsquo;s genuinely useful for a quick system health overview without opening a browser. The Homepage widget data &mdash; Proxmox CPU/RAM, container states, Plex streams, qBittorrent activity &mdash; is all visible at a glance in the Telegram thread.</p>
+
+      <h3>Infrastructure Queries</h3>
+
+      <p>Because the agent has SSH access and a verified knowledge base, it can answer questions that would otherwise require opening multiple UIs:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Query</th>
+            <th>What Hermes Does</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>&ldquo;How much space left on the NAS?&rdquo;</td>
+            <td>SSH to 10.0.0.10 → <code>df -h /volume1 /volume2</code> → summarises</td>
+          </tr>
+          <tr>
+            <td>&ldquo;Is Caddy healthy?&rdquo;</td>
+            <td>SSH to CT102 → <code>systemctl status caddy</code> + checks active routes</td>
+          </tr>
+          <tr>
+            <td>&ldquo;What&rsquo;s on the Proxmox host right now?&rdquo;</td>
+            <td>Queries the Homepage widget data or SSH to host → <code>pvesh get /nodes/pve/status</code></td>
+          </tr>
+          <tr>
+            <td>&ldquo;Restart the AdGuard container&rdquo;</td>
+            <td>SSH to Proxmox host → <code>pct reboot 101</code> → confirms service came back up</td>
+          </tr>
+          <tr>
+            <td>&ldquo;Check Gitea on Jarvis&rdquo;</td>
+            <td>SSH to 100.126.123.7 via Tailscale → <code>docker ps</code> + service health</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Memory and Context Persistence</h2>
+
+      <p>The thing that separates Hermes from a generic chatbot hooked to a shell is the memory layer. After the verification sprint, memory contains the authoritative facts about every container. When a new Telegram session starts &mdash; days or weeks later &mdash; the agent already knows:</p>
+
+      <ul>
+        <li>CT103 Plex runs native via systemd, <strong>not</strong> Docker &mdash; don&rsquo;t check for a container</li>
+        <li>CT104 is decommissioned &mdash; skip it entirely</li>
+        <li>Jarvis is on Tailscale at 100.126.123.7, requires the Tailscale-routed SSH path</li>
+        <li>The NAS has two volumes with different usage profiles</li>
+        <li>Docker TLS certs are deployed on CT105 via mutual TLS for the remote Docker API</li>
+      </ul>
+
+      <p>When infrastructure changes &mdash; a new container, a service migration, a version upgrade &mdash; the agent updates its own memory. The knowledge base stays current without a manual documentation effort.</p>
+
+      <div class="callout blue">
+        Skills compound over time. The first session required full discovery. By the third session, Hermes was answering infrastructure questions from memory alone, using SSH only to confirm live state for queries where freshness matters. The homelab brain gets faster as it accumulates verified context.
+      </div>
+
+      <h2>Installation Summary</h2>
+
+      <p>For reference, the complete setup from scratch:</p>
+
+      <pre><code># 1. Install Hermes Agent
+curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
+
+# 2. Configure model and provider (interactive)
+hermes setup
+
+# 3. Health check
+hermes doctor
+
+# 4. Configure SSH access to your homelab
+#    Ensure your SSH key is loaded:
+#    Windows: ssh-add C:\Users\yourname\.ssh\id_ed25519
+#    Linux:   ssh-add ~/.ssh/id_ed25519
+
+# 5. Set up the Telegram gateway
+hermes gateway setup   # paste your bot token from @BotFather
+
+# 6. Install as background service
+hermes gateway install
+hermes gateway start
+
+# 7. Verify
+hermes gateway status
+hermes gateway logs --tail 20
+
+# 8. Test — send a message to your bot on Telegram
+#    It should respond within a few seconds</code></pre>
+
+      <p>The agent runs on any always-on machine that has SSH access to your homelab. It doesn&rsquo;t need to run inside the homelab itself. For my setup, it runs on the Windows desktop as a Windows service &mdash; starts on boot, survives session logout, logs to <code>%LOCALAPPDATA%\hermes\logs\gateway.log</code>.</p>
+
+      <h2>What&rsquo;s Next</h2>
+
+      <p>The AI brain covers operational queries and reactive automation well. The next evolution is proactive monitoring: scheduled cron jobs that watch for conditions and alert in Telegram without being asked.</p>
+
+      <p>Hermes has a built-in cron scheduler that runs agent prompts on a schedule and delivers results to a configured channel. The first scheduled jobs will be simple: daily NAS usage report, weekly arrstack seeding ratio summary, alert if any container has been stopped for more than an hour. The same agent, the same tools &mdash; just running autonomously rather than on demand.</p>
+
+      <p>The other open thread is the second Proxmox node. With Jarvis already on Tailscale and running Docker workloads, the architecture for a two-node cluster is nearly ready. Live container migration, HA for critical services, rolling Proxmox upgrades without a maintenance window &mdash; that&rsquo;s the next post.</p>
+
+      <h2>Closing Thought</h2>
+
+      <p>The homelab documentation sprint surfaced something I didn&rsquo;t expect: not just stale docs, but actively incorrect assumptions. Plex wasn&rsquo;t running where I thought it was. A whole container had been decommissioned but was still described as active. Ghost Caddy routes were pointing at IPs that no longer existed. None of this caused visible failures &mdash; the services worked fine. But any automation built on those assumptions would have failed silently, and any troubleshooting guided by those docs would have started in the wrong place.</p>
+
+      <p>The AI-verified knowledge base changed the relationship with the homelab. It&rsquo;s not a black box I operate by instinct anymore &mdash; it&rsquo;s a documented system with known state, where every deviation from expected behaviour surfaces immediately because there&rsquo;s a baseline to compare against. The Telegram control surface is the operational layer on top: faster than opening five browser tabs, persistent context across sessions, and smart enough to know that CT103&rsquo;s Plex is a systemd service, not a Docker container.</p>
+
+      <p>Infrastructure that knows itself is infrastructure you can reason about. And infrastructure you can reason about from your phone, at any hour, without a laptop &mdash; that&rsquo;s the thing I didn&rsquo;t know I needed until it existed.</p>
+
+      <div class="series-nav">
+        <strong>Homelab Series:</strong>
+        <a href="/blog/posts/homelab-start-here">Start Here</a>
+        <a href="/blog/posts/homelab-docker-compose-stack">Docker Compose Stack</a>
+        <a href="/blog/posts/homelab-sso-authentik">SSO with Authentik</a>
+        <a href="/blog/posts/homelab-backup-automation">Backup Automation</a>
+        <a href="/blog/posts/homelab-disaster-recovery">Disaster Recovery</a>
+        <a href="/blog/posts/homelab-xcaddy-cloudflare-tunnel-adguard">Xcaddy + Tunnel + AdGuard</a>
+        <a href="/blog/posts/homelab-p2v-proxmox-migration">P2V Migration</a>
+        <a href="/blog/posts/homelab-proxmox-lxc-decomposition">LXC Decomposition</a>
+        <a href="/blog/posts/homelab-full-lxc-migration">Full Migration</a>
+        <a href="/blog/posts/homelab-telegram-yt-dlp-bot">Telegram Video Bot</a>
+        <a href="/blog/posts/homelab-hermes-ai-agent">AI Brain with Hermes</a>
+      </div>
+    </article>
+  </div>
+</body>
+
+</html>
