@@ -2,7 +2,7 @@
 
 Source code for **[anas.semesmieh.com](https://anas.semesmieh.com)** — my personal portfolio and engineering blog.
 
-Built with hand-crafted HTML/CSS (no frameworks, no build pipeline) and served via Cloudflare Tunnel + Caddy reverse proxy from a self-hosted Proxmox homelab.
+Built with hand-crafted HTML/CSS (no frameworks, no build pipeline), hosted on **GitHub Pages**, and served on a custom domain via a **Cloudflare Worker** at [anas.semesmieh.com](https://anas.semesmieh.com).
 
 ---
 
