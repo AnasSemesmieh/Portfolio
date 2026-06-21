@@ -5,7 +5,15 @@
     <link>https://anas.semesmieh.com/blog/</link>
     <description>Platform engineering, Azure architecture, DevSecOps, and engineering leadership insights.</description>
     <language>en-au</language>
-    <lastBuildDate>Sat, 14 Jun 2026 12:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 19 Jun 2026 12:00:00 +0000</lastBuildDate>
+
+    <item>
+      <title>I Gave My Homelab an AI Brain: Documenting Everything and Wiring It to Telegram with Hermes</title>
+      <link>https://anas.semesmieh.com/blog/posts/homelab-hermes-ai-agent</link>
+      <guid>https://anas.semesmieh.com/blog/posts/homelab-hermes-ai-agent</guid>
+      <pubDate>Fri, 19 Jun 2026 12:00:00 +0000</pubDate>
+      <description>How I used Hermes Agent to build a verified knowledge base of my entire homelab, caught real undocumented drift via SSH, and now control Plex, arrstack, and n8n from a Telegram chat.</description>
+    </item>
 
     <item>
       <title>Challenge Accepted: Self-Hosting a Telegram Video Bot with n8n and yt-dlp</title>
@@ -20,7 +28,15 @@
       <link>https://anas.semesmieh.com/blog/posts/homelab-full-lxc-migration</link>
       <guid>https://anas.semesmieh.com/blog/posts/homelab-full-lxc-migration</guid>
       <pubDate>Sun, 08 Jun 2026 12:00:00 +0000</pubDate>
-      <description>Completing the VM100 decomposition: migrating Jellyfin, Scrypted, the full Arrstack, and Homepage into dedicated Proxmox LXCs — then decommissioning the monolith for good.</description>
+      <description>Completing the VM100 decomposition: migrating Jellyfin, Scrypted, the full Arrstack, and Homepage into their own LXCs — and the bind-mount lessons that made it click.</description>
+    </item>
+
+    <item>
+      <title>Decomposing the Monolith: Per-Service LXCs on Proxmox</title>
+      <link>https://anas.semesmieh.com/blog/posts/homelab-proxmox-lxc-decomposition</link>
+      <guid>https://anas.semesmieh.com/blog/posts/homelab-proxmox-lxc-decomposition</guid>
+      <pubDate>Sun, 08 Jun 2026 10:00:00 +0000</pubDate>
+      <description>How I decomposed a monolith homelab VM into dedicated Proxmox LXCs for AdGuard Home, Caddy with Cloudflare Tunnels, and Plex with iGPU passthrough — plus hardening an Intel e1000e NIC that started dropping under load.</description>
     </item>
 
     <item>
