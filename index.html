@@ -589,7 +589,7 @@
 
   <!-- Additional SEO Meta Tags -->
   <meta name="theme-color" content="#7c3aed" />
-  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale" content="en_AU" />
   <meta property="og:site_name" content="Anas Semesmieh Portfolio" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -621,7 +621,8 @@
     },
     "email": "anas@semesmieh.com",
     "sameAs": [
-      "https://www.linkedin.com/in/anassemesmieh"
+      "https://www.linkedin.com/in/anassemesmieh",
+      "https://github.com/AnasSemesmieh"
     ],
     "expertise": [
       "Platform Engineering",
@@ -667,7 +668,7 @@
         "@type": "ListItem",
         "position": 2,
         "name": "About",
-        "item": "https://anas.semesmieh.com/#about"
+        "item": "https://anas.semesmieh.com/about/"
       },
       {
         "@type": "ListItem",
@@ -676,6 +677,30 @@
         "item": "https://anas.semesmieh.com/#experience"
       }
     ]
+  }
+  </script>
+
+  <!-- Structured Data: WebSite (entity signal for name-based search) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Anas Semesmieh",
+    "url": "https://anas.semesmieh.com",
+    "description": "Portfolio and blog of Anas Semesmieh — Engineering Manager and Solutions Architect based in Sydney, Australia.",
+    "author": {
+      "@type": "Person",
+      "name": "Anas Semesmieh",
+      "url": "https://anas.semesmieh.com"
+    },
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://anas.semesmieh.com/blog/?q={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    }
   }
   </script>
 </head>
