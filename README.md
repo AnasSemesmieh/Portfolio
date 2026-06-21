@@ -37,6 +37,7 @@ The blog covers three areas I write about regularly:
 - [Leading Through Uncertainty Without Performing False Confidence](https://anas.semesmieh.com/blog/posts/leading-through-uncertainty-engineering-teams)
 
 **Homelab**
+- [I Gave My Homelab an AI Brain: Documenting Everything and Wiring It to Telegram with Hermes](https://anas.semesmieh.com/blog/posts/homelab-hermes-ai-agent)
 - [My Home Lab Journey: Start Here](https://anas.semesmieh.com/blog/posts/homelab-start-here)
 - [Bare-Metal to VM: A Pragmatic P2V Migration to Proxmox](https://anas.semesmieh.com/blog/posts/homelab-p2v-proxmox-migration)
 - [Decomposing the Monolith: Per-Service LXCs on Proxmox](https://anas.semesmieh.com/blog/posts/homelab-proxmox-lxc-decomposition)
