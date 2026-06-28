@@ -5,7 +5,15 @@
     <link>https://anas.semesmieh.com/blog/</link>
     <description>Platform engineering, Azure architecture, DevSecOps, and engineering leadership insights.</description>
     <language>en-au</language>
-    <lastBuildDate>Fri, 19 Jun 2026 12:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 28 Jun 2026 12:00:00 +0000</lastBuildDate>
+
+    <item>
+      <title>From NAS to DAS: Retiring My Synology Before It Retired My Data</title>
+      <link>https://anas.semesmieh.com/blog/posts/homelab-nas-to-das-migration</link>
+      <guid>https://anas.semesmieh.com/blog/posts/homelab-nas-to-das-migration</guid>
+      <pubDate>Sat, 28 Jun 2026 12:00:00 +0000</pubDate>
+      <description>How three converging pressures — data risk, idle drives, and a 4-bay ceiling — drove a calculated migration from a Synology DS416play to a Proxmox-hosted Unraid array on a QNAP TL-D800C DAS, with Telegram monitoring and ~100 MB/s sustained transfer speeds.</description>
+    </item>
 
     <item>
       <title>I Gave My Homelab an AI Brain: Documenting Everything and Wiring It to Telegram with Hermes</title>

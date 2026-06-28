@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>From NAS to DAS: Retiring My Synology Before It Retired My Data | Anas Semesmieh</title>
+  <meta name="description" content="How three converging pressures — data risk, idle drives, and a 4-bay ceiling — drove a calculated migration from a Synology DS416play to a Proxmox-hosted Unraid array on a QNAP TL-D800C DAS, and how I'm running it as a live operation with Telegram monitoring." />
+  <meta name="keywords" content="Anas Semesmieh, NAS to DAS migration, Unraid homelab, QNAP TL-D800C, Synology DS416play, parity storage, rsync migration, homelab storage, self-hosted storage, Proxmox Unraid VM" />
+  <meta name="author" content="Anas Semesmieh" />
+  <link rel="canonical" href="https://anas.semesmieh.com/blog/posts/homelab-nas-to-das-migration" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="From NAS to DAS: Retiring My Synology Before It Retired My Data" />
+  <meta property="og:description" content="How three converging pressures — data risk, idle drives, and a 4-bay ceiling — drove a calculated migration from a Synology DS416play to a Proxmox-hosted Unraid array on a QNAP TL-D800C DAS." />
+  <meta property="og:url" content="https://anas.semesmieh.com/blog/posts/homelab-nas-to-das-migration" />
+  <meta property="og:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="From NAS to DAS: Retiring My Synology Before It Retired My Data" />
+  <meta name="twitter:description" content="How three converging pressures — data risk, idle drives, and a 4-bay ceiling — drove a calculated migration from a Synology DS416play to a Proxmox-hosted Unraid array on a QNAP TL-D800C DAS." />
+  <meta name="twitter:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #101a2c;
+      --muted: #8ea0be;
+      --text: #e6eef8;
+      --accent: #22c55e;
+      --heading: #60a5fa;
+      --border: rgba(255, 255, 255, 0.07);
+      --maxw: 860px;
+      --radius: 16px;
+      --font: "Inter", "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+    }
+
+    body {
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.75;
+      background:
+        radial-gradient(ellipse at 15% 0%, #13203a 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 15%, #0e1a32 0%, transparent 45%),
+        var(--bg);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+    }
+
+    .nav {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: var(--muted);
+      padding: 7px 13px;
+      border-radius: 10px;
+      font-size: 14px;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .nav a:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    article {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      background: var(--card);
+    }
+
+    h1 {
+      font-size: 36px;
+      line-height: 1.2;
+      color: var(--heading);
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 14px;
+      margin: 10px 0 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h2 {
+      margin-top: 32px;
+      margin-bottom: 12px;
+      font-size: 24px;
+      color: var(--heading);
+    }
+
+    h3 {
+      margin-top: 24px;
+      margin-bottom: 8px;
+      color: #86efac;
+      font-size: 18px;
+    }
+
+    p {
+      margin: 10px 0;
+    }
+
+    ul, ol {
+      margin: 10px 0;
+      padding-left: 22px;
+    }
+
+    li {
+      margin: 4px 0;
+    }
+
+    .callout {
+      border-left: 3px solid var(--accent);
+      padding: 12px 16px;
+      background: rgba(34, 197, 94, 0.07);
+      border-radius: 10px;
+      margin: 20px 0;
+    }
+
+    .callout.blue {
+      border-left-color: var(--heading);
+      background: rgba(96, 165, 250, 0.07);
+    }
+
+    .callout.warn {
+      border-left-color: #fbbf24;
+      background: rgba(251, 191, 36, 0.07);
+    }
+
+    code {
+      background: rgba(255, 255, 255, 0.07);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13.5px;
+    }
+
+    pre {
+      background: rgba(0, 0, 0, 0.35);
+      padding: 16px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.55;
+      color: #e6eef8;
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0;
+      font-size: 14px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .series-nav {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .series-nav a {
+      display: inline-block;
+      margin-right: 12px;
+    }
+
+    .diagram {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 20px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-family: "JetBrains Mono", "Fira Code", monospace;
+      font-size: 12px;
+      line-height: 1.4;
+      color: #86efac;
+      margin: 20px 0;
+    }
+
+    .status-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      margin: 20px 0;
+    }
+
+    .status-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .status-card .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .status-card .value {
+      font-size: 14px;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .status-card .size {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .status-card.done .label { color: #86efac; }
+    .status-card.done { border-color: rgba(134, 239, 172, 0.25); }
+    .status-card.active .label { color: #60a5fa; }
+    .status-card.active { border-color: rgba(96, 165, 250, 0.25); }
+    .status-card.pending .label { color: var(--muted); }
+
+    blockquote {
+      margin: 20px 0;
+      padding: 16px 18px;
+      border-left: 3px solid rgba(96, 165, 250, 0.8);
+      background: rgba(96, 165, 250, 0.07);
+      border-radius: 12px;
+      color: #dbeafe;
+      font-style: italic;
+    }
+
+    @media (max-width: 700px) {
+      .wrap { padding: 16px 14px 48px; }
+      h1 { font-size: 28px; }
+      article { padding: 20px; }
+    }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "From NAS to DAS: Retiring My Synology Before It Retired My Data",
+    "datePublished": "2026-06-28",
+    "dateModified": "2026-06-28",
+    "author": {"@type": "Person", "name": "Anas Semesmieh", "url": "https://anas.semesmieh.com/about/"},
+    "publisher": {"@type": "Person", "name": "Anas Semesmieh"},
+    "mainEntityOfPage": "https://anas.semesmieh.com/blog/posts/homelab-nas-to-das-migration",
+    "image": "https://anas.semesmieh.com/profile-wide.jpg",
+    "description": "How three converging pressures — data risk, idle drives, and a 4-bay ceiling — drove a calculated migration from a Synology DS416play to a Proxmox-hosted Unraid array on a QNAP TL-D800C DAS, and how I'm running it as a live operation with Telegram monitoring."
+  }
+  </script>
+</head>
+
+<body>
+  <div class="wrap">
+    <nav class="nav" aria-label="Post navigation">
+      <a href="/">Portfolio</a>
+      <a href="/blog/">All Posts</a>
+      <a href="/blog/categories/">Categories</a>
+      <a href="/blog/tags/">Tags</a>
+      <a href="/blog/rss.xml">RSS</a>
+    </nav>
+
+    <article>
+      <h1>From NAS to DAS: Retiring My Synology Before It Retired My Data</h1>
+      <p class="meta">By <a href="/about/">Anas Semesmieh</a> &middot; June 28, 2026 &middot; Homelab, Storage, Unraid, Migration, Self-Hosting</p>
+
+      <p>There is a category of risk in a homelab that is easy to ignore because nothing has gone wrong yet. Your drives spin, your Plex library loads, your backups run. The system works &mdash; you can see that much. What you cannot see is that the architecture underneath has no tolerance for failure, and that the longer it keeps working, the more data you have accumulated on a foundation that will not survive a single bad sector on the wrong disk.</p>
+
+      <p>That was my Synology DS416play. Four drives, four Basic volumes, zero parity. ~16 TB of media and backups with no redundancy at all. I knew this. I had known it for a while. What finally forced the decision was not a scare &mdash; it was three pressures landing at the same time, each one reasonable on its own, together making the status quo untenable.</p>
+
+      <p>This post is a status report on the migration in progress: what drove the decision, how I evaluated the options, why Unraid won, how the transfer is being executed, and where things stand right now as of this week. Part two will cover the app migration off the Synology and the before/after performance numbers once we have a week of runtime on the new stack.</p>
+
+      <h2>Three Pressures, One Decision</h2>
+
+      <h3>1. The Risk Was Real and Growing</h3>
+
+      <p>The Synology DS416play was running four Basic storage pools &mdash; one per drive, one volume per pool. Basic volumes in Synology DSM are exactly what they sound like: a single disk with no RAID, no SHR, no redundancy of any kind. The four drives held:</p>
+
+      <ul>
+        <li><strong>Volume 1</strong> &mdash; 4 TB WD Red: system, Docker, ABB, CCTV recordings</li>
+        <li><strong>Volume 2</strong> &mdash; 10 TB: Media (~1.5 TB) and Proxmox Backup Server data (~400 GB)</li>
+        <li><strong>Volume 3</strong> &mdash; 10 TB: Movies library (~5.7 TB)</li>
+        <li><strong>Volume 4</strong> &mdash; 10 TB: Series library (~8.3 TB), flagging low space</li>
+      </ul>
+
+      <p>Any single drive failure would destroy one of those volumes completely. The media libraries in particular had no second copy anywhere &mdash; not on a cloud service, not on a cold backup drive. If the Movies volume died, 5.7 TB of content was gone and the only recovery was re-downloading everything, with all the Plex library history, artwork, and playback progress that goes with it.</p>
+
+      <div class="callout warn">
+        Running 16 TB of accumulated data on Basic (non-redundant) volumes is not a calculated risk &mdash; it is a deferred consequence. Any drive in a spinning array will eventually fail. The question is only when.
+      </div>
+
+      <h3>2. Four Drives Were Sitting Idle</h3>
+
+      <p>I had four drives doing nothing: a 4 TB and three 2 TB units, all in good health, all unused. This was not a planned inventory &mdash; they were leftover from earlier upgrades and drive replacements that had accumulated over time. Four drives that could collectively provide over 10 TB of usable space were contributing nothing.</p>
+
+      <h3>3. The 4-Bay Ceiling Had No Exit</h3>
+
+      <p>Volume 4 was already flagging low space. The Synology DS416play has four bays and all four were occupied. The conventional answer &mdash; swap in a larger drive &mdash; would have required buying a new drive, then a second drive to mirror it onto before retiring the old one, and I would still be on Basic volumes with no parity and the same structural risk. The other conventional answer, buying a 6- or 8-bay NAS, would have cost &pound;300&ndash;500 for the device alone, plus another large drive to actually expand capacity.</p>
+
+      <p>All three of these pressures had been building independently. When they landed together &mdash; no redundancy, idle drives, no growth path &mdash; the Synology&rsquo;s days as the primary storage layer were over.</p>
+
+      <h2>Why a DAS Instead of a New NAS</h2>
+
+      <p>A Direct-Attached Storage enclosure changes the equation entirely. The QNAP TL-D800C is an 8-bay DAS that connects via USB-C to a host machine &mdash; in this case, the Dell OptiPlex 7070 Micro that runs Proxmox. It brings no CPU, no OS, no management overhead. It is just a well-engineered enclosure with a backplane and a fan.</p>
+
+      <p>The DAS approach meant I could slot all seven drives &mdash; the four idle ones I already had plus three more from the Synology as they are freed &mdash; into a single enclosure managed by a single storage OS, with a single parity configuration protecting all of them. No new NAS purchase, no proprietary management interface to maintain, no second device consuming power and generating heat on its own logic. The host machine already exists. The enclosure is just additional bays.</p>
+
+      <h2>Why Unraid</h2>
+
+      <p>Once the DAS path was clear, the storage OS choice came next. Three realistic options were on the table.</p>
+
+      <h3>TrueNAS Scale</h3>
+
+      <p>TrueNAS is excellent software with a strong track record. Its ZFS foundation offers data integrity guarantees that are genuinely hard to match. The limitation for this specific situation is that ZFS RAID-Z requires drives of uniform size to avoid wasted capacity &mdash; or more precisely, a RAID-Z vdev uses the capacity of the smallest member for each slot. A pool built from a 10 TB, a 4 TB, and three 2 TB drives would be constrained to the smallest drive in the set, leaving significant raw capacity unused. You can create multiple vdevs of different sizes, but you lose the unified pool benefit and the configuration becomes significantly more complex to manage.</p>
+
+      <h3>Another NAS Appliance</h3>
+
+      <p>Synology SHR (Synology Hybrid RAID) is genuinely good at mixed-drive arrays within its own ecosystem. But SHR is limited to Synology hardware, and I was already moving away from the NAS appliance model. QNAP&rsquo;s equivalent has the same constraint. Any appliance also means a second computer to maintain &mdash; its own OS updates, its own failure modes, its own power draw.</p>
+
+      <h3>Unraid</h3>
+
+      <p>Unraid&rsquo;s parity model works differently from ZFS or traditional RAID. Each data drive in an Unraid array operates independently as a formatted XFS or BTRFS filesystem. A parity disk &mdash; which must be at least as large as the largest data drive &mdash; stores parity information that can reconstruct any single drive that fails. Critically, drives do not need to be the same size. A 10 TB drive, a 4 TB drive, and three 2 TB drives all contribute their full raw capacity to the pool. You get exactly the sum of all data drive sizes as usable space.</p>
+
+      <p>For this specific inventory &mdash; one 4 TB, three 2 TB in the DAS now, with three 10 TB disks joining from the Synology as they are freed &mdash; Unraid was the only option that used every byte of every drive without waste or artificial constraints. The math made the decision straightforward.</p>
+
+      <p>Unraid also runs as a virtual machine cleanly under Proxmox via PCIe passthrough, which meant no additional hardware. The Proxmox host already exists and has spare capacity. VM 200 on the OptiPlex 7070 Micro runs Unraid 7.3.1 with 4 vCPUs and 8 GB RAM, the QNAP DAS disks passed through via USB, and the Samsung 870 EVO 500 GB SSD that will become the cache pool once parity is assigned post-migration.</p>
+
+      <div class="callout blue">
+        The current array is running without parity &mdash; intentionally. Adding a parity disk requires Unraid to compute parity across all data drives, which takes hours at scale. Running without parity during the migration keeps the array available for writes and avoids tying up the CPU. Parity will be assigned once the first freed 10 TB Synology drive is clean and available.
+      </div>
+
+      <h2>The Migration Architecture</h2>
+
+      <pre class="diagram">Synology DS416play (10.0.0.10)
+  /volume2/Media    — 1.5 TB
+  /volume2/PBS      — 400 GB
+  /volume3/Movies   — 5.7 TB
+  /volume4/Series   — 8.3 TB
+         │
+         │  NFS over dedicated storage LAN (10.0.0.x)
+         │  Intel i219 Gigabit NIC → vmbr1 → Unraid net1
+         ▼
+Proxmox Host — Dell OptiPlex 7070 Micro (192.168.20.1)
+  └── VM 200: Unraid 7.3.1 (192.168.20.200 / 10.0.0.200)
+        └── QNAP TL-D800C via USB passthrough
+              ├── Disk 1: WD 4 TB  (XFS)
+              ├── Disk 2: ST 2 TB  (XFS)
+              ├── Disk 3: ST 2 TB  (XFS)
+              ├── Disk 4: ST 2 TB  (XFS)     ← 9.8 TB usable today
+              ├── Slots 5–8: empty (awaiting Synology drives as freed)
+              └── Cache: Samsung 870 EVO 500 GB (deferred — post-parity)</pre>
+
+      <h3>Migration Sequence</h3>
+
+      <p>The order matters. PBS was migrated first because it is the smallest dataset and losing access to backups during a storage migration is the wrong kind of risk. Media came second &mdash; also relatively small at 1.5 TB and lower consequence if interrupted. Movies and Series are the large ones, but they carry the highest disruption cost if something goes wrong mid-transfer (Plex history, metadata, watched state), so they migrate after PBS and Media are confirmed stable.</p>
+
+      <ol>
+        <li><strong>PBS</strong> &mdash; Reconfigured Proxmox Backup Server (CT100) to write to a new Unraid datastore. One fresh full backup taken. Old Synology PBS history discarded &mdash; only 2&ndash;3 snapshots existed, not worth migrating the deduplicated store.</li>
+        <li><strong>Media</strong> &mdash; rsync from Synology NFS mount to Unraid NFS share. Verified on destination before moving on.</li>
+        <li><strong>Movies</strong> &mdash; rsync in progress. Plex and arrstack remain live on Synology paths during transfer.</li>
+        <li><strong>Drive swap</strong> &mdash; Once Movies is verified, the Movies 10 TB drive is physically removed from the Synology and added to the QNAP DAS. Unraid array is expanded. This frees a slot for Series to start.</li>
+        <li><strong>Series</strong> &mdash; rsync to now-expanded Unraid array.</li>
+        <li><strong>Parity assignment</strong> &mdash; Once all data is on Unraid, assign the freed Series 10 TB as parity disk.</li>
+        <li><strong>Cache pool</strong> &mdash; Samsung 870 EVO 500 GB added as cache after parity sync completes.</li>
+      </ol>
+
+      <p>Services (Plex, arrstack) are not stopped until their dataset is fully verified on Unraid. The Synology remains online throughout, serving its NFS mounts as the source. No service disruption, no re-downloading.</p>
+
+      <h2>Executing the Transfer: What Worked and What Did Not</h2>
+
+      <h3>What Did Not Work: Parallel Jobs</h3>
+
+      <p>The initial instinct was to run multiple rsync processes simultaneously &mdash; one per share &mdash; to maximise throughput. The Synology DS416play runs a quad-core Realtek RTD1296 ARM processor. Under a single rsync job it managed fine. Under parallel rsync jobs it saturated immediately: CPU usage hit 100%, the NFS server became the bottleneck, and transfer speeds dropped well below what a single sequential job delivered. Parallel approach was abandoned within the first hour.</p>
+
+      <h3>What Worked: The Ethernet Port Swap</h3>
+
+      <p>The original network configuration for the storage migration used a USB-to-Ethernet adapter bridged as <code>vmbr1</code> on the Proxmox host. This was already in place for the isolated storage VLAN (<code>10.0.0.x</code>). What was not obvious until we dug into it: USB-attached NICs carry inherent overhead from the USB protocol layer that eats into effective throughput even on a Gigabit link.</p>
+
+      <p>Swapping the storage traffic to the main Intel i219 Gigabit NIC &mdash; the built-in NIC on the OptiPlex &mdash; and reconfiguring <code>vmbr1</code> to bridge it instead of the USB adapter produced an immediate improvement. The Intel NIC operates at the PCIe level with native kernel driver support, no USB framing overhead. This single change had a measurable impact on sustained transfer speeds.</p>
+
+      <h3>rsync Flag Tuning</h3>
+
+      <p>The base rsync flags were adjusted for a LAN transfer of large media files:</p>
+
+      <pre><code>rsync -ah --no-compress --stats --info=progress2 \
+  /mnt/syn-movies/ /mnt/unraid-movies/</code></pre>
+
+      <ul>
+        <li><code>--no-compress</code> &mdash; compression adds CPU cost on both ends with no benefit on a local network transfer. MKV and MP4 files are already compressed; re-compressing them in transit gains nothing.</li>
+        <li>Verbose flag (<code>-v</code>) removed &mdash; printing every filename to stdout adds overhead at scale, particularly with large file counts. <code>--info=progress2</code> gives aggregate progress without per-file noise.</li>
+        <li><code>--append-del</code> used on restarts &mdash; safe resume for interrupted transfers without rechecking the entire source tree.</li>
+      </ul>
+
+      <h3>Pre-Flight Cleanup: Stripping the Noise</h3>
+
+      <p>Before starting the Movies and Series transfers, a cleanup script was run against both source directories on the Synology. The target: remove all the small files that accumulate in a media library over time and add transfer overhead without contributing anything meaningful to the migration.</p>
+
+      <p>Specifically removed:</p>
+      <ul>
+        <li>Thumbnail cache files (<code>@eaDir</code> directories &mdash; Synology-specific metadata)</li>
+        <li>Cached subtitle files and unused subtitle formats</li>
+        <li>Small companion metadata files that Plex would regenerate from the library anyway</li>
+      </ul>
+
+      <p>The effect was meaningful: thousands of small files removed from the transfer queue, which in rsync terms means thousands of stat calls, checksum comparisons, and NFS round trips eliminated. rsync spends a disproportionate amount of time on file count when small files dominate &mdash; cleaning them first means the transfer focuses entirely on the large MKVs and ISOs that actually matter.</p>
+
+      <h3>The Result: ~100 MB/s Sustained</h3>
+
+      <p>After the port swap, flag tuning, and cleanup: sustained transfer speeds of approximately 100 MB/s on both the Media and Movies datasets. Close to the Gigabit ceiling (~125 MB/s theoretical max), with natural variation from disk seek patterns on the spinning Synology drives.</p>
+
+      <h2>The Watcher: Running It Like a Real Deployment</h2>
+
+      <p>A background worker runs alongside the rsync processes and reports to Telegram. Every interval it samples the rsync process &mdash; files transferred, bytes written, current file, estimated completion &mdash; and pushes a structured update: transfer speed, percentage complete, ETA, and any error signals. If rsync exits unexpectedly, the watcher fires an alert immediately.</p>
+
+      <p>This matters for a migration that runs for 13+ hours on the Movies dataset alone. Without monitoring, you are checking in manually on something that should be observable. The Telegram updates mean the migration runs in the background with confidence &mdash; any deviation from expected progress surfaces without polling. It is the same principle applied to a homelab operation that any production deployment team would apply to a long-running data migration job: instrument it, observe it, alert on failure.</p>
+
+      <h2>Where Things Stand Right Now</h2>
+
+      <div class="status-grid">
+        <div class="status-card done">
+          <div class="label">&#10003; PBS</div>
+          <div class="value">Live on Unraid</div>
+          <div class="size">~400 GB &mdash; CT100 writing to new datastore</div>
+        </div>
+        <div class="status-card done">
+          <div class="label">&#10003; Media</div>
+          <div class="value">Complete &amp; Verified</div>
+          <div class="size">1.5 TB &mdash; Synology NFS retired for this share</div>
+        </div>
+        <div class="status-card active">
+          <div class="label">&#9654; Movies</div>
+          <div class="value">Transfer in Progress</div>
+          <div class="size">5.7 TB &mdash; ~100 MB/s, Plex still on Synology path</div>
+        </div>
+        <div class="status-card pending">
+          <div class="label">&#9711; Series</div>
+          <div class="value">Pending Drive Swap</div>
+          <div class="size">8.3 TB &mdash; starts after Movies 10 TB freed</div>
+        </div>
+      </div>
+
+      <p>PBS is the most significant milestone of the week: Proxmox Backup Server is no longer dependent on the Synology at all. CT100 writes its backup jobs directly to the Unraid array, and the PBS datastore is fully operational. The Synology has already been relieved of its most critical storage responsibility.</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Component</th>
+            <th>Status</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Unraid VM 200</td>
+            <td>Running</td>
+            <td>Unraid 7.3.1, 8 GB RAM, 4 vCPU, trial licensed</td>
+          </tr>
+          <tr>
+            <td>Array capacity (today)</td>
+            <td>9.8 TB usable</td>
+            <td>4× drives: 1&times;4 TB + 3&times;2 TB, XFS, no parity yet</td>
+          </tr>
+          <tr>
+            <td>Array capacity (post-migration)</td>
+            <td>~36 TB usable</td>
+            <td>After 3&times;10 TB Synology drives join + parity on largest</td>
+          </tr>
+          <tr>
+            <td>Cache pool</td>
+            <td>Deferred</td>
+            <td>Samsung 870 EVO 500 GB &mdash; added post-parity</td>
+          </tr>
+          <tr>
+            <td>Parity</td>
+            <td>Deferred</td>
+            <td>First freed 10 TB assigned once Movies drive is physically swapped</td>
+          </tr>
+          <tr>
+            <td>Synology DS416play</td>
+            <td>Still running</td>
+            <td>Movies and Series NFS exports still active; retired progressively</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>What Is Coming Next Week</h2>
+
+      <p>Once the Movies transfer completes, the first physical drive swap happens: the 10 TB disk is pulled from the Synology, slotted into the QNAP, and added to the Unraid array. Series migration starts immediately after. When Series is verified, arrstack and Plex are cut over from their Synology NFS mounts to the Unraid shares &mdash; the first moment the new stack takes full production responsibility for media serving.</p>
+
+      <p>After cutover, the next post will cover three things: the updated homelab architecture diagram (the Synology is leaving it entirely), the app migration off the Synology&rsquo;s remaining Docker workloads, and the performance comparison. Running Plex transcoding and arrstack downloads from a spinning array NFS-mounted over USB is a known baseline. Running them from a local NFS share on drives connected via USB-C directly to the Proxmox host, with an SSD cache pool in front, is the target state. The numbers will be in the post.</p>
+
+      <div class="callout">
+        The Synology is not being decommissioned immediately after data migration. The System volume (4 TB, Volume 1) runs the Docker stack, ABB, and CCTV services &mdash; these have their own migration path that requires separate planning. The NAS will run in a reduced capacity role until that work is done. That&rsquo;s a separate post.
+      </div>
+
+      <h2>The Bigger Picture</h2>
+
+      <p>This migration is a maturity milestone for the homelab. The Synology served its purpose well: it was the right device for an early homelab where simplicity mattered more than redundancy. That phase is over. The infrastructure now runs serious enough workloads &mdash; Proxmox backups, 16 TB of media, daily automation jobs &mdash; that running it on unprotected storage is not a calculated risk, it is an unexamined one.</p>
+
+      <p>The DAS + Unraid approach solves the structural problem cleanly: all drives &mdash; the idle ones, the Synology ones, and any future additions &mdash; work together in a single parity-protected pool that grows without constraints. No drive is wasted. No new device purchase was required for the migration itself. The host machine already existed. The enclosure gives it the bay count it needed.</p>
+
+      <p>The approach also reflects a principle that runs through every layer of this homelab: observable, deliberate, and recoverable. The Telegram watcher. The sequential migration order. PBS moved first. No service cut over until the destination is verified. These are not accidents &mdash; they are the habits that make a homelab you can operate with confidence rather than one you hope keeps running.</p>
+
+      <div class="series-nav">
+        <strong>Homelab Series:</strong>
+        <a href="/blog/posts/homelab-start-here">Start Here</a>
+        <a href="/blog/posts/homelab-docker-compose-stack">Docker Compose Stack</a>
+        <a href="/blog/posts/homelab-sso-authentik">SSO with Authentik</a>
+        <a href="/blog/posts/homelab-backup-automation">Backup Automation</a>
+        <a href="/blog/posts/homelab-disaster-recovery">Disaster Recovery</a>
+        <a href="/blog/posts/homelab-xcaddy-cloudflare-tunnel-adguard">Xcaddy + Tunnel + AdGuard</a>
+        <a href="/blog/posts/homelab-p2v-proxmox-migration">P2V Migration</a>
+        <a href="/blog/posts/homelab-proxmox-lxc-decomposition">LXC Decomposition</a>
+        <a href="/blog/posts/homelab-full-lxc-migration">Full Migration</a>
+        <a href="/blog/posts/homelab-telegram-yt-dlp-bot">Telegram Video Bot</a>
+        <a href="/blog/posts/homelab-hermes-ai-agent">AI Brain with Hermes</a>
+        <a href="/blog/posts/homelab-nas-to-das-migration">NAS to DAS Migration</a>
+      </div>
+    </article>
+  </div>
+</body>
+
+</html>
