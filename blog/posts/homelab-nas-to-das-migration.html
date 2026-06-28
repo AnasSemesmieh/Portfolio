@@ -366,7 +366,7 @@
       <p>Unraid also runs as a virtual machine cleanly under Proxmox via PCIe passthrough, which meant no additional hardware. The Proxmox host already exists and has spare capacity. VM 200 on the OptiPlex 7070 Micro runs Unraid 7.3.1 with 4 vCPUs and 8 GB RAM, the QNAP DAS disks passed through via USB, and the Samsung 870 EVO 500 GB SSD that will become the cache pool once parity is assigned post-migration.</p>
 
       <div class="callout blue">
-        The current array is running without parity &mdash; intentionally. Adding a parity disk requires Unraid to compute parity across all data drives, which takes hours at scale. Running without parity during the migration keeps the array available for writes and avoids tying up the CPU. Parity will be assigned once the first freed 10 TB Synology drive is clean and available.
+        The current array is running without parity &mdash; intentionally. Adding a parity disk requires Unraid to compute parity across all data drives, which takes hours at scale. Running without parity during the migration keeps the array available for writes and avoids tying up the CPU. The first freed 10 TB Synology disk goes to <strong>capacity</strong>, not parity &mdash; the array needs that space to absorb the remaining datasets. Parity comes from the third freed 10 TB drive, once all data has moved.
       </div>
 
       <h2>The Migration Architecture</h2>
@@ -502,8 +502,8 @@ Proxmox Host — Dell OptiPlex 7070 Micro (192.168.20.1)
           </tr>
           <tr>
             <td>Array capacity (post-migration)</td>
-            <td>~36 TB usable</td>
-            <td>After 3&times;10 TB Synology drives join + parity on largest</td>
+            <td>~30 TB usable</td>
+            <td>2&times;10 TB data + 4 TB + 3&times;2 TB data; 1&times;10 TB as parity. System volume (4 TB) stays in Synology &mdash; out of scope.</td>
           </tr>
           <tr>
             <td>Cache pool</td>
