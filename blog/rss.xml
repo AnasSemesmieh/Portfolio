@@ -5,7 +5,15 @@
     <link>https://anas.semesmieh.com/blog/</link>
     <description>Platform engineering, Azure architecture, DevSecOps, and engineering leadership insights.</description>
     <language>en-au</language>
-    <lastBuildDate>Sat, 28 Jun 2026 12:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 04 Jul 2026 12:00:00 +0000</lastBuildDate>
+
+    <item>
+      <title>The Migration That Migrated Itself: Surviving a Double Disk Failure Without Parity</title>
+      <link>https://anas.semesmieh.com/blog/posts/homelab-double-disk-failure-without-parity</link>
+      <guid>https://anas.semesmieh.com/blog/posts/homelab-double-disk-failure-without-parity</guid>
+      <pubDate>Sat, 04 Jul 2026 12:00:00 +0000</pubDate>
+      <description>Moving Unraid to bare metal gave it direct SMART access for the first time — and the first disk scan immediately flagged a dying boot/cache SSD and a dying 2TB data disk simultaneously, with zero parity protection in place. How sequential rsync, a five-minute watchdog cron, and a temporary flash-boot detour got both drives replaced without losing a byte.</description>
+    </item>
 
     <item>
       <title>From NAS to DAS: Retiring My Synology Before It Retired My Data</title>

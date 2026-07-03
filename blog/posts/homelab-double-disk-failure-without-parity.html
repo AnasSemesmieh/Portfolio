@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Migration That Migrated Itself: Surviving a Double Disk Failure Without Parity | Anas Semesmieh</title>
+  <meta name="description" content="Moving Unraid from a Proxmox VM to bare metal gave it direct SMART access for the first time — and the first disk scan immediately flagged a dying boot/cache SSD and a dying 2TB data disk simultaneously, with zero parity protection in place. Here's how sequential rsync, a five-minute watchdog cron, and a temporary flash-boot detour got both drives replaced without losing a byte." />
+  <meta name="keywords" content="Anas Semesmieh, Unraid disk failure, no parity, bare metal migration, SMART monitoring, disk recovery, rsync, homelab storage, self-hosted NAS, Unraid array recovery" />
+  <meta name="author" content="Anas Semesmieh" />
+  <link rel="canonical" href="https://anas.semesmieh.com/blog/posts/homelab-double-disk-failure-without-parity" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="The Migration That Migrated Itself: Surviving a Double Disk Failure Without Parity" />
+  <meta property="og:description" content="Bare metal gave Unraid direct SMART access for the first time — and immediately flagged a dying boot SSD and a dying data disk simultaneously, with zero parity protection running." />
+  <meta property="og:url" content="https://anas.semesmieh.com/blog/posts/homelab-double-disk-failure-without-parity" />
+  <meta property="og:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="The Migration That Migrated Itself: Surviving a Double Disk Failure Without Parity" />
+  <meta name="twitter:description" content="Bare metal gave Unraid direct SMART access for the first time — and immediately flagged a dying boot SSD and a dying data disk simultaneously, with zero parity protection running." />
+  <meta name="twitter:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #101a2c;
+      --muted: #8ea0be;
+      --text: #e6eef8;
+      --accent: #22c55e;
+      --heading: #60a5fa;
+      --border: rgba(255, 255, 255, 0.07);
+      --maxw: 860px;
+      --radius: 16px;
+      --font: "Inter", "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+    }
+
+    body {
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.75;
+      background:
+        radial-gradient(ellipse at 15% 0%, #13203a 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 15%, #0e1a32 0%, transparent 45%),
+        var(--bg);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+    }
+
+    .nav {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: var(--muted);
+      padding: 7px 13px;
+      border-radius: 10px;
+      font-size: 14px;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .nav a:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    article {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      background: var(--card);
+    }
+
+    h1 {
+      font-size: 36px;
+      line-height: 1.2;
+      color: var(--heading);
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 14px;
+      margin: 10px 0 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h2 {
+      margin-top: 32px;
+      margin-bottom: 12px;
+      font-size: 24px;
+      color: var(--heading);
+    }
+
+    h3 {
+      margin-top: 24px;
+      margin-bottom: 8px;
+      color: #86efac;
+      font-size: 18px;
+    }
+
+    p {
+      margin: 10px 0;
+    }
+
+    ul, ol {
+      margin: 10px 0;
+      padding-left: 22px;
+    }
+
+    li {
+      margin: 4px 0;
+    }
+
+    .callout {
+      border-left: 3px solid var(--accent);
+      padding: 12px 16px;
+      background: rgba(34, 197, 94, 0.07);
+      border-radius: 10px;
+      margin: 20px 0;
+    }
+
+    .callout.blue {
+      border-left-color: var(--heading);
+      background: rgba(96, 165, 250, 0.07);
+    }
+
+    .callout.warn {
+      border-left-color: #fbbf24;
+      background: rgba(251, 191, 36, 0.07);
+    }
+
+    code {
+      background: rgba(255, 255, 255, 0.07);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13.5px;
+    }
+
+    pre {
+      background: rgba(0, 0, 0, 0.35);
+      padding: 16px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.55;
+      color: #e6eef8;
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0;
+      font-size: 14px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .series-nav {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .series-nav a {
+      display: inline-block;
+      margin-right: 12px;
+    }
+
+    .diagram {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 20px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-family: "JetBrains Mono", "Fira Code", monospace;
+      font-size: 12px;
+      line-height: 1.4;
+      color: #86efac;
+      margin: 20px 0;
+    }
+
+    .status-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      margin: 20px 0;
+    }
+
+    .status-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .status-card .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .status-card .value {
+      font-size: 14px;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .status-card .size {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .status-card.done .label { color: #86efac; }
+    .status-card.done { border-color: rgba(134, 239, 172, 0.25); }
+    .status-card.active .label { color: #60a5fa; }
+    .status-card.active { border-color: rgba(96, 165, 250, 0.25); }
+    .status-card.pending .label { color: var(--muted); }
+    .status-card.warn .label { color: #fbbf24; }
+    .status-card.warn { border-color: rgba(251, 191, 36, 0.25); }
+
+    blockquote {
+      margin: 20px 0;
+      padding: 16px 18px;
+      border-left: 3px solid rgba(96, 165, 250, 0.8);
+      background: rgba(96, 165, 250, 0.07);
+      border-radius: 12px;
+      color: #dbeafe;
+      font-style: italic;
+    }
+
+    @media (max-width: 700px) {
+      .wrap { padding: 16px 14px 48px; }
+      h1 { font-size: 28px; }
+      article { padding: 20px; }
+    }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "The Migration That Migrated Itself: Surviving a Double Disk Failure Without Parity",
+    "datePublished": "2026-07-04",
+    "dateModified": "2026-07-04",
+    "author": {"@type": "Person", "name": "Anas Semesmieh", "url": "https://anas.semesmieh.com/about/"},
+    "publisher": {"@type": "Person", "name": "Anas Semesmieh"},
+    "mainEntityOfPage": "https://anas.semesmieh.com/blog/posts/homelab-double-disk-failure-without-parity",
+    "image": "https://anas.semesmieh.com/profile-wide.jpg",
+    "description": "Moving Unraid from a Proxmox VM to bare metal gave it direct SMART access for the first time — and the first disk scan immediately flagged a dying boot/cache SSD and a dying 2TB data disk simultaneously, with zero parity protection in place."
+  }
+  </script>
+</head>
+
+<body>
+  <div class="wrap">
+    <nav class="nav" aria-label="Post navigation">
+      <a href="/">Portfolio</a>
+      <a href="/blog/">All Posts</a>
+      <a href="/blog/categories/">Categories</a>
+      <a href="/blog/tags/">Tags</a>
+      <a href="/blog/rss.xml">RSS</a>
+    </nav>
+
+    <article>
+      <h1>The Migration That Migrated Itself: Surviving a Double Disk Failure Without Parity</h1>
+      <p class="meta">By <a href="/about/">Anas Semesmieh</a> &middot; July 4, 2026 &middot; Homelab, Unraid, Storage, Hardware Failure, Self-Hosting</p>
+
+      <p>Two posts ago, I moved Unraid from a Synology onto a QNAP DAS running as a Proxmox VM, and I made a deliberate decision to run the array <strong>without parity</strong> during the migration. That was the correct call at the time &mdash; parity sync competes for I/O with active data transfers, and there was no failed hardware yet to protect against. What I did not plan for was uplifting that same VM to bare metal a few days later, and having the very first disk scan flag two drives as failing at once &mdash; the boot/cache SSD and a 2 TB data disk &mdash; while the array was still running with exactly zero redundancy.</p>
+
+      <p>This post is about that week: why bare metal is what surfaced two failures that had been invisible under virtualization, how a data disk and a boot SSD got replaced simultaneously with no parity safety net, and where the array stands right now as parity finally gets assigned for the first time.</p>
+
+      <div class="callout warn">
+        At the moment both drives were flagged, the array had <strong>zero parity protection</strong>. Any additional failure &mdash; on any of the six data disks, mid-recovery &mdash; meant permanent data loss with no way to reconstruct it. Everything below happened under that constraint.
+      </div>
+
+      <h2>Bare Metal Doesn't Lie</h2>
+
+      <p>The previous post left Unraid running as VM200 on the Proxmox host (a Dell OptiPlex 7070 Micro), with the QNAP TL-D800C DAS passed through via USB. That was always meant to be temporary &mdash; the plan was to move Unraid onto dedicated hardware once the bulk of the data migration settled. That hardware was an <a href="https://www.acer.com" target="_blank" rel="noopener">Acer Veriton N4640G</a> (Intel i5-6500T, 8 GB RAM) sitting idle. The physical move itself was uneventful: pull the Samsung 870 EVO (the boot+cache SSD) out of the OptiPlex, slot it into the Veriton's 2.5" SATA bay, move the DAS USB cable over, boot.</p>
+
+      <p>Unraid came up, re-detected its array disks, and ran its first disk scan directly against real SATA/USB controllers instead of through QEMU's virtual disk layer. Within minutes, two drives were flagged: the boot/cache SSD, and a 2 TB data disk sitting at roughly 90% full (about 1.7 TB of 2 TB used).</p>
+
+      <div class="callout blue">
+        <strong>Why this happened on bare metal and not before:</strong> QEMU/VM disk passthrough does not reliably surface full SMART attribute data to the guest OS &mdash; reallocated sector counts, pending sectors, and other health attributes can be masked or incomplete under virtualization. Bare metal gives Unraid direct access to the physical drive controllers, so SMART state that had been silently accumulating for a while became visible for the first time right after the move. This was not new damage caused by the migration &mdash; it was existing damage that virtualization had been hiding. Moving to bare metal was a diagnostic upgrade, not a regression.
+      </div>
+
+      <p>That distinction mattered in the moment. Seeing two drives flagged red on the very first boot after a hardware move looks like the move broke something. It didn't &mdash; it just stopped hiding something.</p>
+
+      <h2>Failure One: The Boot/Cache SSD</h2>
+
+      <p>The Samsung 870 EVO 500 GB had been serving double duty since the original migration: Unraid's boot device (internal-SSD-boot, not the traditional USB flash stick) and the cache pool for the array. SMART on the real controller showed it was failing. The fix was straightforward in principle &mdash; replace it with a new drive &mdash; but it came with an unplanned detour.</p>
+
+      <p>Mid-replacement, Unraid needed its configuration synced back onto the USB flash drive as a fallback boot path while the SSD was being swapped out. This was mildly funny in a dark-humor way: internal-SSD-boot was itself a recent upgrade away from flash-drive boot, celebrated just days earlier. For a few hours mid-crisis, the array was back on the exact boot method it had just left. That was always meant to be temporary, and once the replacement SSD was in and cache/boot was reconfigured on it, the array moved back to internal-SSD-boot for good. If you're doing this kind of swap yourself: don't panic if Unraid detours through flash mid-recovery &mdash; just confirm the final state actually lands back on the new SSD rather than getting stranded on the fallback.</p>
+
+      <p>The replacement is a new 256 GB Samsung SSD, handling both boot and cache duties exactly as the 500 GB drive did. Less capacity, but 256 GB is comfortably enough for a cache pool and boot partition &mdash; the array's bulk storage lives on the spinning data disks, not the cache tier.</p>
+
+      <h2>Failure Two: The Data Disk at 90% Full</h2>
+
+      <p>The second flagged drive was a 2 TB Seagate <code>ST2000DM001</code> &mdash; the same disk documented in my internal runbook from an earlier retirement pass, now confirmed failing for real: <strong>842+ reallocated/bad sectors</strong> and climbing. The general SMART thresholds I use for this call:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>SMART Attribute</th>
+            <th>Threshold</th>
+            <th>Meaning</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Reallocated_Sector_Ct &gt; 100</td>
+            <td>⚠️ Watch</td>
+            <td>Sectors relocated after failing &mdash; early warning</td>
+          </tr>
+          <tr>
+            <td>Reallocated_Sector_Ct &gt; 500</td>
+            <td>🔴 Failing</td>
+            <td>Drain ASAP &mdash; this disk was well past this line</td>
+          </tr>
+          <tr>
+            <td>Current_Pending_Sector &gt; 0</td>
+            <td>🔴 Unreadable sectors</td>
+            <td>Causes I/O errors mid-transfer</td>
+          </tr>
+          <tr>
+            <td>Offline_Uncorrectable &gt; 0</td>
+            <td>🔴 Permanent damage</td>
+            <td>Sectors that can never be recovered</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout warn">
+        &ldquo;SMART overall: PASSED&rdquo; is misleading on its own &mdash; a disk can report an overall pass while carrying hundreds of bad sectors. The individual attributes are what matter, not the summary verdict.
+      </div>
+
+      <h3>Parallel Rsync Made It Worse</h3>
+
+      <p>The first drain attempt ran two rsync jobs in parallel &mdash; splitting the disk's remaining data across two destination targets simultaneously, the same pattern that works fine for a healthy disk. On a disk that's actively failing, this was the wrong call: two concurrent read streams hitting an already-stressed drive meant more seeks, more retries, and the reallocated sector count climbing visibly faster during the transfer itself. Switching to a single sequential job &mdash; one destination at a time, no split I/O &mdash; was both safer and, in practice, faster overall. Keeping all reads focused on one job at a time instead of thrashing the head between two targets turned out to matter more than the theoretical throughput gain from parallelism.</p>
+
+      <pre><code>rsync -a --no-compress --partial --append-verify \
+  --ignore-errors --ignore-missing-args \
+  --remove-source-files \
+  --log-file=/tmp/rsync-drain.log \
+  /mnt/disk-failing/movies/ /mnt/disk-target/movies/</code></pre>
+
+      <ul>
+        <li><code>--ignore-errors</code> &mdash; skip unreadable sectors and keep going instead of aborting the whole job on the first bad read</li>
+        <li><code>--partial --append-verify</code> &mdash; resume interrupted files instead of restarting from zero when the disk drops out mid-transfer</li>
+        <li><code>--remove-source-files</code> &mdash; only deletes the source copy after a file is actually, successfully transferred</li>
+      </ul>
+
+      <h3>The Five-Minute Watchdog</h3>
+
+      <p>A failing disk doesn't drain in one clean pass &mdash; it drops out, the array occasionally needs a restart to make the disk briefly readable again, and babysitting that manually for hours is a bad use of attention. A small watchdog script ran as a cron job every 5 minutes:</p>
+
+      <ol>
+        <li>Check if the rsync job is still running &mdash; if yes, do nothing</li>
+        <li>If rsync stopped and the disk is still accessible, relaunch it (always <code>pkill</code> any stale process first &mdash; otherwise multiple rsync instances stack up)</li>
+        <li>If the disk is inaccessible (I/O error), restart the Unraid array (<code>mdcmd stop</code> / <code>mdcmd start</code>), wait, and check again</li>
+        <li>If the disk comes back, relaunch the transfer automatically</li>
+        <li>If the disk stays dead, send an alert instead of retrying forever</li>
+      </ol>
+
+      <p>This meant the drain ran unattended across the hours it needed, self-healing through the disk's intermittent dropouts, with a human only pulled in if it genuinely couldn't recover on its own. It's the same principle that ran through the Telegram-monitored migration in the last post &mdash; instrument it, let it recover automatically where it safely can, alert on the cases it can't.</p>
+
+      <p>Not every file moved cleanly on the first pass &mdash; a portion of the data needed to be re-drained and re-copied after the disk dropped out and came back, since a completed-looking rsync summary doesn't always mean every file transferred (a skipped, already-matching file on the destination doesn't get removed from the source, and a disk dropout mid-file needs a second pass to actually finish it). No data was permanently lost, but it took more than one clean sweep to confirm the disk was genuinely empty before pulling it from the array.</p>
+
+      <p>The replacement drive is a 4 TB unit &mdash; double the capacity of the 2 TB disk it replaced, which is the obvious move when you're already swapping a failing drive for a new one.</p>
+
+      <h2>Running the Entire Recovery With No Safety Net</h2>
+
+      <p>The detail that makes this week different from a routine disk swap: none of it happened with parity protection running. Parity had been deliberately deferred since the original NAS-to-DAS migration, and there's a hard rule for exactly this situation &mdash; <strong>don't add a new parity disk while a failing disk is still being drained.</strong> Parity sync reads every disk in the array, including the dying one, and that extra read load is more likely to push a failing disk over the edge mid-rebuild, at the worst possible time.</p>
+
+      <p>So the correct order was: finish both drive replacements completely, confirm the failing disk was genuinely empty, remove it from the array, then &mdash; only after all of that &mdash; assign parity. Which meant the entire boot-SSD swap and the entire multi-hour data disk drain ran back-to-back with the array fully exposed. Any unrelated failure on any of the other five data disks during that window would have been unrecoverable. Nothing else failed. But it's worth being honest that this stretch was the least protected the array has been at any point since the original Synology retirement &mdash; the whole point of that migration was to stop running unprotected, and for a few days, protection was still not there while the fix for the first problem was underway.</p>
+
+      <h2>Where Things Stand Right Now</h2>
+
+      <p>Both replacements are done. The array is back to six healthy data disks plus the new cache/boot SSD, and &mdash; for the first time since this whole migration started &mdash; a parity disk is finally being assigned and synced.</p>
+
+      <div class="status-grid">
+        <div class="status-card done">
+          <div class="label">✓ Boot/Cache SSD</div>
+          <div class="value">Replaced &amp; Healthy</div>
+          <div class="size">256 GB Samsung — internal-SSD-boot restored</div>
+        </div>
+        <div class="status-card done">
+          <div class="label">✓ Data Disk</div>
+          <div class="value">Replaced &amp; Healthy</div>
+          <div class="size">4 TB — was 2 TB (ST2000DM001, retired)</div>
+        </div>
+        <div class="status-card active">
+          <div class="label">▶ Parity Sync</div>
+          <div class="value">In Progress</div>
+          <div class="size">~2% complete, ~46 MB/s, ETA ~2 days 7 hours</div>
+        </div>
+        <div class="status-card done">
+          <div class="label">✓ Array Health</div>
+          <div class="value">6/6 Data Disks OK</div>
+          <div class="size">0 errors across the array</div>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Slot</th>
+            <th>Model</th>
+            <th>Size</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Parity</td>
+            <td>ST10000NM017B</td>
+            <td>10 TB</td>
+            <td>⏳ Syncing (first assignment)</td>
+          </tr>
+          <tr>
+            <td>Disk 1</td>
+            <td>ST10000NM0086</td>
+            <td>10 TB</td>
+            <td>✅ OK</td>
+          </tr>
+          <tr>
+            <td>Disk 2</td>
+            <td>Toshiba MG06ACA10TEY</td>
+            <td>10 TB</td>
+            <td>✅ OK</td>
+          </tr>
+          <tr>
+            <td>Disk 3</td>
+            <td>WDC WD40EFPX</td>
+            <td>4 TB</td>
+            <td>✅ OK</td>
+          </tr>
+          <tr>
+            <td>Disk 4</td>
+            <td>WDC WD40EFPX (new)</td>
+            <td>4 TB</td>
+            <td>✅ OK — replaced the failed 2 TB disk</td>
+          </tr>
+          <tr>
+            <td>Disk 5</td>
+            <td>ST2000LM015</td>
+            <td>2 TB</td>
+            <td>✅ OK</td>
+          </tr>
+          <tr>
+            <td>Disk 6</td>
+            <td>ST2000VN000</td>
+            <td>2 TB</td>
+            <td>✅ OK</td>
+          </tr>
+          <tr>
+            <td>Cache / Boot</td>
+            <td>Samsung SSD (new)</td>
+            <td>256 GB</td>
+            <td>✅ OK — replaced the failed 500 GB SSD</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>Total usable data capacity across the six array disks is just under 32 TB raw (~30 TB usable once formatting overhead is accounted for), protected by the 10 TB parity disk currently syncing. Once parity finishes, this is the first time since the original Synology retirement began that the array has real redundancy &mdash; any single future disk failure becomes a routine rebuild instead of a scramble.</p>
+
+      <div class="callout">
+        Parity sync reads every data disk sequentially to build the parity map, so array performance is reduced until it completes. At ~46 MB/s and just under 2% in, current ETA is a little over 2 days. No files are at risk during this window &mdash; it's a read-and-compute operation, not a write operation to the data disks.
+      </div>
+
+      <h2>Lessons</h2>
+
+      <ul>
+        <li><strong>Bare metal beats virtualization for disk health visibility.</strong> If a storage array's health data matters, don't trust SMART readings through a VM's virtual disk layer &mdash; get the array on hardware that talks to the physical controller directly, or budget for the fact that real failures can stay hidden until you do.</li>
+        <li><strong>Sequential beats parallel on a dying disk.</strong> The instinct to parallelize a drain for speed is wrong when the source disk is the bottleneck's cause, not its cure &mdash; splitting I/O across a failing drive accelerates its failure.</li>
+        <li><strong>Automate the recovery loop, not just the monitoring.</strong> A watchdog that only alerts you to go fix something manually is half a solution. One that safely restarts the array and relaunches the transfer on its own turns an hours-long babysitting job into something you check on periodically instead of constantly.</li>
+        <li><strong>Never add parity while a disk is actively failing.</strong> It's tempting to want redundancy back as fast as possible, but adding parity mid-crisis makes the crisis worse. Finish the recovery, confirm the array is clean, then protect it.</li>
+      </ul>
+
+      <p>The irony isn't lost on me: a migration that was explicitly designed to eliminate the risk of running unprotected storage ended up running unprotected for longer than planned, because the move that was supposed to finish the job is what surfaced the failures in the first place. The array is healthier for it now than it would have been left alone on the VM, quietly accumulating bad sectors that nothing was watching for. Once parity finishes syncing in a couple of days, this migration is finally, actually done.</p>
+
+      <div class="series-nav">
+        <strong>Homelab Series:</strong>
+        <a href="/blog/posts/homelab-start-here">Start Here</a>
+        <a href="/blog/posts/homelab-docker-compose-stack">Docker Compose Stack</a>
+        <a href="/blog/posts/homelab-sso-authentik">SSO with Authentik</a>
+        <a href="/blog/posts/homelab-backup-automation">Backup Automation</a>
+        <a href="/blog/posts/homelab-disaster-recovery">Disaster Recovery</a>
+        <a href="/blog/posts/homelab-secrets-management">Secrets Management</a>
+        <a href="/blog/posts/homelab-xcaddy-cloudflare-tunnel-adguard">Xcaddy + Tunnel + AdGuard</a>
+        <a href="/blog/posts/homelab-vaultwarden-self-hosted-passwords">Vaultwarden</a>
+        <a href="/blog/posts/homelab-p2v-proxmox-migration">P2V to Proxmox</a>
+        <a href="/blog/posts/homelab-proxmox-lxc-decomposition">LXC Decomposition</a>
+        <a href="/blog/posts/homelab-full-lxc-migration">Full LXC Migration</a>
+        <a href="/blog/posts/homelab-telegram-yt-dlp-bot">Telegram Video Bot</a>
+        <a href="/blog/posts/homelab-hermes-ai-agent">AI Brain with Hermes</a>
+        <a href="/blog/posts/homelab-nas-to-das-migration">NAS to DAS Migration</a>
+        <a href="/blog/posts/homelab-double-disk-failure-without-parity">Double Disk Failure Without Parity</a>
+      </div>
+    </article>
+  </div>
+</body>
+
+</html>
