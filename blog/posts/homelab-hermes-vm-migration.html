@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Homelab Brain Transplant: Giving Hermes a Proper Linux Home | Anas Semesmieh</title>
+  <meta name="description" content="How I migrated Hermes AI agent from a Windows laptop to a Proxmox VM — systemd services, Tailscale DNS pitfalls, Electron on RDP, and why VMs are the right home for always-on agents." />
+  <meta name="keywords" content="Anas Semesmieh, Hermes, AI agent, Proxmox, Debian, migration, self-hosting, systemd, Tailscale, homelab" />
+  <meta name="author" content="Anas Semesmieh" />
+  <link rel="canonical" href="https://anas.semesmieh.com/blog/posts/homelab-hermes-vm-migration" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Homelab Brain Transplant: Giving Hermes a Proper Linux Home" />
+  <meta property="og:description" content="How I migrated Hermes AI agent from a Windows laptop to a Proxmox VM — systemd services, Tailscale DNS pitfalls, Electron on RDP, and why VMs are the right home for always-on agents." />
+  <meta property="og:url" content="https://anas.semesmieh.com/blog/posts/homelab-hermes-vm-migration" />
+  <meta property="og:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Homelab Brain Transplant: Giving Hermes a Proper Linux Home" />
+  <meta name="twitter:description" content="How I migrated Hermes AI agent from a Windows laptop to a Proxmox VM — systemd services, Tailscale DNS pitfalls, Electron on RDP, and why VMs are the right home for always-on agents." />
+  <meta name="twitter:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #101a2c;
+      --muted: #8ea0be;
+      --text: #e6eef8;
+      --accent: #16a34a;
+      --border: rgba(255, 255, 255, 0.08);
+      --maxw: 800px;
+      --radius: 14px;
+      --font: "IBM Plex Sans", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.72;
+      background: var(--bg);
+    }
+
+    .wrap { max-width: var(--maxw); margin: 0 auto; padding: 30px 18px 80px; }
+    .nav { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+    .nav a { text-decoration: none; color: var(--muted); padding: 8px 12px; border-radius: 10px; }
+    .nav a:hover { color: var(--text); background: rgba(255, 255, 255, 0.03); }
+    article { border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; background: var(--card); }
+    h1 { margin-top: 0; font-size: 34px; line-height: 1.2; }
+    .meta { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+    h2 { margin-top: 28px; }
+    pre {
+      background: #0a1628;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    code { font-family: "IBM Plex Mono", "Fira Code", monospace; font-size: 13px; }
+    p code, li code {
+      background: rgba(255,255,255,0.07);
+      padding: 2px 6px;
+      border-radius: 5px;
+    }
+    ul, ol { padding-left: 22px; }
+    li { margin-bottom: 6px; }
+    .callout {
+      border-left: 3px solid var(--accent);
+      background: rgba(22, 163, 74, 0.07);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px;
+      margin: 20px 0;
+      font-size: 15px;
+    }
+    .callout.warn {
+      border-left-color: #f59e0b;
+      background: rgba(245, 158, 11, 0.07);
+    }
+    table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 14px; }
+    th { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border); color: var(--muted); }
+    td { padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: top; }
+    .series-nav { margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 14px; }
+    .series-nav strong { display: block; color: var(--muted); margin-bottom: 10px; }
+    .series-nav a { color: var(--muted); text-decoration: none; margin-right: 14px; line-height: 2; }
+    .series-nav a:hover { color: var(--text); }
+    .series-nav a.current { color: var(--text); font-weight: 600; }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Homelab Brain Transplant: Giving Hermes a Proper Linux Home",
+    "datePublished": "2026-07-12",
+    "dateModified": "2026-07-12",
+    "author": {
+      "@type": "Person",
+      "name": "Anas Semesmieh",
+      "url": "https://anas.semesmieh.com/about/"
+    },
+    "publisher": {
+      "@type": "Person",
+      "name": "Anas Semesmieh"
+    },
+    "mainEntityOfPage": "https://anas.semesmieh.com/blog/posts/homelab-hermes-vm-migration",
+    "image": "https://anas.semesmieh.com/profile-wide.jpg",
+    "description": "How I migrated Hermes AI agent from a Windows laptop to a Proxmox VM — systemd services, Tailscale DNS pitfalls, Electron on RDP, and why VMs are the right home for always-on agents."
+  }
+  </script>
+</head>
+
+<body>
+  <div class="wrap">
+    <nav class="nav" aria-label="Post navigation">
+      <a href="/">Portfolio</a>
+      <a href="/blog/">All Posts</a>
+      <a href="/blog/categories/">Categories</a>
+      <a href="/blog/tags/">Tags</a>
+      <a href="/blog/rss.xml">RSS</a>
+    </nav>
+
+    <article>
+      <h1>Homelab Brain Transplant: Giving Hermes a Proper Linux Home</h1>
+      <p class="meta">By <a href="/about/">Anas Semesmieh</a> · July 12, 2026 · Homelab, AI, Proxmox, Self-Hosting, Automation</p>
+
+      <p>
+        Earlier this year I <a href="/blog/posts/homelab-hermes-ai-agent">wired Hermes into my homelab</a> — an AI agent running locally, connected to Telegram, with memory, skills, cron jobs, and a Mnemosyne dashboard. It worked well. It worked from my Windows laptop. And that was quietly the problem all along.
+      </p>
+      <p>
+        Closing the lid killed Telegram. A restart needed the startup scripts to fire in the right order. A reboot during a long cron job meant silent data loss. The agent had a brain, but the brain lived in the wrong body. Today I fixed that.
+      </p>
+
+      <h2>Why the transplant was overdue</h2>
+      <p>There were four compounding reasons, each enough on its own:</p>
+      <ul>
+        <li><strong>Single point of failure.</strong> The Telegram gateway ran as a Windows startup script. Laptop closed, lid down, or Windows Update deciding it's reboot time at 3am? Gateway dead. No messages delivered, no cron jobs fired, no agent.</li>
+        <li><strong>Startup scripts are not services.</strong> There's a reason Linux has systemd. Startup scripts don't restart on failure, don't log to a structured journal, don't have dependency ordering, and don't survive logout. Running a long-lived agent process this way was always a workaround, not a solution.</li>
+        <li><strong>Windows was never the right home.</strong> Hermes is a Linux-native tool. Running it on Windows meant dealing with CRLF line endings corrupting <code>.env</code> files, path separators scattered through config and cron job prompts, no native rsync, and Electron needing extra flags to work at all on a real Linux desktop.</li>
+        <li><strong>Blast radius on compromise.</strong> An AI agent with terminal access, SSH keys, GitHub credentials, and Telegram access is a high-value target. Running it on my daily-use laptop means a compromise takes everything with it. A VM is isolated by design — it has its own network namespace, its own disk, and a PBS backup that means worst case is a rollback, not a full laptop wipe.</li>
+      </ul>
+
+      <h2>Picking the body</h2>
+      <p>
+        The VM landed on the same Proxmox node that hosts the rest of my homelab. The spec is deliberately modest — this is an agent, not a model host:
+      </p>
+      <table>
+        <tr><th>Property</th><th>Value</th></tr>
+        <tr><td>OS</td><td>Debian 13 (Trixie)</td></tr>
+        <tr><td>CPU</td><td>4 vCPU</td></tr>
+        <tr><td>RAM</td><td>8 GB</td></tr>
+        <tr><td>Disk</td><td>80 GB SSD-LVM</td></tr>
+        <tr><td>IP</td><td>192.168.20.69 (static)</td></tr>
+        <tr><td>Tailscale</td><td>100.125.95.69</td></tr>
+        <tr><td>Desktop</td><td>XFCE + xrdp</td></tr>
+      </table>
+      <p>
+        Debian 13 over Ubuntu because it's lighter, and I already had the pattern from previous LXC work. XFCE because Hermes has an Electron desktop app and I needed a real display server for it — not just a headless server. Tailscale from day one because the agent needs to reach Gitea on another node, and Tailscale makes that a non-event.
+      </p>
+
+      <h2>The migration plan</h2>
+      <p>
+        I broke it into 12 phases with a hard rule: <strong>Windows stays primary until Phase 11</strong>. The Telegram gateway stayed running on the laptop through all the setup, config, and testing. Only at the end, once everything was verified, did I stop Windows and start the VM.
+      </p>
+      <table>
+        <tr><th>Phase</th><th>What</th></tr>
+        <tr><td>1–4</td><td>VM creation, networking, Tailscale, desktop, Hermes + Copilot auth</td></tr>
+        <tr><td>5</td><td>Migrate Mnemosyne DB, skills, SSH keys, cron jobs, config, scripts</td></tr>
+        <tr><td>6</td><td>Clone repos (Gitea + GitHub), set per-repo git identities, fix paths</td></tr>
+        <tr><td>7</td><td>systemd services for gateway + Mnemosyne dashboard</td></tr>
+        <tr><td>8</td><td>Update Caddy: <code>h-mem.semesmieh.com → 192.168.20.69:8765</code></td></tr>
+        <tr><td>9</td><td>Activate crons on VM, pause on Windows</td></tr>
+        <tr><td>10</td><td>Validation pass — SSH, git, Mnemosyne, Tailscale, browser</td></tr>
+        <tr><td>11</td><td>Cutover — start VM gateway, stop Windows gateway</td></tr>
+        <tr><td>12</td><td>PBS backup + Proxmox snapshot, decommission Windows Hermes</td></tr>
+      </table>
+
+      <h2>What moved and how</h2>
+      <p>
+        Phase 5 was mostly mechanical but had a few wrinkles worth noting. No rsync on Windows — so everything was piped through SSH using <code>tar</code>:
+      </p>
+      <pre><code>cd "C:/Users/anass/AppData/Local/hermes/"
+tar czf - skills/ | ssh anas@192.168.20.69 "tar xzf - -C ~/.hermes/"</code></pre>
+      <p>
+        The Mnemosyne SQLite database migrated cleanly with a straight <code>scp</code> of the <code>.db</code>, <code>.db-shm</code>, and <code>.db-wal</code> files. SSH key pairs all transferred with <code>scp</code>, then <code>chmod 600</code> on the VM.
+      </p>
+      <p>
+        The trickier part was path cleanup. The Windows config, cron job prompts, and skill files all contained paths like <code>C:/Users/anass/Desktop/Homelab</code> or <code>/c/Users/anass/.ssh</code>. A few targeted <code>sed</code> passes replaced them with <code>/home/anas/</code>. The <code>.env</code> file also arrived with Windows CRLF line endings — which silently corrupted the Telegram bot token until I ran <code>sed -i 's/\r//' ~/.hermes/.env</code>.
+      </p>
+
+      <div class="callout warn">
+        <strong>CRLF is a silent killer.</strong> The Telegram gateway started, showed "Connecting to Telegram (attempt 1/8)…", and hung indefinitely — not because of a network issue, but because the bot token had a trailing <code>\r</code> that made it invalid. Always strip Windows line endings from any file transferred to Linux.
+      </div>
+
+      <h2>Making it a proper service</h2>
+      <p>
+        Rather than manually creating systemd unit files, I used <code>hermes gateway install</code> — which writes a proper user-level systemd service, enables linger so it survives logout, and registers it under <code>~/.config/systemd/user/</code>. The gateway runs as the <code>anas</code> user, not root.
+      </p>
+      <pre><code>hermes gateway install
+# Creates ~/.config/systemd/user/hermes-gateway.service
+# Enables linger: loginctl enable-linger anas
+# Starts the service
+
+systemctl --user status hermes-gateway</code></pre>
+      <p>
+        The Mnemosyne dashboard runs as a separate systemd system service on port 8765, fronted by Caddy with TLS. Updating Caddy was a one-liner:
+      </p>
+      <pre><code># /etc/caddy/Caddyfile on 192.168.20.71
+h-mem.semesmieh.com {
+  reverse_proxy http://192.168.20.69:8765  # was 192.168.20.5
+}</code></pre>
+      <p>
+        One mistake I made: I initially hand-wrote a system-level <code>/etc/systemd/system/hermes-gateway.service</code> unit. This conflicted with the user-level service that <code>hermes gateway install</code> creates, leading to confusing behaviour where <code>hermes gateway status</code> and <code>systemctl status hermes-gateway</code> reported different things. Lesson: let Hermes manage its own service file.
+      </p>
+
+      <h2>The gotchas</h2>
+      <p>The happy path took about two hours. The gotchas took another two. Here's what bit me:</p>
+
+      <h3>1. Tailscale MagicDNS blocking HuggingFace CDN</h3>
+      <p>
+        On first message after cutover, Telegram showed "typing" — and nothing came back. The gateway logs showed it was stuck loading the fastembed embedding model for Mnemosyne. The model download was hanging silently.
+      </p>
+      <p>
+        The culprit: Tailscale MagicDNS was resolving <code>us.aws.cdn.hf.co</code> (HuggingFace's CDN) to <code>0.0.0.0</code>, making the download silently fail with a connection refused. The fix was to temporarily disable MagicDNS, download the model, then re-enable:
+      </p>
+      <pre><code>tailscale set --accept-dns=false
+curl -L 'https://huggingface.co/qdrant/bge-small-en-v1.5-onnx-q/resolve/main/model_optimized.onnx' \
+  -o ~/.hermes/cache/fastembed/models--qdrant--bge-small-en-v1.5-onnx-q/snapshots/.../model_optimized.onnx
+tailscale set --accept-dns=true</code></pre>
+      <p>
+        Once the 64MB ONNX model is cached locally, this never happens again. But it's a gotcha worth knowing: any Tailscale node that uses MagicDNS with custom split-DNS may block external CDNs that happen to share a pattern with internal names.
+      </p>
+
+      <h3>2. Electron crashing silently on RDP</h3>
+      <p>
+        Running <code>hermes desktop</code> in the XFCE terminal launched the process, printed a few lines, and exited with no obvious error. Two flags fixed it:
+      </p>
+      <pre><code>/path/to/Hermes --no-sandbox --disable-gpu</code></pre>
+      <ul>
+        <li><strong><code>--no-sandbox</code></strong>: Electron normally uses Linux kernel user namespaces for renderer process sandboxing. Debian 13 restricts unprivileged user namespaces by default — the sandbox fails to start and the whole app exits. This flag disables the sandbox layer. Safe on a personal VM you control.</li>
+        <li><strong><code>--disable-gpu</code></strong>: Over RDP there's no GPU. Electron's GPU process crashes trying to initialise hardware acceleration that doesn't exist, taking the main process with it. Software rendering works fine over RDP.</li>
+      </ul>
+      <p>
+        These flags are standard for Electron in VM/container/RDP environments. I updated the launcher wrapper script to pass them unconditionally on this host.
+      </p>
+
+      <h3>3. Stale Chromium systemd scopes</h3>
+      <p>
+        Every crashed Electron instance leaves a stale <code>app-org.chromium.Chromium-XXXXX.scope</code> registered in the user systemd session. The next launch tries to register a new scope with the same base name, hits <code>UnitExists</code>, logs an error, and exits. The launcher now runs a cleanup step first:
+      </p>
+      <pre><code>systemctl --user stop "app-org.chromium.Chromium*.scope" 2>/dev/null || true
+systemctl --user reset-failed 2>/dev/null || true</code></pre>
+
+      <h3>4. Two gateway services fighting each other</h3>
+      <p>
+        During setup I hand-wrote a system-level unit file for the gateway, then later ran <code>hermes gateway install</code> which created a user-level one. Both enabled, both trying to start. The system service would crash (couldn't find user home), systemd would restart it, and the user service would detect "a gateway is already running" and refuse to start. The fix: remove the hand-written system unit entirely and let <code>hermes gateway install</code> own the service lifecycle.
+      </p>
+
+      <h2>The result</h2>
+      <p>
+        As of today, Hermes runs entirely from <code>hermes-vm</code>:
+      </p>
+      <table>
+        <tr><th>Component</th><th>Where</th><th>How</th></tr>
+        <tr><td>Telegram gateway</td><td>hermes-vm</td><td>systemd user service, survives logout</td></tr>
+        <tr><td>Mnemosyne dashboard</td><td>hermes-vm:8765</td><td>systemd system service, Caddy TLS frontend</td></tr>
+        <tr><td>Hermes Desktop</td><td>hermes-vm</td><td>Electron via XFCE + xrdp, <code>--no-sandbox --disable-gpu</code></td></tr>
+        <tr><td>Browser tool</td><td>hermes-vm</td><td>Chromium + Xvfb on <code>:99</code></td></tr>
+        <tr><td>Cron jobs (3)</td><td>hermes-vm</td><td>Managed by gateway scheduler</td></tr>
+        <tr><td>PBS backup</td><td>unraid-pbs</td><td>Post-migration snapshot + full backup done</td></tr>
+      </table>
+      <p>
+        The Windows laptop is a laptop again. No startup scripts, no gateway to keep alive, no risk that a Windows Update reboot silences my agent at midnight.
+      </p>
+
+      <div class="callout">
+        <strong>The migration took a full day end-to-end</strong> — most of that was the gotchas. The actual data migration (Phase 5–6) was under 30 minutes. If you're running Hermes on Windows and thinking about moving it to a VM, the path is well-worn now.
+      </div>
+
+      <h2>What's next</h2>
+      <p>
+        The VM is the new home. Next steps are operational hardening: monitoring the gateway with a healthcheck cron that alerts if it goes quiet, exploring whether the Mnemosyne embedding model can be pre-warmed on service start to avoid the first-message delay, and potentially adding a second PBS backup schedule now that the agent's data matters more. The brain is in a better body — time to see how it runs.
+      </p>
+
+      <div class="series-nav">
+        <strong>Homelab Series:</strong>
+        <a href="/blog/posts/homelab-start-here">Start Here</a>
+        <a href="/blog/posts/homelab-docker-compose-stack">Docker Compose Stack</a>
+        <a href="/blog/posts/homelab-sso-authentik">SSO with Authentik</a>
+        <a href="/blog/posts/homelab-backup-automation">Backup Automation</a>
+        <a href="/blog/posts/homelab-disaster-recovery">Disaster Recovery</a>
+        <a href="/blog/posts/homelab-secrets-management">Secrets Management</a>
+        <a href="/blog/posts/homelab-xcaddy-cloudflare-tunnel-adguard">Xcaddy + Tunnel + AdGuard</a>
+        <a href="/blog/posts/homelab-vaultwarden-self-hosted-passwords">Vaultwarden</a>
+        <a href="/blog/posts/homelab-p2v-proxmox-migration">P2V to Proxmox</a>
+        <a href="/blog/posts/homelab-proxmox-lxc-decomposition">LXC Decomposition</a>
+        <a href="/blog/posts/homelab-full-lxc-migration">Full LXC Migration</a>
+        <a href="/blog/posts/homelab-telegram-yt-dlp-bot">Telegram Video Bot</a>
+        <a href="/blog/posts/homelab-hermes-ai-agent">AI Brain with Hermes</a>
+        <a href="/blog/posts/homelab-nas-to-das-migration">NAS to DAS Migration</a>
+        <a href="/blog/posts/homelab-double-disk-failure-without-parity">Double Disk Failure Without Parity</a>
+        <a href="/blog/posts/homelab-hermes-vm-migration" class="current">Brain Transplant: Hermes to VM</a>
+      </div>
+    </article>
+  </div>
+</body>
+
+</html>
