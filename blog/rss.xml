@@ -5,7 +5,15 @@
     <link>https://anas.semesmieh.com/blog/</link>
     <description>Platform engineering, Azure architecture, DevSecOps, and engineering leadership insights.</description>
     <language>en-au</language>
-    <lastBuildDate>Sat, 12 Jul 2026 12:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 18 Jul 2026 12:00:00 +0000</lastBuildDate>
+
+    <item>
+      <title>Your DNS Knows Too Much: Building a Private Recursive Resolver with Unbound</title>
+      <link>https://anas.semesmieh.com/blog/posts/homelab-unbound-recursive-dns</link>
+      <guid>https://anas.semesmieh.com/blog/posts/homelab-unbound-recursive-dns</guid>
+      <pubDate>Fri, 18 Jul 2026 12:00:00 +0000</pubDate>
+      <description>AdGuard blocks ads but still forwards every query to Quad9 or Cloudflare. Here's how I replaced that with Unbound — a pure recursive resolver that queries root servers directly, with no upstream seeing your traffic.</description>
+    </item>
 
     <item>
       <title>Homelab Brain Transplant: Giving Hermes a Proper Linux Home</title>

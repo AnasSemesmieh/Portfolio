@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Your DNS Knows Too Much: Building a Private Recursive Resolver with Unbound | Anas Semesmieh</title>
+  <meta name="description" content="AdGuard blocks ads, but it still forwards every query to Quad9 or Cloudflare. Here's how I replaced that with Unbound — a pure recursive resolver that queries root servers directly, with no upstream seeing your traffic." />
+  <meta name="keywords" content="Anas Semesmieh, Unbound, DNS, recursive resolver, AdGuard Home, privacy, self-hosting, homelab, DNSSEC, Proxmox LXC" />
+  <meta name="author" content="Anas Semesmieh" />
+  <link rel="canonical" href="https://anas.semesmieh.com/blog/posts/homelab-unbound-recursive-dns" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Your DNS Knows Too Much: Building a Private Recursive Resolver with Unbound" />
+  <meta property="og:description" content="AdGuard blocks ads, but it still forwards every query to Quad9 or Cloudflare. Here's how I replaced that with Unbound — a pure recursive resolver that queries root servers directly, with no upstream seeing your traffic." />
+  <meta property="og:url" content="https://anas.semesmieh.com/blog/posts/homelab-unbound-recursive-dns" />
+  <meta property="og:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Your DNS Knows Too Much: Building a Private Recursive Resolver with Unbound" />
+  <meta name="twitter:description" content="AdGuard blocks ads, but it still forwards every query to Quad9 or Cloudflare. Here's how I replaced that with Unbound — a pure recursive resolver that queries root servers directly, with no upstream seeing your traffic." />
+  <meta name="twitter:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #101a2c;
+      --muted: #8ea0be;
+      --text: #e6eef8;
+      --accent: #22c55e;
+      --heading: #60a5fa;
+      --border: rgba(255, 255, 255, 0.07);
+      --maxw: 860px;
+      --radius: 16px;
+      --font: "Inter", "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+    }
+
+    body {
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.75;
+      background:
+        radial-gradient(ellipse at 15% 0%, #13203a 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 15%, #0e1a32 0%, transparent 45%),
+        var(--bg);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+    }
+
+    .nav {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: var(--muted);
+      padding: 7px 13px;
+      border-radius: 10px;
+      font-size: 14px;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .nav a:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    article {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      background: var(--card);
+    }
+
+    h1 {
+      font-size: 36px;
+      line-height: 1.2;
+      color: var(--heading);
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 14px;
+      margin: 10px 0 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h2 {
+      margin-top: 32px;
+      margin-bottom: 12px;
+      font-size: 24px;
+      color: var(--heading);
+    }
+
+    h3 {
+      margin-top: 24px;
+      margin-bottom: 8px;
+      color: #86efac;
+      font-size: 18px;
+    }
+
+    p {
+      margin: 10px 0;
+    }
+
+    ul, ol {
+      margin: 10px 0;
+      padding-left: 22px;
+    }
+
+    li {
+      margin: 4px 0;
+    }
+
+    .callout {
+      border-left: 3px solid var(--accent);
+      padding: 12px 16px;
+      background: rgba(34, 197, 94, 0.07);
+      border-radius: 10px;
+      margin: 20px 0;
+    }
+
+    .callout.warn {
+      border-left-color: #fbbf24;
+      background: rgba(251, 191, 36, 0.07);
+    }
+
+    code {
+      background: rgba(255, 255, 255, 0.07);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13.5px;
+    }
+
+    pre {
+      background: rgba(0, 0, 0, 0.35);
+      padding: 16px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.55;
+      color: #e6eef8;
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0;
+      font-size: 14px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .series-nav {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .series-nav a {
+      display: inline-block;
+      margin-right: 12px;
+    }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Your DNS Knows Too Much: Building a Private Recursive Resolver with Unbound",
+    "datePublished": "2026-07-18",
+    "dateModified": "2026-07-18",
+    "author": {
+      "@type": "Person",
+      "name": "Anas Semesmieh",
+      "url": "https://anas.semesmieh.com/about/"
+    },
+    "publisher": {
+      "@type": "Person",
+      "name": "Anas Semesmieh"
+    },
+    "mainEntityOfPage": "https://anas.semesmieh.com/blog/posts/homelab-unbound-recursive-dns",
+    "image": "https://anas.semesmieh.com/profile-wide.jpg",
+    "description": "AdGuard blocks ads, but it still forwards every query to Quad9 or Cloudflare. Here's how I replaced that with Unbound — a pure recursive resolver that queries root servers directly, with no upstream seeing your traffic."
+  }
+  </script>
+</head>
+
+<body>
+  <div class="wrap">
+    <nav class="nav" aria-label="Post navigation">
+      <a href="/">Portfolio</a>
+      <a href="/blog/">All Posts</a>
+      <a href="/blog/categories/">Categories</a>
+      <a href="/blog/tags/">Tags</a>
+      <a href="/blog/rss.xml">RSS</a>
+    </nav>
+
+    <article>
+      <h1>Your DNS Knows Too Much: Building a Private Recursive Resolver with Unbound</h1>
+      <p class="meta">By <a href="/about/">Anas Semesmieh</a> · July 18, 2026 · Homelab, DNS, Privacy, Networking, Self-Hosting</p>
+
+      <p>
+        AdGuard Home is great. It blocks ads at the DNS layer, rewrites internal subdomains, enforces safe search,
+        and lets you inspect every query your network makes. I've had it running as a <a href="/blog/posts/homelab-xcaddy-cloudflare-tunnel-adguard">core part of my homelab stack</a>
+        for a while — a primary on a Proxmox LXC and a synced replica on Unraid for redundancy.
+      </p>
+
+      <p>
+        But there's something AdGuard doesn't solve on its own: <strong>every query it can't answer locally still
+        leaves your network</strong>. By default, it forwards those queries to an upstream resolver — Quad9,
+        Cloudflare, Google, whatever you configure. That upstream sees the full, unencrypted domain name for
+        every site your devices visit. You've just moved the trust boundary, not eliminated it.
+      </p>
+
+      <p>
+        This week I fixed that. Here's how I replaced the forwarding upstream with <strong>Unbound</strong> —
+        a pure recursive resolver that talks directly to the authoritative nameservers for every domain,
+        with no third party in the middle.
+      </p>
+
+      <h2>What DNS Forwarding Actually Means</h2>
+
+      <p>
+        When most people set up AdGuard, they configure an upstream like <code>https://dns.quad9.net/dns-query</code>.
+        That's DNS-over-HTTPS (DoH) — the transport is encrypted, which is good, but it doesn't change who
+        <em>receives</em> the query. Quad9 still sees your full question: "what's the IP for this domain?"
+        DoH just hides it from your ISP. Quad9 itself has full visibility.
+      </p>
+
+      <p>
+        Whether you trust Quad9 is a separate question. The point is you're <em>trusting someone</em>. They have
+        your IP and a timestamped log of every domain your network looked up. That's a lot of signal about
+        what you're doing, when, and how often.
+      </p>
+
+      <p>
+        A <strong>recursive resolver</strong> works differently. Instead of forwarding to a trusted third party,
+        it resolves the answer itself by walking the DNS tree from the root:
+      </p>
+
+      <pre><code>You: "what's github.com?"
+
+Unbound → Root servers (a.root-servers.net etc.)
+          "Who handles .com?"
+          ← "Verisign"
+
+Unbound → Verisign (.com TLD servers)
+          "Who handles github.com?"
+          ← "ns1.p16.dynect.net"
+
+Unbound → ns1.p16.dynect.net (GitHub's own nameserver)
+          "What's github.com?"
+          ← "140.82.121.4"</code></pre>
+
+      <p>
+        No single upstream sees the full query. The root servers only see "who handles .com?". Verisign only
+        sees "who handles github.com?". GitHub's nameserver only sees the final question. Each hop knows as
+        little as possible — this is called <strong>qname minimisation</strong> (RFC 7816), and Unbound
+        enables it by default.
+      </p>
+
+      <div class="callout">
+        <strong>The privacy win in one sentence:</strong> Quad9 and Cloudflare go from seeing every domain
+        your network queries to seeing nothing at all.
+      </div>
+
+      <h2>What I Already Had</h2>
+
+      <p>
+        Before this change, my DNS setup looked like this:
+      </p>
+
+      <pre><code>Devices → AdGuard Primary (CT101, 192.168.20.70:53)
+  └─ *.semesmieh.com rewrites → 192.168.20.71 (Caddy)
+  └─ Everything else → Quad9 DoH (load-balanced across 3 endpoints)
+
+AdGuard Mirror (192.168.20.79, Unraid) — replica via adguardhome-sync on CT108</code></pre>
+
+      <p>
+        I started this week by verifying both instances were healthy — checking query counts, confirming the
+        adguardhome-sync was propagating filter lists correctly, and making sure neither instance had stuck
+        stats. Everything checked out: 58K+ queries/day on the primary, 29 filter lists synced identically
+        on both sides, last sync successful. Good baseline.
+      </p>
+
+      <p>
+        Which made it a good time to improve the upstream rather than fix anything broken.
+      </p>
+
+      <h2>The Architecture Decision</h2>
+
+      <p>Two choices upfront:</p>
+
+      <h3>Run Unbound inside CT101 alongside AdGuard?</h3>
+
+      <p>
+        Tempting — no new container to manage, sub-millisecond loopback latency. But CT101 already uses
+        677 MB of RAM running AdGuard (with 29 blocklists in memory), and more importantly: I have
+        <em>two</em> AdGuard instances. Both should use the same recursive resolver — which means a
+        standalone Unbound that both can point to makes more architectural sense than one embedded in CT101
+        and one replica still hitting Quad9.
+      </p>
+
+      <p>
+        There's also a failure domain argument. If CT101 crashes, AdGuard and Unbound go down together.
+        With a separate LXC, the layers fail independently.
+      </p>
+
+      <h3>Forwarding over DoT vs. pure recursive?</h3>
+
+      <p>
+        Forwarding over DNS-over-TLS to Quad9 is slightly faster on cold queries (no need to walk from root),
+        but you're still trusting an upstream. Pure recursive is slower on the very first lookup for an
+        uncached domain — maybe 100–300ms while it walks root → TLD → authoritative — but after that
+        everything is cached and fast. With prefetch enabled, frequently-queried domains are renewed before
+        their TTL expires, so common sites are always warm.
+      </p>
+
+      <p>The privacy win only exists with pure recursive. That was the goal.</p>
+
+      <h2>The Build</h2>
+
+      <h3>CT110 — a minimal LXC on ssd-lvm</h3>
+
+      <p>
+        Unbound is genuinely lean. 1 core, 256 MB RAM, 2 GB disk is plenty — the whole service idles at
+        around 30 MB resident after warmup. I created it as an unprivileged Debian 12 LXC on <code>ssd-lvm</code>
+        (same pool as CT101 and CT102):
+      </p>
+
+      <pre><code>pct create 110 local:vztmpl/debian-12-standard_12.12-1_amd64.tar.zst \
+  --hostname unbound \
+  --cores 1 \
+  --memory 256 \
+  --swap 0 \
+  --rootfs ssd-lvm:2 \
+  --net0 name=eth0,bridge=vmbr0,ip=192.168.20.80/24,gw=192.168.20.1 \
+  --nameserver 192.168.20.70 \
+  --unprivileged 1 \
+  --onboot 1</code></pre>
+
+      <p>Then installed Unbound and its dependencies:</p>
+
+      <pre><code>apt-get update && apt-get install -y unbound curl dnsutils</code></pre>
+
+      <h3>The config</h3>
+
+      <p>
+        I dropped a single file at <code>/etc/unbound/unbound.conf.d/homelab.conf</code>. Here it is with
+        commentary on the decisions that matter:
+      </p>
+
+      <pre><code>server:
+    # Port 5335 — AdGuard owns :53, Unbound is the upstream layer
+    interface: 0.0.0.0
+    port: 5335
+    do-ip4: yes
+    do-ip6: no
+    do-udp: yes
+    do-tcp: yes
+
+    # LAN-only access — no public exposure
+    access-control: 127.0.0.0/8 allow
+    access-control: 192.168.20.0/24 allow
+    access-control: 0.0.0.0/0 refuse
+
+    # Root hints — bootstrap list of root nameservers from IANA
+    root-hints: "/var/lib/unbound/root.hints"
+
+    # Privacy hardening
+    hide-identity: yes          # don't reveal hostname in chaos queries
+    hide-version: yes           # don't reveal software version
+    harden-glue: yes            # reject out-of-zone glue records
+    harden-dnssec-stripped: yes # reject answers with DNSSEC stripped
+    harden-referral-path: yes   # validate referral paths
+    use-caps-for-id: yes        # 0x20 encoding — spoofing resistance
+    qname-minimisation: yes     # RFC 7816 — send minimal queries upstream
+
+    # Performance — warm cache, prefetch before TTL expires
+    prefetch: yes
+    prefetch-key: yes
+    num-threads: 1
+    msg-cache-size: 50m
+    rrset-cache-size: 100m
+    cache-min-ttl: 300
+    cache-max-ttl: 86400</code></pre>
+
+      <p>A few settings worth explaining:</p>
+
+      <ul>
+        <li><strong><code>use-caps-for-id</code></strong> (0x20 encoding): Unbound randomises the capitalisation of query names — e.g. <code>GiThUb.CoM</code> — and expects the authoritative server to echo it back exactly. A spoofed response that doesn't match the random casing is rejected. It's a cheap defence against cache poisoning attacks.</li>
+        <li><strong><code>qname-minimisation</code></strong>: Instead of sending the full domain to the root ("what's github.com?"), Unbound sends the minimum — just "who handles .com?" The root servers learn nothing about the actual domain being queried.</li>
+        <li><strong><code>prefetch: yes</code></strong>: When a cached entry is within 10% of its TTL expiry and gets queried, Unbound proactively renews it in the background. Common domains stay warm without the user ever experiencing a cold lookup.</li>
+        <li><strong>Port 5335</strong>: AdGuard owns port 53. Unbound is a backend, not a front-facing resolver, so it listens on 5335 and only AdGuard talks to it directly.</li>
+      </ul>
+
+      <h3>Root hints and DNSSEC trust anchor</h3>
+
+      <p>
+        The root hints file is just a list of the 13 root nameserver clusters — Unbound needs it to know
+        where to start. Fetch it from IANA:
+      </p>
+
+      <pre><code>curl -sS https://www.internic.net/domain/named.cache \
+  -o /var/lib/unbound/root.hints</code></pre>
+
+      <p>
+        For DNSSEC, Debian's <code>unbound</code> package auto-bootstraps the root trust anchor at
+        <code>/var/lib/unbound/root.key</code> during install. No manual step needed — just make sure
+        your config's <code>auto-trust-anchor-file</code> isn't declared twice (Debian already adds it
+        in <code>root-auto-trust-anchor-file.conf</code>; duplicate declarations cause a startup error).
+      </p>
+
+      <h2>Wiring Up AdGuard</h2>
+
+      <p>
+        With Unbound running, the change in AdGuard is small — two fields in <code>AdGuardHome.yaml</code>:
+      </p>
+
+      <pre><code># Before
+upstream_dns:
+  - https://dns.quad9.net/dns-query
+  - https://dns11.quad9.net/dns-query
+  - https://dns10.quad9.net/dns-query
+
+# After
+upstream_dns:
+  - 192.168.20.80:5335</code></pre>
+
+      <p>
+        I kept Quad9 as the <strong>fallback</strong> — it's already there and only activates if CT110 is
+        completely unreachable:
+      </p>
+
+      <pre><code>fallback_dns:
+  - 9.9.9.9
+  - 1.1.1.1</code></pre>
+
+      <p>
+        I also disabled DNSSEC validation in AdGuard (<code>enable_dnssec: false</code>). With Unbound
+        doing full DNSSEC validation at the resolver level, AdGuard validating again is redundant and can
+        cause false negatives on edge cases. One layer owns it cleanly.
+      </p>
+
+      <p>
+        The same change went to the Unraid replica. Since adguardhome-sync runs every 5 minutes and syncs
+        config from primary to replica, this was also propagated automatically on the next cycle — but I
+        applied it manually to both for immediate effect.
+      </p>
+
+      <div class="callout warn">
+        <strong>Watch out:</strong> adguardhome-sync syncs the full upstream_dns config, so once you change
+        the primary, the next sync cycle will propagate Unbound as the upstream to the replica automatically.
+        This is the behaviour you want — but verify it after the first sync runs so you're sure it didn't
+        revert instead.
+      </div>
+
+      <h2>Verification</h2>
+
+      <p>Three checks to confirm everything is working end-to-end:</p>
+
+      <h3>1. Unbound resolves and validates DNSSEC</h3>
+
+      <pre><code># Basic resolution
+dig +short google.com @192.168.20.80 -p 5335
+# → 142.250.183.46  ✓
+
+# DNSSEC valid domain — should have the AD flag (Authenticated Data)
+dig sigok.verteiltesysteme.net @192.168.20.80 -p 5335 +dnssec | grep "flags:"
+# → flags: qr rd ra ad  ✓  (ad = DNSSEC authenticated by Unbound)
+
+# DNSSEC bogus domain — should return SERVFAIL
+dig sigfail.verteiltesysteme.net @192.168.20.80 -p 5335 | grep "status:"
+# → status: SERVFAIL  ✓  (Unbound correctly rejects broken DNSSEC)</code></pre>
+
+      <h3>2. AdGuard is routing through Unbound</h3>
+
+      <p>Pull the query log from AdGuard's API and check the upstream field:</p>
+
+      <pre><code>curl -sk -u 'user:pass' 'https://adguard.yourdomain.com/control/querylog?limit=5' \
+  | python3 -c "
+import sys, json
+for e in json.load(sys.stdin).get('data', []):
+    print(e.get('question',{}).get('name'), '|', e.get('upstream',''))
+"
+# → region1.v2.argotunnel.com | 192.168.20.80:5335  ✓</code></pre>
+
+      <h3>3. Split-DNS rewrites still work</h3>
+
+      <pre><code>dig +short home.semesmieh.com @192.168.20.70
+# → 192.168.20.71  ✓  (AdGuard rewrite still routes to Caddy)</code></pre>
+
+      <p>
+        AdGuard's own rewrites are answered locally before the query ever reaches Unbound, so split-DNS
+        is completely unaffected.
+      </p>
+
+      <h3>4. Fallback test</h3>
+
+      <pre><code># Stop Unbound
+systemctl stop unbound
+
+# DNS should still work — AdGuard falls back to 9.9.9.9
+dig +short github.com @192.168.20.70
+# → 4.237.22.38  ✓  (resolves via fallback)
+
+# Restore
+systemctl start unbound</code></pre>
+
+      <h2>The Result</h2>
+
+      <p>The updated DNS flow:</p>
+
+      <pre><code>Devices
+  └─► AdGuard Primary  (192.168.20.70:53)  ─┐
+  └─► AdGuard Replica  (192.168.20.79:53)  ─┼─► Unbound CT110 (192.168.20.80:5335)
+                                              │    pure recursive · DNSSEC validated
+                                             ─┘         │
+                                                         └─► Root/TLD/Authoritative servers
+                                                              (no middleman)
+
+                          Fallback only: 9.9.9.9 / 1.1.1.1 (if CT110 unreachable)</code></pre>
+
+      <p>What changed in practice:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Property</th>
+            <th>Before</th>
+            <th>After</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Upstream</td>
+            <td>Quad9 DoH (3 endpoints, load-balanced)</td>
+            <td>Unbound CT110 — pure recursive</td>
+          </tr>
+          <tr>
+            <td>Who sees your queries</td>
+            <td>Quad9</td>
+            <td>Nobody (root → TLD → authoritative, minimal per-hop)</td>
+          </tr>
+          <tr>
+            <td>DNSSEC validation</td>
+            <td>AdGuard (shallow)</td>
+            <td>Unbound (full, with trust anchor)</td>
+          </tr>
+          <tr>
+            <td>Cold query latency</td>
+            <td>~10–30ms (Quad9 is fast)</td>
+            <td>~100–300ms first lookup, then cached/prefetched</td>
+          </tr>
+          <tr>
+            <td>Upstream dependency</td>
+            <td>Required</td>
+            <td>None (fallback exists but never touched under normal operation)</td>
+          </tr>
+          <tr>
+            <td>qname minimisation</td>
+            <td>No (full domain sent to Quad9)</td>
+            <td>Yes — root servers see only what they need to</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>
+        I also added Unbound to the Homepage dashboard as a simple ping tile in the Networking section,
+        sitting alongside AdGuard Home, AdGuard Mirror, and AdGuard Sync. No widget needed — it's
+        infrastructure, not a user-facing service. Green dot is all I need at a glance.
+      </p>
+
+      <div class="callout">
+        <strong>Total resource cost:</strong> CT110 runs at ~30 MB RAM and effectively 0% CPU at idle.
+        The whole thing costs less than a browser tab. There's no reason not to do this.
+      </div>
+
+      <h2>Is This Overkill?</h2>
+
+      <p>
+        Depends on your threat model. If you trust Quad9 and DoH is good enough for you — totally fine.
+        Quad9 has a solid privacy policy and blocks known malicious domains on top of that.
+      </p>
+
+      <p>
+        For me, the goal isn't distrust of Quad9 specifically. It's eliminating an unnecessary dependency.
+        Why rely on an external service for something I can run locally, faster, with no data leaving my
+        network, at essentially zero cost? The homelab philosophy in one sentence.
+      </p>
+
+      <p>
+        The privacy win is real and the complexity cost is low. A 256 MB LXC, a config file, and two lines
+        changed in AdGuard. Everything else — ad blocking, split-DNS rewrites, sync between instances —
+        works exactly as before.
+      </p>
+
+      <div class="series-nav">
+        <strong>Homelab Series:</strong>
+        <a href="/blog/posts/homelab-start-here">Start Here</a>
+        <a href="/blog/posts/homelab-docker-compose-stack">Docker Compose Stack</a>
+        <a href="/blog/posts/homelab-sso-authentik">SSO with Authentik</a>
+        <a href="/blog/posts/homelab-backup-automation">Backup Automation</a>
+        <a href="/blog/posts/homelab-disaster-recovery">Disaster Recovery</a>
+        <a href="/blog/posts/homelab-secrets-management">Secrets Management</a>
+        <a href="/blog/posts/homelab-xcaddy-cloudflare-tunnel-adguard">Xcaddy + Tunnel + AdGuard</a>
+        <a href="/blog/posts/homelab-vaultwarden-self-hosted-passwords">Vaultwarden</a>
+        <a href="/blog/posts/homelab-p2v-proxmox-migration">P2V to Proxmox</a>
+        <a href="/blog/posts/homelab-proxmox-lxc-decomposition">LXC Decomposition</a>
+        <a href="/blog/posts/homelab-full-lxc-migration">Full LXC Migration</a>
+        <a href="/blog/posts/homelab-telegram-yt-dlp-bot">Telegram Video Bot</a>
+        <a href="/blog/posts/homelab-hermes-ai-agent">AI Brain with Hermes</a>
+        <a href="/blog/posts/homelab-nas-to-das-migration">NAS to DAS Migration</a>
+        <a href="/blog/posts/homelab-double-disk-failure-without-parity">Double Disk Failure Without Parity</a>
+        <a href="/blog/posts/homelab-hermes-vm-migration">Hermes VM Migration</a>
+        <a href="/blog/posts/homelab-unbound-recursive-dns">Private Recursive DNS</a>
+      </div>
+    </article>
+  </div>
+</body>
+
+</html>
