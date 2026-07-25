@@ -199,6 +199,11 @@
       display: inline-block;
       margin-right: 12px;
     }
+
+    .post-img { width:100%; border-radius:12px; margin:20px 0; object-fit:cover; display:block; border:1px solid var(--border); }
+    .post-img-hero { max-height:420px; }
+    .post-img-section { max-height:280px; }
+    .img-caption { text-align:center; font-size:13px; color:var(--muted); margin-top:-12px; margin-bottom:20px; }
   </style>
 
   <script type="application/ld+json">
@@ -264,6 +269,9 @@
       <h1>Your DNS Knows Too Much: Building a Private Recursive Resolver with Unbound</h1>
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> · July 18, 2026 · Homelab, DNS, Privacy, Networking, Self-Hosting</p>
 
+      <img src="/assets/images/blog/homelab-unbound-recursive-dns/homelab-unbound-recursive-dns-hero.png" alt="Anas at a cyberpunk network operations center with holographic DNS query trees and matrix code" class="post-img post-img-hero" loading="eager" />
+      <p class="img-caption">Eliminating the upstream — every DNS query resolved privately, root to answer.</p>
+
       <p>
         AdGuard Home is great. It blocks ads at the DNS layer, rewrites internal subdomains, enforces safe search,
         and lets you inspect every query your network makes. I've had it running as a <a href="/blog/posts/homelab-xcaddy-cloudflare-tunnel-adguard">core part of my homelab stack</a>
@@ -284,6 +292,9 @@
       </p>
 
       <h2>What DNS Forwarding Actually Means</h2>
+
+      <img src="/assets/images/blog/homelab-unbound-recursive-dns/homelab-unbound-recursive-dns-forwarding.png" alt="Split-screen cyberpunk visualization: forwarding DNS queries through a proxy vs recursive resolution branching to root servers" class="post-img post-img-section" loading="lazy" />
+      <p class="img-caption">Forwarding: you trust someone else. Recursive: you trust the tree.</p>
 
       <p>
         When most people set up AdGuard, they configure an upstream like <code>https://dns.quad9.net/dns-query</code>.
@@ -353,6 +364,9 @@ AdGuard Mirror (192.168.20.79, Unraid) — replica via adguardhome-sync on CT108
       </p>
 
       <h2>The Architecture Decision</h2>
+
+      <img src="/assets/images/blog/homelab-unbound-recursive-dns/homelab-unbound-recursive-dns-architecture.png" alt="Three glowing LXC container nodes: AdGuard Primary, AdGuard Replica, and Unbound CT110 connected by neon streams" class="post-img post-img-section" loading="lazy" />
+      <p class="img-caption">Separate layers, separate failure domains — Unbound as a shared backend for both AdGuard instances.</p>
 
       <p>Two choices upfront:</p>
 
@@ -573,6 +587,9 @@ dig +short github.com @192.168.20.70
 systemctl start unbound</code></pre>
 
       <h2>The Result</h2>
+
+      <img src="/assets/images/blog/homelab-unbound-recursive-dns/homelab-unbound-recursive-dns-result.png" alt="Cyberpunk DNS pipeline: devices feeding into dual AdGuard nodes, routing through Unbound, branching to root and authoritative servers" class="post-img post-img-section" loading="lazy" />
+      <p class="img-caption">The final flow — two AdGuard instances, one Unbound backend, zero upstreams under normal operation.</p>
 
       <p>The updated DNS flow:</p>
 
