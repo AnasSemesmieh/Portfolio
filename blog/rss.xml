@@ -5,7 +5,15 @@
     <link>https://anas.semesmieh.com/blog/</link>
     <description>Platform engineering, Azure architecture, DevSecOps, and engineering leadership insights.</description>
     <language>en-au</language>
-    <lastBuildDate>Fri, 18 Jul 2026 12:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 25 Jul 2026 12:00:00 +0000</lastBuildDate>
+
+    <item>
+      <title>Giving My Blog Posts a Visual Identity with Agnes AI and a Custom Hermes Skill</title>
+      <link>https://anas.semesmieh.com/blog/posts/homelab-ai-blog-images</link>
+      <guid>https://anas.semesmieh.com/blog/posts/homelab-ai-blog-images</guid>
+      <pubDate>Fri, 25 Jul 2026 12:00:00 +0000</pubDate>
+      <description>How I built a custom Hermes skill to auto-generate and embed contextually relevant AI images into my blog posts using Agnes AI — and why plain text posts were holding back my portfolio.</description>
+    </item>
 
     <item>
       <title>Your DNS Knows Too Much: Building a Private Recursive Resolver with Unbound</title>

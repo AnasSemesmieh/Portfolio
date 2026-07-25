@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Giving My Blog Posts a Visual Identity with Agnes AI and a Custom Hermes Skill | Anas Semesmieh</title>
   <meta name="description" content="How I built a custom Hermes skill to auto-generate and embed contextually relevant AI images into my blog posts using Agnes AI — and why plain text posts were holding back my portfolio." />
+  <meta name="keywords" content="Anas Semesmieh, AI image generation, Agnes AI, Hermes Agent, blog automation, homelab, portfolio, technical writing" />
   <meta name="author" content="Anas Semesmieh" />
   <link rel="canonical" href="https://anas.semesmieh.com/blog/posts/homelab-ai-blog-images" />
   <meta property="og:type" content="article" />
@@ -24,11 +25,12 @@
       --card: #101a2c;
       --muted: #8ea0be;
       --text: #e6eef8;
-      --accent: #16a34a;
+      --accent: #22c55e;
+      --heading: #60a5fa;
       --border: rgba(255, 255, 255, 0.08);
       --maxw: 800px;
       --radius: 14px;
-      --font: "IBM Plex Sans", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      --font: "Inter", "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
     }
 
     * { box-sizing: border-box; }
@@ -38,7 +40,10 @@
       color: var(--text);
       font-family: var(--font);
       line-height: 1.72;
-      background: var(--bg);
+      background:
+        radial-gradient(ellipse at 15% 0%, #13203a 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 15%, #0e1a32 0%, transparent 45%),
+        var(--bg);
     }
 
     .wrap { max-width: var(--maxw); margin: 0 auto; padding: 30px 18px 80px; }
@@ -46,10 +51,10 @@
     .nav a { text-decoration: none; color: var(--muted); padding: 8px 12px; border-radius: 10px; }
     .nav a:hover { color: var(--text); background: rgba(255, 255, 255, 0.03); }
     article { border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; background: var(--card); }
-    h1 { margin-top: 0; font-size: 34px; line-height: 1.2; }
+    h1 { margin-top: 0; font-size: 34px; line-height: 1.2; color: var(--heading); }
     .meta { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
-    h2 { margin-top: 36px; font-size: 22px; }
-    h3 { margin-top: 24px; font-size: 18px; color: var(--text); }
+    h2 { margin-top: 36px; font-size: 22px; color: var(--heading); }
+    h3 { margin-top: 24px; font-size: 18px; color: var(--heading); }
     p { margin: 0 0 16px; }
     a { color: var(--accent); text-decoration: none; }
     a:hover { text-decoration: underline; }
@@ -139,6 +144,17 @@
     .related-posts a:hover { background: rgba(255,255,255,0.03); }
     .related-posts .rp-title { font-weight: 600; margin-bottom: 2px; }
     .related-posts .rp-meta { font-size: 13px; color: var(--muted); }
+
+    .series-nav {
+      margin-top: 40px;
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 2;
+    }
+    .series-nav strong { display: block; margin-bottom: 6px; }
+    .series-nav a { color: var(--accent); margin-right: 8px; }
   </style>
 
   <script type="application/ld+json">
@@ -169,6 +185,9 @@
     <nav class="nav" aria-label="Post navigation">
       <a href="/">Portfolio</a>
       <a href="/blog/">All Posts</a>
+      <a href="/blog/categories/">Categories</a>
+      <a href="/blog/tags/">Tags</a>
+      <a href="/blog/rss.xml">RSS</a>
     </nav>
 
     <article>
@@ -383,6 +402,28 @@ Technical infrastructure illustration style."</code></pre>
           <div class="rp-title">Running Hermes AI Agent in My Homelab</div>
           <div class="rp-meta">How I use a local AI agent for infrastructure automation and technical writing</div>
         </a>
+      </div>
+
+      <div class="series-nav">
+        <strong>Homelab Series:</strong>
+        <a href="/blog/posts/homelab-start-here">Start Here</a>
+        <a href="/blog/posts/homelab-docker-compose-stack">Docker Compose Stack</a>
+        <a href="/blog/posts/homelab-sso-authentik">SSO with Authentik</a>
+        <a href="/blog/posts/homelab-backup-automation">Backup Automation</a>
+        <a href="/blog/posts/homelab-disaster-recovery">Disaster Recovery</a>
+        <a href="/blog/posts/homelab-secrets-management">Secrets Management</a>
+        <a href="/blog/posts/homelab-xcaddy-cloudflare-tunnel-adguard">Xcaddy + Tunnel + AdGuard</a>
+        <a href="/blog/posts/homelab-vaultwarden-self-hosted-passwords">Vaultwarden</a>
+        <a href="/blog/posts/homelab-p2v-proxmox-migration">P2V to Proxmox</a>
+        <a href="/blog/posts/homelab-proxmox-lxc-decomposition">LXC Decomposition</a>
+        <a href="/blog/posts/homelab-full-lxc-migration">Full LXC Migration</a>
+        <a href="/blog/posts/homelab-telegram-yt-dlp-bot">Telegram Video Bot</a>
+        <a href="/blog/posts/homelab-hermes-ai-agent">AI Brain with Hermes</a>
+        <a href="/blog/posts/homelab-nas-to-das-migration">NAS to DAS Migration</a>
+        <a href="/blog/posts/homelab-double-disk-failure-without-parity">Double Disk Failure Without Parity</a>
+        <a href="/blog/posts/homelab-hermes-vm-migration">Hermes VM Migration</a>
+        <a href="/blog/posts/homelab-unbound-recursive-dns">Private Recursive DNS</a>
+        <a href="/blog/posts/homelab-ai-blog-images">AI Blog Images</a>
       </div>
     </article>
   </div>
