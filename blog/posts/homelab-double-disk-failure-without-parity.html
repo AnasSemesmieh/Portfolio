@@ -332,6 +332,10 @@
       <h1>The Migration That Migrated Itself: Surviving a Double Disk Failure Without Parity</h1>
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> &middot; July 4, 2026 &middot; Homelab, Unraid, Storage, Hardware Failure, Self-Hosting</p>
 
+      <figure class="post-hero-image">
+        <img src="/blog/images/double-disk-hero.png" alt="Bald bearded man staring calmly at two red SMART failure warnings on dual monitors in a dark server room" style="width:100%;border-radius:8px;margin-bottom:1.5rem;">
+      </figure>
+
       <p>Two posts ago, I moved Unraid from a Synology onto a QNAP DAS running as a Proxmox VM, and I made a deliberate decision to run the array <strong>without parity</strong> during the migration. That was the correct call at the time &mdash; parity sync competes for I/O with active data transfers, and there was no failed hardware yet to protect against. What I did not plan for was uplifting that same VM to bare metal a few days later, and having the very first disk scan flag two drives as failing at once &mdash; the boot/cache SSD and a 2 TB data disk &mdash; while the array was still running with exactly zero redundancy.</p>
 
       <p>This post is about that week: why bare metal is what surfaced two failures that had been invisible under virtualization, how a data disk and a boot SSD got replaced simultaneously with no parity safety net, and where the array stands right now as parity finally gets assigned for the first time.</p>
@@ -341,6 +345,11 @@
       </div>
 
       <h2>Bare Metal Doesn't Lie</h2>
+
+      <figure style="margin:1.5rem 0;">
+        <img src="/blog/images/double-disk-bare-metal-reveal.png" alt="Split diagram: QEMU hiding SMART errors on the left vs bare metal exposing reallocated sectors and failing health on the right" style="width:100%;border-radius:8px;">
+        <figcaption style="font-size:0.85rem;color:#888;margin-top:0.5rem;text-align:center;">QEMU masked the drive's deteriorating SMART attributes. Bare metal told the truth on first boot.</figcaption>
+      </figure>
 
       <p>The previous post left Unraid running as VM200 on the Proxmox host (a Dell OptiPlex 7070 Micro), with the QNAP TL-D800C DAS passed through via USB. That was always meant to be temporary &mdash; the plan was to move Unraid onto dedicated hardware once the bulk of the data migration settled. That hardware was an <a href="https://www.acer.com" target="_blank" rel="noopener">Acer Veriton N4640G</a> (Intel i5-6500T, 8 GB RAM) sitting idle. The physical move itself was uneventful: pull the Samsung 870 EVO (the boot+cache SSD) out of the OptiPlex, slot it into the Veriton's 2.5" SATA bay, move the DAS USB cable over, boot.</p>
 
@@ -361,6 +370,10 @@
       <p>The replacement is a new 256 GB Samsung SSD, handling both boot and cache duties exactly as the 500 GB drive did. Less capacity, but 256 GB is comfortably enough for a cache pool and boot partition &mdash; the array's bulk storage lives on the spinning data disks, not the cache tier.</p>
 
       <h2>Failure Two: The Data Disk at 90% Full</h2>
+      <figure style="margin:1.5rem 0;">
+        <img src="/blog/images/double-disk-dual-replacement.png" alt="QNAP DAS enclosure with two bays glowing red, two replacement drives hovering above with no parity safety net warning" style="width:100%;border-radius:8px;">
+        <figcaption style="font-size:0.85rem;color:#888;margin-top:0.5rem;text-align:center;">Replacing both drives simultaneously with zero parity — any third failure mid-recovery meant permanent data loss.</figcaption>
+      </figure>
 
       <p>The second flagged drive was a 2 TB Seagate <code>ST2000DM001</code> &mdash; the same disk documented in my internal runbook from an earlier retirement pass, now confirmed failing for real: <strong>842+ reallocated/bad sectors</strong> and climbing. The general SMART thresholds I use for this call:</p>
 
@@ -441,6 +454,10 @@
       <p>So the correct order was: finish both drive replacements completely, confirm the failing disk was genuinely empty, remove it from the array, then &mdash; only after all of that &mdash; assign parity. Which meant the entire boot-SSD swap and the entire multi-hour data disk drain ran back-to-back with the array fully exposed. Any unrelated failure on any of the other five data disks during that window would have been unrecoverable. Nothing else failed. But it's worth being honest that this stretch was the least protected the array has been at any point since the original Synology retirement &mdash; the whole point of that migration was to stop running unprotected, and for a few days, protection was still not there while the fix for the first problem was underway.</p>
 
       <h2>Where Things Stand Right Now</h2>
+      <figure style="margin:1.5rem 0;">
+        <img src="/blog/images/double-disk-parity-complete.png" alt="Unraid dashboard showing all drives healthy and parity sync in progress for the first time" style="width:100%;border-radius:8px;">
+        <figcaption style="font-size:0.85rem;color:#888;margin-top:0.5rem;text-align:center;">Parity assigned for the first time — the array finally has redundancy after weeks without it.</figcaption>
+      </figure>
 
       <p>Both replacements are done. The array is back to six healthy data disks plus the new cache/boot SSD, and &mdash; for the first time since this whole migration started &mdash; a parity disk is finally being assigned and synced.</p>
 
