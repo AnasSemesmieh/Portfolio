@@ -52,6 +52,10 @@
     th { color:var(--muted); font-weight:600; font-size:13px; text-transform:uppercase; letter-spacing:0.5px; }
     .series-nav { margin-top:32px; padding-top:20px; border-top:1px solid var(--border); }
     .series-nav a { display:inline-block; margin-right:12px; }
+    .post-img { width:100%; border-radius:12px; margin:20px 0; object-fit:cover; display:block; border:1px solid var(--border); }
+    .post-img-hero { max-height:420px; }
+    .post-img-section { max-height:280px; }
+    .img-caption { text-align:center; font-size:13px; color:var(--muted); margin-top:-12px; margin-bottom:20px; }
     @media (max-width:700px) { .wrap { padding:16px 14px 48px; } h1 { font-size:28px; } article { padding:20px; } }
   </style>
   <script type="application/ld+json">
@@ -106,6 +110,9 @@
       <h1>My Home Lab Journey: Start Here</h1>
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> · April 12, 2026 · Homelab</p>
 
+      <img src="/assets/images/blog/homelab-start-here/homelab-start-here-hero.png" alt="Anas in a cyberpunk home server room surrounded by holographic Docker containers and matrix code" class="post-img post-img-hero" loading="eager" />
+      <p class="img-caption">My homelab: where weekend curiosity meets production-grade thinking.</p>
+
       <p>As a platform engineering leader, I spend my weekdays designing cloud architectures and scaling teams. On weekends, I run a homelab — not because I have to, but because it keeps my hands dirty and my instincts sharp. This series documents everything I've built, broken, and automated along the way.</p>
 
       <div class="callout">
@@ -113,6 +120,8 @@
       </div>
 
       <h2>What I Run</h2>
+      <img src="/assets/images/blog/homelab-start-here/homelab-start-here-what-i-run.png" alt="Cyberpunk home server room with Docker, Traefik, Plex, Home Assistant and Grafana holographic dashboards" class="post-img post-img-section" loading="lazy" />
+      <p class="img-caption">The full stack — 9 services, one host, zero compromises.</p>
       <p>My homelab is a single Ubuntu Server host running everything via Docker Compose. Here's the full stack:</p>
       <ul>
         <li><strong>Traefik</strong> — Reverse proxy with a self-signed wildcard TLS certificate (<code>*.homelab</code>) from a local CA</li>
@@ -127,7 +136,9 @@
       </ul>
 
       <h2>The Backup-First Philosophy</h2>
-      <p>The centerpiece of my homelab isn't any single service — it's the automated backup system. My <a href="https://github.com/AnasSemesmieh/homelab" target="_blank">repo</a> is the source of truth for all configuration. Every day at 03:25 UTC, a cron job:</p>
+      <img src="/assets/images/blog/homelab-start-here/homelab-start-here-backup-philosophy.png" alt="Cyberpunk vault with matrix data streams, glowing backup drives, and redundant storage nodes" class="post-img post-img-section" loading="lazy" />
+      <p class="img-caption">Three copies, two media types, one offsite — always.</p>
+      <p>Before I ran a single container, I set up backups. Everything in my homelab follows the 3-2-1 rule: the centerpiece is an automated backup system where my <a href="https://github.com/AnasSemesmieh/homelab" target="_blank">repo</a> is the source of truth for all configuration. Every day at 03:25 UTC, a cron job:</p>
       <ol>
         <li><strong>Syncs</strong> allowlisted config files from <code>~/</code> into <code>configs/</code> using an inventory file</li>
         <li><strong>Redacts</strong> every password, API key, and token automatically via regex patterns</li>
@@ -137,6 +148,8 @@
       <p>Every Sunday, a weekly snapshot tag (<code>backup-YYYY-MM-DD</code>) is created for point-in-time recovery. The entire setup can be rebuilt from zero using the repo's fresh-install and restore runbooks.</p>
 
       <h2>Why This Matters for My Career</h2>
+      <img src="/assets/images/blog/homelab-start-here/homelab-start-here-career-matters.png" alt="Platform engineer in a neon-lit command center reviewing architecture diagrams with matrix code streams" class="post-img post-img-section" loading="lazy" />
+      <p class="img-caption">Battle-testing at home so the real systems don't become the test.</p>
       <p>Running this lab forces me to practice what I preach: infrastructure as code, automated pipelines, secret management, disaster recovery, and documentation-first operations. When I advise teams on platform engineering practices at work, I've already battle-tested those patterns at home — on my own weekends, with my own hardware.</p>
 
       <h2>What This Series Covers</h2>
