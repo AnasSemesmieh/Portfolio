@@ -282,6 +282,12 @@
       padding: 3px 12px;
       font-size: 12px;
       color: var(--muted);
+      text-decoration: none;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    a.tag:hover {
+      border-color: rgba(34,197,94,0.4);
+      color: var(--accent);
     }
 
   </style>
@@ -343,11 +349,11 @@
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> &middot; July 4, 2026</p>
 
       <div class="tag-list">
-        <span class="tag">Homelab</span>
-        <span class="tag">Unraid</span>
-        <span class="tag">Storage</span>
-        <span class="tag">Hardware Failure</span>
-        <span class="tag">Self-Hosting</span>
+        <a href="/blog/?tag=Homelab" class="tag">Homelab</a>
+        <a href="/blog/?tag=Unraid" class="tag">Unraid</a>
+        <a href="/blog/?tag=Storage" class="tag">Storage</a>
+        <a href="/blog/?tag=Hardware Failure" class="tag">Hardware Failure</a>
+        <a href="/blog/?tag=Self-Hosting" class="tag">Self-Hosting</a>
       </div>
 
       <figure class="post-hero-image">

@@ -63,6 +63,12 @@
       padding: 3px 12px;
       font-size: 12px;
       color: var(--muted);
+      text-decoration: none;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    a.tag:hover {
+      border-color: rgba(34,197,94,0.4);
+      color: var(--accent);
     }
 
   </style>
@@ -130,8 +136,8 @@
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> · March 30, 2026</p>
 
       <div class="tag-list">
-        <span class="tag">AI Adoption</span>
-        <span class="tag">Engineering Leadership</span>
+        <a href="/blog/?tag=AI Adoption" class="tag">AI Adoption</a>
+        <a href="/blog/?tag=Engineering Leadership" class="tag">Engineering Leadership</a>
       </div>
 
       <p>Whenever AI comes up in leadership conversations, the same question arrives almost immediately: is this going to replace engineers? I understand why people ask it. It is the fastest path to anxiety and the easiest headline to repeat. But it is still the wrong frame for most engineering organizations today. The more useful question is where AI actually improves the operating model right now, and what kind of team behavior makes that improvement real.</p>

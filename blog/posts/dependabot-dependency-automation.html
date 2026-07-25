@@ -55,6 +55,12 @@
       padding: 3px 12px;
       font-size: 12px;
       color: var(--muted);
+      text-decoration: none;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    a.tag:hover {
+      border-color: rgba(34,197,94,0.4);
+      color: var(--accent);
     }
 
   </style>
@@ -122,9 +128,9 @@
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> · December 11, 2025</p>
 
       <div class="tag-list">
-        <span class="tag">Automation</span>
-        <span class="tag">Security</span>
-        <span class="tag">Platform Engineering</span>
+        <a href="/blog/?tag=Automation" class="tag">Automation</a>
+        <a href="/blog/?tag=Security" class="tag">Security</a>
+        <a href="/blog/?tag=Platform Engineering" class="tag">Platform Engineering</a>
       </div>
 
       <p>The original Dependabot document was much more technical than this blog post initially reflected. It was not just advocating automation in the abstract. It documented a concrete workflow for a mixed-stack monorepo where dependency updates had to cover both <code>package.json</code> and <code>.csproj</code> files, raise reviewable pull requests automatically, and keep security remediation from turning into a manual coordination task.</p>

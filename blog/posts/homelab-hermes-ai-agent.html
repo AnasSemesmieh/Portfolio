@@ -268,6 +268,12 @@
       padding: 3px 12px;
       font-size: 12px;
       color: var(--muted);
+      text-decoration: none;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    a.tag:hover {
+      border-color: rgba(34,197,94,0.4);
+      color: var(--accent);
     }
 
   </style>
@@ -329,11 +335,11 @@
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> &middot; June 19, 2026</p>
 
       <div class="tag-list">
-        <span class="tag">Homelab</span>
-        <span class="tag">AI</span>
-        <span class="tag">Self-Hosting</span>
-        <span class="tag">Automation</span>
-        <span class="tag">Proxmox</span>
+        <a href="/blog/?tag=Homelab" class="tag">Homelab</a>
+        <a href="/blog/?tag=AI" class="tag">AI</a>
+        <a href="/blog/?tag=Self-Hosting" class="tag">Self-Hosting</a>
+        <a href="/blog/?tag=Automation" class="tag">Automation</a>
+        <a href="/blog/?tag=Proxmox" class="tag">Proxmox</a>
       </div>
 
       <p>At some point, every homelab builder reaches the same moment. You&rsquo;re explaining your setup to someone and they ask &ldquo;wait, where does Plex actually run?&rdquo; and you pause for a second longer than you should. The architecture lives in your head &mdash; assembled piece by piece over months of migrations, refactors, and late-night experiments. It works, you know <em>that</em> much. But is what you think is running actually what&rsquo;s running?</p>

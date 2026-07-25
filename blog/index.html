@@ -296,20 +296,35 @@
       </div>
       <div class="filter-bar" id="filterBar">
         <button class="filter-pill active" data-filter="all">All</button>
-        <button class="filter-pill" data-filter="Platform Engineering">Platform Engineering</button>
         <button class="filter-pill" data-filter="Homelab">Homelab</button>
-        <button class="filter-pill" data-filter="Docker">Docker</button>
-        <button class="filter-pill" data-filter="Security">Security</button>
-        <button class="filter-pill" data-filter="Self-Hosting">Self-Hosting</button>
-        <button class="filter-pill" data-filter="SSO">SSO</button>
+        <button class="filter-pill" data-filter="Platform Engineering">Platform Engineering</button>
         <button class="filter-pill" data-filter="Automation">Automation</button>
-        <button class="filter-pill" data-filter="IaC">IaC</button>
+        <button class="filter-pill" data-filter="Self-Hosting">Self-Hosting</button>
+        <button class="filter-pill" data-filter="Security">Security</button>
+        <button class="filter-pill" data-filter="Docker">Docker</button>
         <button class="filter-pill" data-filter="Proxmox">Proxmox</button>
-        <button class="filter-pill" data-filter="Networking">Networking</button>
-        <button class="filter-pill" data-filter="IDP">IDP</button>
-        <button class="filter-pill" data-filter="Digital Transformation">Digital Transformation</button>
+        <button class="filter-pill" data-filter="Developer Experience">Developer Experience</button>
         <button class="filter-pill" data-filter="Engineering Leadership">Leadership</button>
         <button class="filter-pill" data-filter="AI">AI</button>
+        <button class="filter-pill" data-filter="AI Adoption">AI Adoption</button>
+        <button class="filter-pill" data-filter="Hermes Agent">Hermes Agent</button>
+        <button class="filter-pill" data-filter="IDP">IDP</button>
+        <button class="filter-pill" data-filter="Networking">Networking</button>
+        <button class="filter-pill" data-filter="Storage">Storage</button>
+        <button class="filter-pill" data-filter="Unraid">Unraid</button>
+        <button class="filter-pill" data-filter="Cloud Architecture">Cloud Architecture</button>
+        <button class="filter-pill" data-filter="IaC">IaC</button>
+        <button class="filter-pill" data-filter="Digital Transformation">Digital Transformation</button>
+        <button class="filter-pill" data-filter="SSO">SSO</button>
+        <button class="filter-pill" data-filter="Secrets Management">Secrets Management</button>
+        <button class="filter-pill" data-filter="DNS">DNS</button>
+        <button class="filter-pill" data-filter="Privacy">Privacy</button>
+        <button class="filter-pill" data-filter="Migration">Migration</button>
+        <button class="filter-pill" data-filter="Disaster Recovery">Disaster Recovery</button>
+        <button class="filter-pill" data-filter="Hardware Failure">Hardware Failure</button>
+        <button class="filter-pill" data-filter="KTLO">KTLO</button>
+        <button class="filter-pill" data-filter="Agnes AI">Agnes AI</button>
+        <button class="filter-pill" data-filter="Portfolio">Portfolio</button>
       </div>
       <div class="grid" id="postGrid">
             <article data-date="2026-07-25" data-tags="AI,Homelab,Automation,Portfolio,Agnes AI,Hermes Agent">
@@ -728,6 +743,16 @@
         return Array.from(grid.querySelectorAll('article'));
       }
 
+      function setActiveFilter(tag) {
+        activeFilter = tag || 'all';
+        filterBar.querySelectorAll('.filter-pill').forEach(p => {
+          p.classList.toggle('active', p.dataset.filter === activeFilter);
+        });
+        // Scroll active pill into view
+        const activePill = filterBar.querySelector('.filter-pill.active');
+        if (activePill) activePill.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+
       function applyFilters() {
         const query = searchBox.value.toLowerCase().trim();
         const articles = getArticles();
@@ -768,11 +793,25 @@
       filterBar.addEventListener('click', (e) => {
         const pill = e.target.closest('.filter-pill');
         if (!pill) return;
-        filterBar.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
-        pill.classList.add('active');
-        activeFilter = pill.dataset.filter;
+        const tag = pill.dataset.filter;
+        setActiveFilter(tag);
+        // Update URL so the filtered state is bookmarkable / linkable
+        const url = new URL(window.location);
+        if (tag === 'all') {
+          url.searchParams.delete('tag');
+        } else {
+          url.searchParams.set('tag', tag);
+        }
+        history.replaceState(null, '', url);
         applyFilters();
       });
+
+      // On load: read ?tag= from URL and activate matching pill
+      const initTag = new URLSearchParams(window.location.search).get('tag');
+      if (initTag) {
+        setActiveFilter(initTag);
+      }
+      applyFilters();
     })();
   </script>
 </body>

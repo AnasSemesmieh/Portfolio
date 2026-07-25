@@ -299,6 +299,12 @@
       padding: 3px 12px;
       font-size: 12px;
       color: var(--muted);
+      text-decoration: none;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    a.tag:hover {
+      border-color: rgba(34,197,94,0.4);
+      color: var(--accent);
     }
 
   </style>
@@ -360,10 +366,10 @@
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> &middot; June 14, 2026</p>
 
       <div class="tag-list">
-        <span class="tag">Homelab</span>
-        <span class="tag">Docker</span>
-        <span class="tag">Self-Hosting</span>
-        <span class="tag">Automation</span>
+        <a href="/blog/?tag=Homelab" class="tag">Homelab</a>
+        <a href="/blog/?tag=Docker" class="tag">Docker</a>
+        <a href="/blog/?tag=Self-Hosting" class="tag">Self-Hosting</a>
+        <a href="/blog/?tag=Automation" class="tag">Automation</a>
       </div>
 
       <p>A friend mentioned offhand that he&rsquo;d love a tool that lets you send a video link to a chat and get the file back &mdash; no browser, no app, no ads. I said &ldquo;challenge accepted&rdquo; and went quiet for a day. This is what came out of it.</p>

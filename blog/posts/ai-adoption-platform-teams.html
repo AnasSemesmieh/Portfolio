@@ -61,6 +61,12 @@
       padding: 3px 12px;
       font-size: 12px;
       color: var(--muted);
+      text-decoration: none;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    a.tag:hover {
+      border-color: rgba(34,197,94,0.4);
+      color: var(--accent);
     }
 
   </style>
@@ -129,9 +135,9 @@
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> · May 3, 2026</p>
 
       <div class="tag-list">
-        <span class="tag">AI Adoption</span>
-        <span class="tag">Engineering Leadership</span>
-        <span class="tag">Platform Engineering</span>
+        <a href="/blog/?tag=AI Adoption" class="tag">AI Adoption</a>
+        <a href="/blog/?tag=Engineering Leadership" class="tag">Engineering Leadership</a>
+        <a href="/blog/?tag=Platform Engineering" class="tag">Platform Engineering</a>
       </div>
 
       <p>AI adoption in engineering usually stalls for one of two reasons. Either leadership treats it like a procurement event and assumes licenses will create value on their own, or engineers get handed a chatbot with no context, no workflow fit, and no clear review model. Developers do not adopt tools because the demo looked impressive. They adopt tools that reduce friction in the work they do every day without lowering the quality bar they are still accountable for.</p>

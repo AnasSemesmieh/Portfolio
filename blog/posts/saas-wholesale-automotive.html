@@ -61,6 +61,12 @@
       padding: 3px 12px;
       font-size: 12px;
       color: var(--muted);
+      text-decoration: none;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    a.tag:hover {
+      border-color: rgba(34,197,94,0.4);
+      color: var(--accent);
     }
 
   </style>
@@ -128,8 +134,8 @@
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> · January 5, 2026</p>
 
       <div class="tag-list">
-        <span class="tag">Digital Transformation</span>
-        <span class="tag">Engineering Leadership</span>
+        <a href="/blog/?tag=Digital Transformation" class="tag">Digital Transformation</a>
+        <a href="/blog/?tag=Engineering Leadership" class="tag">Engineering Leadership</a>
       </div>
 
       <p>This post revisits the framework I used in my AADA workshop on SaaS for wholesale in automotive, delivered alongside Andrew Tyson and later published as a <a href="https://www.youtube.com/watch?v=QQ6KAWBMNt4" target="_blank" rel="noopener noreferrer">recorded session</a>. I was the technical voice in that conversation, but the argument was never meant to be abstract or vendor-led. It was meant to be practical. Too many software decisions in operational businesses start from the demo instead of the workflow. Wholesale teams do not need more tools for the sake of it. They need clearer, faster, more reliable ways to run evaluation, acquisition, marketing, and selling.</p>

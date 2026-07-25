@@ -52,6 +52,12 @@
       padding: 3px 12px;
       font-size: 12px;
       color: var(--muted);
+      text-decoration: none;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    a.tag:hover {
+      border-color: rgba(34,197,94,0.4);
+      color: var(--accent);
     }
 
   </style>
@@ -119,9 +125,9 @@
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> · May 8, 2026</p>
 
       <div class="tag-list">
-        <span class="tag">IDP</span>
-        <span class="tag">Developer Experience</span>
-        <span class="tag">Platform Engineering</span>
+        <a href="/blog/?tag=IDP" class="tag">IDP</a>
+        <a href="/blog/?tag=Developer Experience" class="tag">Developer Experience</a>
+        <a href="/blog/?tag=Platform Engineering" class="tag">Platform Engineering</a>
       </div>
 
       <p>The original Backstage proposal was much more concrete than this article initially made it sound. It was not a generic internal-developer-platform argument. It documented a platform team spending roughly half of its workload on ad-hoc support, alongside specific developer pain points: new service creation, onboarding, scattered runtime visibility, difficult Kafka topic observability, and fragmented access to deployment and platform tools.</p>
