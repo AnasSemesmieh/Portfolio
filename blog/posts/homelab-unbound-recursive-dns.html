@@ -203,6 +203,7 @@
     .post-img { width:100%; border-radius:12px; margin:20px 0; object-fit:cover; display:block; border:1px solid var(--border); }
     .post-img-hero { max-height:420px; }
     .post-img-section { max-height:280px; }
+    .post-img-diagram { object-fit:contain; max-height:none; background:transparent; }
     .img-caption { text-align:center; font-size:13px; color:var(--muted); margin-top:-12px; margin-bottom:20px; }
   </style>
 
@@ -293,7 +294,7 @@
 
       <h2>What DNS Forwarding Actually Means</h2>
 
-      <img src="/assets/images/blog/homelab-unbound-recursive-dns/homelab-unbound-recursive-dns-forwarding.png" alt="Split-screen cyberpunk visualization: forwarding DNS queries through a proxy vs recursive resolution branching to root servers" class="post-img post-img-section" loading="lazy" />
+      <img src="/assets/images/blog/homelab-unbound-recursive-dns/homelab-unbound-recursive-dns-forwarding.png" alt="Split-screen cyberpunk visualization: forwarding DNS queries through a proxy vs recursive resolution branching to root servers" class="post-img post-img-diagram" loading="lazy" />
       <p class="img-caption">Forwarding: you trust someone else. Recursive: you trust the tree.</p>
 
       <p>
@@ -588,7 +589,7 @@ systemctl start unbound</code></pre>
 
       <h2>The Result</h2>
 
-      <img src="/assets/images/blog/homelab-unbound-recursive-dns/homelab-unbound-recursive-dns-result.png" alt="Cyberpunk DNS pipeline: devices feeding into dual AdGuard nodes, routing through Unbound, branching to root and authoritative servers" class="post-img post-img-section" loading="lazy" />
+      <img src="/assets/images/blog/homelab-unbound-recursive-dns/homelab-unbound-recursive-dns-result.png" alt="Cyberpunk DNS pipeline: devices feeding into dual AdGuard nodes, routing through Unbound, branching to root and authoritative servers" class="post-img post-img-diagram" loading="lazy" />
       <p class="img-caption">The final flow — two AdGuard instances, one Unbound backend, zero upstreams under normal operation.</p>
 
       <p>The updated DNS flow:</p>
