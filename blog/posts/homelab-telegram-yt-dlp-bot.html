@@ -291,6 +291,16 @@
         padding: 20px;
       }
     }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+    .tag {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
   </style>
 
   <script type="application/ld+json">
@@ -348,6 +358,13 @@
     <article>
       <h1>Challenge Accepted: Self-Hosting a Telegram Video Bot with n8n and yt-dlp</h1>
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> &middot; June 14, 2026 &middot; Homelab, Docker, Self-Hosting, Automation</p>
+
+      <div class="tag-list">
+        <span class="tag">Homelab</span>
+        <span class="tag">Docker</span>
+        <span class="tag">Self-Hosting</span>
+        <span class="tag">Automation</span>
+      </div>
 
       <p>A friend mentioned offhand that he&rsquo;d love a tool that lets you send a video link to a chat and get the file back &mdash; no browser, no app, no ads. I said &ldquo;challenge accepted&rdquo; and went quiet for a day. This is what came out of it.</p>
 

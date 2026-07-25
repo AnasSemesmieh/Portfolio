@@ -53,6 +53,16 @@
     .series-nav { margin-top:32px; padding-top:20px; border-top:1px solid var(--border); }
     .series-nav a { display:inline-block; margin-right:12px; }
     @media (max-width:700px) { .wrap { padding:16px 14px 48px; } h1 { font-size:28px; } article { padding:20px; } }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+    .tag {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
   </style>
 
   <script type="application/ld+json">
@@ -116,6 +126,13 @@
     <article>
       <h1>Single Sign-On for Homelabs: Authentik, Traefik Forward-Auth, and Cloudflare Tunnel</h1>
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> &middot; May 11, 2026 &middot; Homelab, SSO, Authentik</p>
+
+      <div class="tag-list">
+        <span class="tag">Homelab</span>
+        <span class="tag">SSO</span>
+        <span class="tag">Security</span>
+        <span class="tag">Docker</span>
+      </div>
 
       <p>I run 15+ self-hosted services. Each one had its own login page, its own password, its own session timeout. Plex has plex.tv auth. Portainer has local accounts. The Arr stack has Forms authentication. Tautulli has yet another password. Opening my homelab dashboard meant clicking through login screens like it was 2005.</p>
 
@@ -460,7 +477,7 @@ http:
 
       <p>Then configured Portainer via its API:</p>
       <pre><code>curl -X PUT "https://portainer:9443/api/settings" \
-  -H "Authorization: Bearer $JWT" \
+  -H "Authorization: Bearer ***" \
   -H "Content-Type: application/json" \
   -d '{
     "AuthenticationMethod": 3,

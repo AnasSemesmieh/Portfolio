@@ -55,6 +55,16 @@
     .series-nav { margin-top:32px; padding-top:20px; border-top:1px solid var(--border); }
     .series-nav a { display:inline-block; margin-right:12px; }
     @media (max-width:700px) { .wrap { padding:16px 14px 48px; } h1 { font-size:28px; } article { padding:20px; } }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+    .tag {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
   </style>
 
   <script type="application/ld+json">
@@ -118,6 +128,11 @@
     <article>
       <h1>AI Is an Amplifier, Not a Substitute for Engineering Judgment</h1>
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> · March 30, 2026 · AI Adoption, Engineering Leadership</p>
+
+      <div class="tag-list">
+        <span class="tag">AI Adoption</span>
+        <span class="tag">Engineering Leadership</span>
+      </div>
 
       <p>Whenever AI comes up in leadership conversations, the same question arrives almost immediately: is this going to replace engineers? I understand why people ask it. It is the fastest path to anxiety and the easiest headline to repeat. But it is still the wrong frame for most engineering organizations today. The more useful question is where AI actually improves the operating model right now, and what kind of team behavior makes that improvement real.</p>
 

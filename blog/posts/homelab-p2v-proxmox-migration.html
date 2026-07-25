@@ -210,6 +210,16 @@
         padding: 20px;
       }
     }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+    .tag {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
   </style>
 
   <script type="application/ld+json">
@@ -267,6 +277,13 @@
     <article>
       <h1>Bare-Metal to VM: A Pragmatic P2V Migration to Proxmox</h1>
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> &middot; June 7, 2026 &middot; Homelab, Proxmox, Networking, Self-Hosting</p>
+
+      <div class="tag-list">
+        <span class="tag">Homelab</span>
+        <span class="tag">Proxmox</span>
+        <span class="tag">Networking</span>
+        <span class="tag">Self-Hosting</span>
+      </div>
 
       <p>My homelab runs 24+ Docker services on a single Samsung 870 EVO 500 GB SSD &mdash; reverse proxies, DNS, SSO, password management, monitoring, media, and more. All of it on bare metal, one kernel panic away from a full outage with no isolation between workloads. This post is about how I moved that entire stack into a Proxmox VE virtual machine without downtime, and why the migration itself is just the beginning of a larger architecture shift.</p>
 

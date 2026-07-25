@@ -53,6 +53,16 @@
     .series-nav { margin-top:32px; padding-top:20px; border-top:1px solid var(--border); }
     .series-nav a { display:inline-block; margin-right:12px; }
     @media (max-width:700px) { .wrap { padding:16px 14px 48px; } h1 { font-size:28px; } article { padding:20px; } }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+    .tag {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
   </style>
 
   <script type="application/ld+json">
@@ -116,6 +126,12 @@
     <article>
       <h1>Designing an Internal Developer Portal That Teams Actually Use</h1>
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> · April 2, 2026 · IDP, Developer Experience</p>
+
+      <div class="tag-list">
+        <span class="tag">IDP</span>
+        <span class="tag">Developer Experience</span>
+        <span class="tag">Automation</span>
+      </div>
 
       <p>Most internal developer portal articles still describe the portal as a destination. Developers do not care about destinations. They care about flow. Can they create a new service, inherit the right standards, register ownership, find the APIs they depend on, read docs close to the code, and recover from a failed workflow without asking the platform team to do it for them? If the answer is no, then the portal is still just another tab.</p>
 

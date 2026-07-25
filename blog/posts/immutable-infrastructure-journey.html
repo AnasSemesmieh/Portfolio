@@ -53,6 +53,16 @@
     .series-nav { margin-top:32px; padding-top:20px; border-top:1px solid var(--border); }
     .series-nav a { display:inline-block; margin-right:12px; }
     @media (max-width:700px) { .wrap { padding:16px 14px 48px; } h1 { font-size:28px; } article { padding:20px; } }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+    .tag {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
   </style>
 
   <script type="application/ld+json">
@@ -116,6 +126,12 @@
     <article>
       <h1>From Legacy to Immutable: A Practical IaC Maturity Journey</h1>
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> · March 24, 2026 · IaC, Cloud Architecture</p>
+
+      <div class="tag-list">
+        <span class="tag">IaC</span>
+        <span class="tag">Cloud Architecture</span>
+        <span class="tag">Platform Engineering</span>
+      </div>
 
       <p>Immutable infrastructure is easy to praise and easy to misapply. In practice, most teams do not jump straight from long-lived mutable servers to golden images, short-lived nodes, and full replacement rollouts. They inherit live systems, handwritten fixes, environment drift, and a backlog of undocumented assumptions. The real journey is not from bad to perfect. It is from undocumented mutation to controlled replacement.</p>
 

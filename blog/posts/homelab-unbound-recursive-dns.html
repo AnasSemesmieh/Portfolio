@@ -205,6 +205,16 @@
     .post-img-section { max-height:280px; }
     .post-img-diagram { object-fit:contain; max-height:none; background:transparent; }
     .img-caption { text-align:center; font-size:13px; color:var(--muted); margin-top:-12px; margin-bottom:20px; }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+    .tag {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
   </style>
 
   <script type="application/ld+json">
@@ -269,6 +279,14 @@
     <article>
       <h1>Your DNS Knows Too Much: Building a Private Recursive Resolver with Unbound</h1>
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> · July 18, 2026 · Homelab, DNS, Privacy, Networking, Self-Hosting</p>
+
+      <div class="tag-list">
+        <span class="tag">Homelab</span>
+        <span class="tag">DNS</span>
+        <span class="tag">Privacy</span>
+        <span class="tag">Networking</span>
+        <span class="tag">Self-Hosting</span>
+      </div>
 
       <img src="/assets/images/blog/homelab-unbound-recursive-dns/homelab-unbound-recursive-dns-hero.png" alt="Anas at a cyberpunk network operations center with holographic DNS query trees and matrix code" class="post-img post-img-hero" loading="eager" />
       <p class="img-caption">Eliminating the upstream — every DNS query resolved privately, root to answer.</p>

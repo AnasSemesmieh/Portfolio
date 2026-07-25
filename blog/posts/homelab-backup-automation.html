@@ -53,10 +53,20 @@
     .series-nav { margin-top:32px; padding-top:20px; border-top:1px solid var(--border); }
     .series-nav a { display:inline-block; margin-right:12px; }
     @media (max-width:700px) { .wrap { padding:16px 14px 48px; } h1 { font-size:28px; } article { padding:20px; } }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+    .tag {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
   </style>
   <script type="application/ld+json">
   {
-    "@context":"https://schema.org","@type":"BlogPosting",
+    "@context":"https://***@type":"BlogPosting",
     "headline":"Automated Config Backup with Secret Redaction",
     "datePublished":"2026-04-28","dateModified":"2026-04-28",
     "author":{"@type":"Person","name":"Anas Semesmieh","url":"https://anas.semesmieh.com/about/"},
@@ -105,6 +115,12 @@
     <article>
       <h1>Automated Config Backup with Secret Redaction</h1>
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> · April 28, 2026 · Homelab · Automation</p>
+
+      <div class="tag-list">
+        <span class="tag">Homelab</span>
+        <span class="tag">Automation</span>
+        <span class="tag">Security</span>
+      </div>
 
       <p>The worst time to think about backups is after you've lost your configs. My homelab runs 10+ Docker Compose services, and losing even one <code>docker-compose.yml</code> or <code>config.ini</code> means hours of reconstruction from memory. So I built a fully automated backup pipeline that runs every night — and it's the single most valuable thing in my lab.</p>
 

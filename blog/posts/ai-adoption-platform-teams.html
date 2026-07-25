@@ -53,6 +53,16 @@
     .series-nav { margin-top:32px; padding-top:20px; border-top:1px solid var(--border); }
     .series-nav a { display:inline-block; margin-right:12px; }
     @media (max-width:700px) { .wrap { padding:16px 14px 48px; } h1 { font-size:28px; } article { padding:20px; } }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+    .tag {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
   </style>
 
   <script type="application/ld+json">
@@ -117,6 +127,12 @@
     <article>
       <h1>Driving AI Adoption in Platform Teams Without Losing Engineering Discipline</h1>
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> · May 3, 2026 · AI Adoption, Engineering Leadership</p>
+
+      <div class="tag-list">
+        <span class="tag">AI Adoption</span>
+        <span class="tag">Engineering Leadership</span>
+        <span class="tag">Platform Engineering</span>
+      </div>
 
       <p>AI adoption in engineering usually stalls for one of two reasons. Either leadership treats it like a procurement event and assumes licenses will create value on their own, or engineers get handed a chatbot with no context, no workflow fit, and no clear review model. Developers do not adopt tools because the demo looked impressive. They adopt tools that reduce friction in the work they do every day without lowering the quality bar they are still accountable for.</p>
 

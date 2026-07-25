@@ -44,6 +44,16 @@
     a { color: var(--accent); text-decoration:none; }
     a:hover { text-decoration: underline; }
     @media (max-width:700px) { .wrap { padding:16px 14px 48px; } h1 { font-size:28px; } article { padding:20px; } }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+    .tag {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
   </style>
 
   <script type="application/ld+json">
@@ -107,6 +117,12 @@
     <article>
       <h1>The Edge-First Frontend: Standardizing Web Architecture on Cloudflare</h1>
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> · February 19, 2026 · Cloud Architecture, Platform Engineering</p>
+
+      <div class="tag-list">
+        <span class="tag">Cloud Architecture</span>
+        <span class="tag">Platform Engineering</span>
+        <span class="tag">Security</span>
+      </div>
 
       <p>The source proposal behind this post was far more specific than the original article suggested. It was not just an argument for "edge is good." It asked for formal approval to standardize Cloudflare as the default hosting and execution environment for all future UI/UX and presentation-layer workloads after a proof of concept covering a static asset shell, SPA containers, and a headless CMS migration.</p>
 

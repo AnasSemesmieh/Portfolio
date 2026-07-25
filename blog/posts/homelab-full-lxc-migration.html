@@ -222,6 +222,16 @@
         padding: 20px;
       }
     }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+    .tag {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
   </style>
 
   <script type="application/ld+json">
@@ -279,6 +289,14 @@
     <article>
       <h1>Finishing the Decomposition: Every Service Gets Its Own Container</h1>
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> &middot; June 8, 2026 &middot; Homelab, Docker, Proxmox, Self-Hosting, Automation</p>
+
+      <div class="tag-list">
+        <span class="tag">Homelab</span>
+        <span class="tag">Docker</span>
+        <span class="tag">Proxmox</span>
+        <span class="tag">Self-Hosting</span>
+        <span class="tag">Automation</span>
+      </div>
 
       <p>The <a href="/blog/posts/homelab-proxmox-lxc-decomposition">previous post</a> ended with a promise: &ldquo;Docker stacks stay on VM100 for now &mdash; they&rsquo;re a future phase.&rdquo; That future phase happened the next day. Twelve services, five new LXC containers, one decommissioned VM. The Samsung SSD is cold storage now, and the entire homelab runs on a single NVMe drive at 31% memory utilization.</p>
 

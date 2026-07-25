@@ -44,6 +44,16 @@
     a { color: var(--accent); text-decoration:none; }
     a:hover { text-decoration: underline; }
     @media (max-width:700px) { .wrap { padding:16px 14px 48px; } h1 { font-size:28px; } article { padding:20px; } }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+    .tag {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
   </style>
 
   <script type="application/ld+json">
@@ -107,6 +117,12 @@
     <article>
       <h1>The Ad-Hoc Tax: How Backstage Recovered Platform Capacity for Higher-Value Work</h1>
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> · May 8, 2026 · IDP, Developer Experience</p>
+
+      <div class="tag-list">
+        <span class="tag">IDP</span>
+        <span class="tag">Developer Experience</span>
+        <span class="tag">Platform Engineering</span>
+      </div>
 
       <p>The original Backstage proposal was much more concrete than this article initially made it sound. It was not a generic internal-developer-platform argument. It documented a platform team spending roughly half of its workload on ad-hoc support, alongside specific developer pain points: new service creation, onboarding, scattered runtime visibility, difficult Kafka topic observability, and fragmented access to deployment and platform tools.</p>
 

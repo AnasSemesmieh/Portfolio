@@ -210,6 +210,16 @@
         padding: 20px;
       }
     }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+    .tag {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
   </style>
 
   <script type="application/ld+json">
@@ -267,6 +277,13 @@
     <article>
       <h1>Decomposing the Monolith: Per-Service LXCs on Proxmox</h1>
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> &middot; June 8, 2026 &middot; Homelab, Proxmox, Networking, Self-Hosting</p>
+
+      <div class="tag-list">
+        <span class="tag">Homelab</span>
+        <span class="tag">Proxmox</span>
+        <span class="tag">Networking</span>
+        <span class="tag">Self-Hosting</span>
+      </div>
 
       <p>Twelve hours into the migration, the NIC dropped. SSH sessions froze, containers went dark, and <code>dmesg</code> filled with <code>e1000e: Detected Hardware Unit Hang</code>. Not the best welcome for a freshly decomposed architecture &mdash; but I'm getting ahead of myself.</p>
 

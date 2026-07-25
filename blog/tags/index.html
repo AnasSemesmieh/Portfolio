@@ -5,8 +5,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Blog Tags | Anas Semesmieh</title>
-  <meta name="description" content="Browse blog tags on platform engineering, leadership, digital transformation, automation, and DevSecOps." />
+  <meta name="description" content="Browse all blog tags: homelab, platform engineering, automation, security, AI, Proxmox, Docker, engineering leadership, and more." />
+  <meta name="author" content="Anas Semesmieh" />
   <link rel="canonical" href="https://anas.semesmieh.com/blog/tags/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Blog Tags | Anas Semesmieh" />
+  <meta property="og:description" content="Browse all tags across Anas Semesmieh blog posts." />
+  <meta property="og:url" content="https://anas.semesmieh.com/blog/tags/" />
+  <meta property="og:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
   <style>
     :root {
       --bg: #0b1220; --card: #101a2c; --muted: #8ea0be; --text: #e6eef8;
@@ -22,14 +28,28 @@
     .nav { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:24px; }
     .nav a { color:var(--muted); text-decoration:none; padding:7px 13px; border-radius:10px; font-size:14px; transition: color 0.15s, background 0.15s; }
     .nav a:hover { color:var(--text); background:rgba(255,255,255,0.04); }
-    h1 { color: var(--heading); margin-bottom: 20px; font-size: 32px; }
-    .taglist { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px; }
-    .tag { border:1px solid rgba(34,197,94,0.25); color:#86efac; border-radius:999px; padding:5px 14px; font-size:12px; background:rgba(34,197,94,0.06); }
-    .card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:22px 24px; }
+    h1 { color: var(--heading); margin-bottom: 8px; font-size: 32px; }
+    .subtitle { color: var(--muted); font-size: 15px; margin-bottom: 28px; }
+    .grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap:16px; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:22px 24px; transition: border-color 0.18s, transform 0.18s; }
+    .card:hover { border-color: rgba(96,165,250,0.35); transform: translateY(-1px); }
+    .card h2 { color: var(--heading); font-size: 20px; margin-bottom: 6px; }
+    .card .count { color: var(--muted); font-size: 13px; margin-bottom: 12px; }
     .card a { color: var(--accent); text-decoration: none; }
     .card a:hover { text-decoration: underline; }
     .card p { margin: 6px 0; font-size: 14px; }
-    @media (max-width:700px) { .wrap { padding:16px 14px 48px; } h1 { font-size:26px; } }
+    .card .desc { color: var(--muted); font-size: 13px; margin-bottom: 14px; line-height: 1.5; }
+    @media (max-width:700px) { .wrap { padding:16px 14px 48px; } .grid { grid-template-columns:1fr; } h1 { font-size:26px; } }
+    .tagcloud { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:36px; }
+    .tag { border:1px solid rgba(34,197,94,0.25); color:#86efac; border-radius:999px; padding:5px 14px; font-size:12px; background:rgba(34,197,94,0.06); cursor:default; }
+    .tag .count { color: var(--muted); font-size: 11px; }
+    .section { margin-bottom: 32px; border-bottom: 1px solid var(--border); padding-bottom: 24px; }
+    .section:last-child { border-bottom: none; }
+    .section h2 { color: var(--heading); font-size: 18px; margin-bottom: 4px; }
+    .section .count { color: var(--muted); font-size: 13px; margin-bottom: 12px; }
+    .section a { color: var(--accent); text-decoration: none; }
+    .section a:hover { text-decoration: underline; }
+    .section p { margin: 6px 0; font-size: 14px; }
   </style>
 </head>
 
@@ -39,52 +59,296 @@
       <a href="/">Portfolio</a>
       <a href="/blog/">All Posts</a>
       <a href="/blog/categories/">Categories</a>
+      <a href="/blog/rss.xml">RSS</a>
     </nav>
 
     <h1>Tags</h1>
+    <p class="subtitle">29 tags across 30 posts.</p>
 
-    <div class="taglist">
-      <span class="tag">Platform Engineering</span>
-      <span class="tag">IaC</span>
-      <span class="tag">IDP</span>
-      <span class="tag">Automation</span>
-      <span class="tag">Developer Experience</span>
-      <span class="tag">Cloud Architecture</span>
-      <span class="tag">KTLO</span>
-      <span class="tag">AI Adoption</span>
-      <span class="tag">Engineering Leadership</span>
-      <span class="tag">Digital Transformation</span>
-      <span class="tag">Homelab</span>
-      <span class="tag">Docker</span>
-      <span class="tag">Self-Hosting</span>
-      <span class="tag">Security</span>
-      <span class="tag">Disaster Recovery</span>
-      <span class="tag">Secrets Management</span>
-      <span class="tag">Proxmox</span>
-      <span class="tag">Networking</span>
+    <div class="tagcloud">
+      <span class="tag">Homelab <span class="count">(18)</span></span>
+      <span class="tag">Automation <span class="count">(12)</span></span>
+      <span class="tag">Self-Hosting <span class="count">(11)</span></span>
+      <span class="tag">Platform Engineering <span class="count">(9)</span></span>
+      <span class="tag">Security <span class="count">(7)</span></span>
+      <span class="tag">Docker <span class="count">(6)</span></span>
+      <span class="tag">Proxmox <span class="count">(5)</span></span>
+      <span class="tag">Developer Experience <span class="count">(4)</span></span>
+      <span class="tag">Engineering Leadership <span class="count">(4)</span></span>
+      <span class="tag">AI <span class="count">(3)</span></span>
+      <span class="tag">IDP <span class="count">(3)</span></span>
+      <span class="tag">Networking <span class="count">(3)</span></span>
+      <span class="tag">AI Adoption <span class="count">(2)</span></span>
+      <span class="tag">Cloud Architecture <span class="count">(2)</span></span>
+      <span class="tag">Storage <span class="count">(2)</span></span>
+      <span class="tag">Unraid <span class="count">(2)</span></span>
+      <span class="tag">Agnes AI <span class="count">(1)</span></span>
+      <span class="tag">DNS <span class="count">(1)</span></span>
+      <span class="tag">Digital Transformation <span class="count">(1)</span></span>
+      <span class="tag">Disaster Recovery <span class="count">(1)</span></span>
+      <span class="tag">Hardware Failure <span class="count">(1)</span></span>
+      <span class="tag">Hermes Agent <span class="count">(1)</span></span>
+      <span class="tag">IaC <span class="count">(1)</span></span>
+      <span class="tag">KTLO <span class="count">(1)</span></span>
+      <span class="tag">Migration <span class="count">(1)</span></span>
+      <span class="tag">Portfolio <span class="count">(1)</span></span>
+      <span class="tag">Privacy <span class="count">(1)</span></span>
+      <span class="tag">SSO <span class="count">(1)</span></span>
+      <span class="tag">Secrets Management <span class="count">(1)</span></span>
     </div>
 
-    <div class="card">
+
+    <div class="section">
+      <h2 id="homelab">Homelab</h2>
+      <p class="count">18 posts</p>
+      <p><a href="/blog/posts/homelab-ai-blog-images">Giving My Blog Posts a Visual Identity with Agnes AI and a Custom Hermes Skill</a></p>
+      <p><a href="/blog/posts/homelab-unbound-recursive-dns">Your DNS Knows Too Much: Building a Private Recursive Resolver with Unbound</a></p>
+      <p><a href="/blog/posts/homelab-hermes-vm-migration">Homelab Brain Transplant: Giving Hermes a Proper Linux Home</a></p>
+      <p><a href="/blog/posts/homelab-double-disk-failure-without-parity">The Migration That Migrated Itself: Surviving a Double Disk Failure Without Parity</a></p>
+      <p><a href="/blog/posts/homelab-nas-to-das-migration">From NAS to DAS: Retiring My Synology Before It Retired My Data</a></p>
+      <p><a href="/blog/posts/homelab-hermes-ai-agent">I Gave My Homelab an AI Brain: Documenting Everything and Wiring It to Telegram with Hermes</a></p>
+      <p><a href="/blog/posts/homelab-telegram-yt-dlp-bot">Challenge Accepted: Self-Hosting a Telegram Video Bot with n8n and yt-dlp</a></p>
+      <p><a href="/blog/posts/homelab-full-lxc-migration">Finishing the Decomposition: Every Service Gets Its Own Container</a></p>
+      <p><a href="/blog/posts/homelab-proxmox-lxc-decomposition">Decomposing the Monolith: Per-Service LXCs on Proxmox</a></p>
       <p><a href="/blog/posts/homelab-p2v-proxmox-migration">Bare-Metal to VM: A Pragmatic P2V Migration to Proxmox</a></p>
       <p><a href="/blog/posts/homelab-xcaddy-cloudflare-tunnel-adguard">Xcaddy + Cloudflare Tunnel + AdGuard Home: A Simpler Homelab Edge</a></p>
-      <p><a href="/blog/posts/platform-engineering-at-scale">How Platform Engineering Creates Strategic Capacity</a></p>
-      <p><a href="/blog/posts/immutable-infrastructure-journey">From Legacy to Immutable: A Practical IaC Maturity Journey</a></p>
-      <p><a href="/blog/posts/git-flow-branching-strategy">Git Flow Without the Ceremony Tax: A Practical Branching Strategy for Growing Teams</a></p>
-      <p><a href="/blog/posts/dependabot-dependency-automation">Dependabot Without Pull Request Fatigue: Automating Dependency Hygiene the Right Way</a></p>
-      <p><a href="/blog/posts/cloudflare-frontend-standardization">The Edge-First Frontend: Standardizing Web Architecture on Cloudflare</a></p>
-      <p><a href="/blog/posts/idp-self-service-playbook">Designing an Internal Developer Portal That Teams Actually Use</a></p>
-      <p><a href="/blog/posts/backstage-idp-platform-capacity">The Ad-Hoc Tax: How Backstage Recovered Platform Capacity for Higher-Value Work</a></p>
-      <p><a href="/blog/posts/ai-amplifier-engineering-judgment">AI Is an Amplifier, Not a Substitute for Engineering Judgment</a></p>
-      <p><a href="/blog/posts/ai-adoption-platform-teams">Driving AI Adoption in Platform Teams Without Losing Engineering Discipline</a></p>
-      <p><a href="/blog/posts/leading-through-uncertainty-engineering-teams">Leading Through Uncertainty Without Performing False Confidence</a></p>
-      <p><a href="/blog/posts/platform-engineering-innovation-with-guardrails">Platform Engineering Works When Innovation Ships With Guardrails</a></p>
-      <p><a href="/blog/posts/saas-wholesale-automotive">SaaS for Wholesale in Automotive: What Good Digital Transformation Looks Like</a></p>
-      <p><a href="/blog/posts/homelab-start-here">My Home Lab Journey: Start Here</a></p>
+      <p><a href="/blog/posts/homelab-vaultwarden-self-hosted-passwords">Self-Hosting Vaultwarden: Ditching 1Password for Total Password Ownership</a></p>
+      <p><a href="/blog/posts/homelab-sso-authentik">Single Sign-On for Homelabs: Authentik, Traefik Forward-Auth, and Cloudflare Tunnel</a></p>
+      <p><a href="/blog/posts/homelab-secrets-management">Secrets Management for Homelabs: Redaction, Scanning, and Rehydration</a></p>
+      <p><a href="/blog/posts/homelab-disaster-recovery">Homelab Disaster Recovery in Under an Hour</a></p>
       <p><a href="/blog/posts/homelab-backup-automation">Automated Config Backup with Secret Redaction</a></p>
       <p><a href="/blog/posts/homelab-docker-compose-stack">Docker Compose All The Things: Running 10+ Services on One Host</a></p>
-      <p><a href="/blog/posts/homelab-disaster-recovery">Homelab Disaster Recovery in Under an Hour</a></p>
-      <p><a href="/blog/posts/homelab-secrets-management">Secrets Management for Homelabs</a></p>
+      <p><a href="/blog/posts/homelab-start-here">My Home Lab Journey: Start Here</a></p>
     </div>
+
+    <div class="section">
+      <h2 id="automation">Automation</h2>
+      <p class="count">12 posts</p>
+      <p><a href="/blog/posts/homelab-ai-blog-images">Giving My Blog Posts a Visual Identity with Agnes AI and a Custom Hermes Skill</a></p>
+      <p><a href="/blog/posts/homelab-hermes-vm-migration">Homelab Brain Transplant: Giving Hermes a Proper Linux Home</a></p>
+      <p><a href="/blog/posts/homelab-hermes-ai-agent">I Gave My Homelab an AI Brain: Documenting Everything and Wiring It to Telegram with Hermes</a></p>
+      <p><a href="/blog/posts/homelab-telegram-yt-dlp-bot">Challenge Accepted: Self-Hosting a Telegram Video Bot with n8n and yt-dlp</a></p>
+      <p><a href="/blog/posts/homelab-full-lxc-migration">Finishing the Decomposition: Every Service Gets Its Own Container</a></p>
+      <p><a href="/blog/posts/homelab-xcaddy-cloudflare-tunnel-adguard">Xcaddy + Cloudflare Tunnel + AdGuard Home: A Simpler Homelab Edge</a></p>
+      <p><a href="/blog/posts/homelab-disaster-recovery">Homelab Disaster Recovery in Under an Hour</a></p>
+      <p><a href="/blog/posts/homelab-backup-automation">Automated Config Backup with Secret Redaction</a></p>
+      <p><a href="/blog/posts/idp-self-service-playbook">Designing an Internal Developer Portal That Teams Actually Use</a></p>
+      <p><a href="/blog/posts/platform-engineering-at-scale">How Platform Engineering Creates Strategic Capacity</a></p>
+      <p><a href="/blog/posts/dependabot-dependency-automation">Dependabot Without Pull Request Fatigue: Automating Dependency Hygiene the Right Way</a></p>
+      <p><a href="/blog/posts/git-flow-branching-strategy">Git Flow Without the Ceremony Tax: A Practical Branching Strategy for Growing Teams</a></p>
+    </div>
+
+    <div class="section">
+      <h2 id="self-hosting">Self-Hosting</h2>
+      <p class="count">11 posts</p>
+      <p><a href="/blog/posts/homelab-unbound-recursive-dns">Your DNS Knows Too Much: Building a Private Recursive Resolver with Unbound</a></p>
+      <p><a href="/blog/posts/homelab-hermes-vm-migration">Homelab Brain Transplant: Giving Hermes a Proper Linux Home</a></p>
+      <p><a href="/blog/posts/homelab-double-disk-failure-without-parity">The Migration That Migrated Itself: Surviving a Double Disk Failure Without Parity</a></p>
+      <p><a href="/blog/posts/homelab-nas-to-das-migration">From NAS to DAS: Retiring My Synology Before It Retired My Data</a></p>
+      <p><a href="/blog/posts/homelab-hermes-ai-agent">I Gave My Homelab an AI Brain: Documenting Everything and Wiring It to Telegram with Hermes</a></p>
+      <p><a href="/blog/posts/homelab-telegram-yt-dlp-bot">Challenge Accepted: Self-Hosting a Telegram Video Bot with n8n and yt-dlp</a></p>
+      <p><a href="/blog/posts/homelab-full-lxc-migration">Finishing the Decomposition: Every Service Gets Its Own Container</a></p>
+      <p><a href="/blog/posts/homelab-proxmox-lxc-decomposition">Decomposing the Monolith: Per-Service LXCs on Proxmox</a></p>
+      <p><a href="/blog/posts/homelab-p2v-proxmox-migration">Bare-Metal to VM: A Pragmatic P2V Migration to Proxmox</a></p>
+      <p><a href="/blog/posts/homelab-vaultwarden-self-hosted-passwords">Self-Hosting Vaultwarden: Ditching 1Password for Total Password Ownership</a></p>
+      <p><a href="/blog/posts/homelab-docker-compose-stack">Docker Compose All The Things: Running 10+ Services on One Host</a></p>
+    </div>
+
+    <div class="section">
+      <h2 id="platform-engineering">Platform Engineering</h2>
+      <p class="count">9 posts</p>
+      <p><a href="/blog/posts/backstage-idp-platform-capacity">The Ad-Hoc Tax: How Backstage Recovered Platform Capacity for Higher-Value Work</a></p>
+      <p><a href="/blog/posts/platform-engineering-innovation-with-guardrails">Platform Engineering Works When Innovation Ships With Guardrails</a></p>
+      <p><a href="/blog/posts/ai-adoption-platform-teams">Driving AI Adoption in Platform Teams Without Losing Engineering Discipline</a></p>
+      <p><a href="/blog/posts/homelab-start-here">My Home Lab Journey: Start Here</a></p>
+      <p><a href="/blog/posts/immutable-infrastructure-journey">From Legacy to Immutable: A Practical IaC Maturity Journey</a></p>
+      <p><a href="/blog/posts/platform-engineering-at-scale">How Platform Engineering Creates Strategic Capacity</a></p>
+      <p><a href="/blog/posts/cloudflare-frontend-standardization">The Edge-First Frontend: Standardizing Web Architecture on Cloudflare</a></p>
+      <p><a href="/blog/posts/dependabot-dependency-automation">Dependabot Without Pull Request Fatigue: Automating Dependency Hygiene the Right Way</a></p>
+      <p><a href="/blog/posts/git-flow-branching-strategy">Git Flow Without the Ceremony Tax: A Practical Branching Strategy for Growing Teams</a></p>
+    </div>
+
+    <div class="section">
+      <h2 id="security">Security</h2>
+      <p class="count">7 posts</p>
+      <p><a href="/blog/posts/homelab-xcaddy-cloudflare-tunnel-adguard">Xcaddy + Cloudflare Tunnel + AdGuard Home: A Simpler Homelab Edge</a></p>
+      <p><a href="/blog/posts/homelab-vaultwarden-self-hosted-passwords">Self-Hosting Vaultwarden: Ditching 1Password for Total Password Ownership</a></p>
+      <p><a href="/blog/posts/homelab-sso-authentik">Single Sign-On for Homelabs: Authentik, Traefik Forward-Auth, and Cloudflare Tunnel</a></p>
+      <p><a href="/blog/posts/homelab-secrets-management">Secrets Management for Homelabs: Redaction, Scanning, and Rehydration</a></p>
+      <p><a href="/blog/posts/homelab-backup-automation">Automated Config Backup with Secret Redaction</a></p>
+      <p><a href="/blog/posts/cloudflare-frontend-standardization">The Edge-First Frontend: Standardizing Web Architecture on Cloudflare</a></p>
+      <p><a href="/blog/posts/dependabot-dependency-automation">Dependabot Without Pull Request Fatigue: Automating Dependency Hygiene the Right Way</a></p>
+    </div>
+
+    <div class="section">
+      <h2 id="docker">Docker</h2>
+      <p class="count">6 posts</p>
+      <p><a href="/blog/posts/homelab-telegram-yt-dlp-bot">Challenge Accepted: Self-Hosting a Telegram Video Bot with n8n and yt-dlp</a></p>
+      <p><a href="/blog/posts/homelab-full-lxc-migration">Finishing the Decomposition: Every Service Gets Its Own Container</a></p>
+      <p><a href="/blog/posts/homelab-vaultwarden-self-hosted-passwords">Self-Hosting Vaultwarden: Ditching 1Password for Total Password Ownership</a></p>
+      <p><a href="/blog/posts/homelab-sso-authentik">Single Sign-On for Homelabs: Authentik, Traefik Forward-Auth, and Cloudflare Tunnel</a></p>
+      <p><a href="/blog/posts/homelab-docker-compose-stack">Docker Compose All The Things: Running 10+ Services on One Host</a></p>
+      <p><a href="/blog/posts/homelab-start-here">My Home Lab Journey: Start Here</a></p>
+    </div>
+
+    <div class="section">
+      <h2 id="proxmox">Proxmox</h2>
+      <p class="count">5 posts</p>
+      <p><a href="/blog/posts/homelab-hermes-vm-migration">Homelab Brain Transplant: Giving Hermes a Proper Linux Home</a></p>
+      <p><a href="/blog/posts/homelab-hermes-ai-agent">I Gave My Homelab an AI Brain: Documenting Everything and Wiring It to Telegram with Hermes</a></p>
+      <p><a href="/blog/posts/homelab-full-lxc-migration">Finishing the Decomposition: Every Service Gets Its Own Container</a></p>
+      <p><a href="/blog/posts/homelab-proxmox-lxc-decomposition">Decomposing the Monolith: Per-Service LXCs on Proxmox</a></p>
+      <p><a href="/blog/posts/homelab-p2v-proxmox-migration">Bare-Metal to VM: A Pragmatic P2V Migration to Proxmox</a></p>
+    </div>
+
+    <div class="section">
+      <h2 id="developer-experience">Developer Experience</h2>
+      <p class="count">4 posts</p>
+      <p><a href="/blog/posts/backstage-idp-platform-capacity">The Ad-Hoc Tax: How Backstage Recovered Platform Capacity for Higher-Value Work</a></p>
+      <p><a href="/blog/posts/platform-engineering-innovation-with-guardrails">Platform Engineering Works When Innovation Ships With Guardrails</a></p>
+      <p><a href="/blog/posts/idp-self-service-playbook">Designing an Internal Developer Portal That Teams Actually Use</a></p>
+      <p><a href="/blog/posts/git-flow-branching-strategy">Git Flow Without the Ceremony Tax: A Practical Branching Strategy for Growing Teams</a></p>
+    </div>
+
+    <div class="section">
+      <h2 id="engineering-leadership">Engineering Leadership</h2>
+      <p class="count">4 posts</p>
+      <p><a href="/blog/posts/ai-adoption-platform-teams">Driving AI Adoption in Platform Teams Without Losing Engineering Discipline</a></p>
+      <p><a href="/blog/posts/leading-through-uncertainty-engineering-teams">Leading Through Uncertainty Without Performing False Confidence</a></p>
+      <p><a href="/blog/posts/ai-amplifier-engineering-judgment">AI Is an Amplifier, Not a Substitute for Engineering Judgment</a></p>
+      <p><a href="/blog/posts/saas-wholesale-automotive">SaaS for Wholesale in Automotive: What Good Digital Transformation Looks Like</a></p>
+    </div>
+
+    <div class="section">
+      <h2 id="ai">AI</h2>
+      <p class="count">3 posts</p>
+      <p><a href="/blog/posts/homelab-ai-blog-images">Giving My Blog Posts a Visual Identity with Agnes AI and a Custom Hermes Skill</a></p>
+      <p><a href="/blog/posts/homelab-hermes-vm-migration">Homelab Brain Transplant: Giving Hermes a Proper Linux Home</a></p>
+      <p><a href="/blog/posts/homelab-hermes-ai-agent">I Gave My Homelab an AI Brain: Documenting Everything and Wiring It to Telegram with Hermes</a></p>
+    </div>
+
+    <div class="section">
+      <h2 id="idp">IDP</h2>
+      <p class="count">3 posts</p>
+      <p><a href="/blog/posts/backstage-idp-platform-capacity">The Ad-Hoc Tax: How Backstage Recovered Platform Capacity for Higher-Value Work</a></p>
+      <p><a href="/blog/posts/idp-self-service-playbook">Designing an Internal Developer Portal That Teams Actually Use</a></p>
+      <p><a href="/blog/posts/platform-engineering-at-scale">How Platform Engineering Creates Strategic Capacity</a></p>
+    </div>
+
+    <div class="section">
+      <h2 id="networking">Networking</h2>
+      <p class="count">3 posts</p>
+      <p><a href="/blog/posts/homelab-unbound-recursive-dns">Your DNS Knows Too Much: Building a Private Recursive Resolver with Unbound</a></p>
+      <p><a href="/blog/posts/homelab-proxmox-lxc-decomposition">Decomposing the Monolith: Per-Service LXCs on Proxmox</a></p>
+      <p><a href="/blog/posts/homelab-p2v-proxmox-migration">Bare-Metal to VM: A Pragmatic P2V Migration to Proxmox</a></p>
+    </div>
+
+    <div class="section">
+      <h2 id="ai-adoption">AI Adoption</h2>
+      <p class="count">2 posts</p>
+      <p><a href="/blog/posts/ai-adoption-platform-teams">Driving AI Adoption in Platform Teams Without Losing Engineering Discipline</a></p>
+      <p><a href="/blog/posts/ai-amplifier-engineering-judgment">AI Is an Amplifier, Not a Substitute for Engineering Judgment</a></p>
+    </div>
+
+    <div class="section">
+      <h2 id="cloud-architecture">Cloud Architecture</h2>
+      <p class="count">2 posts</p>
+      <p><a href="/blog/posts/immutable-infrastructure-journey">From Legacy to Immutable: A Practical IaC Maturity Journey</a></p>
+      <p><a href="/blog/posts/cloudflare-frontend-standardization">The Edge-First Frontend: Standardizing Web Architecture on Cloudflare</a></p>
+    </div>
+
+    <div class="section">
+      <h2 id="storage">Storage</h2>
+      <p class="count">2 posts</p>
+      <p><a href="/blog/posts/homelab-double-disk-failure-without-parity">The Migration That Migrated Itself: Surviving a Double Disk Failure Without Parity</a></p>
+      <p><a href="/blog/posts/homelab-nas-to-das-migration">From NAS to DAS: Retiring My Synology Before It Retired My Data</a></p>
+    </div>
+
+    <div class="section">
+      <h2 id="unraid">Unraid</h2>
+      <p class="count">2 posts</p>
+      <p><a href="/blog/posts/homelab-double-disk-failure-without-parity">The Migration That Migrated Itself: Surviving a Double Disk Failure Without Parity</a></p>
+      <p><a href="/blog/posts/homelab-nas-to-das-migration">From NAS to DAS: Retiring My Synology Before It Retired My Data</a></p>
+    </div>
+
+    <div class="section">
+      <h2 id="agnes-ai">Agnes AI</h2>
+      <p class="count">1 post</p>
+      <p><a href="/blog/posts/homelab-ai-blog-images">Giving My Blog Posts a Visual Identity with Agnes AI and a Custom Hermes Skill</a></p>
+    </div>
+
+    <div class="section">
+      <h2 id="dns">DNS</h2>
+      <p class="count">1 post</p>
+      <p><a href="/blog/posts/homelab-unbound-recursive-dns">Your DNS Knows Too Much: Building a Private Recursive Resolver with Unbound</a></p>
+    </div>
+
+    <div class="section">
+      <h2 id="digital-transformation">Digital Transformation</h2>
+      <p class="count">1 post</p>
+      <p><a href="/blog/posts/saas-wholesale-automotive">SaaS for Wholesale in Automotive: What Good Digital Transformation Looks Like</a></p>
+    </div>
+
+    <div class="section">
+      <h2 id="disaster-recovery">Disaster Recovery</h2>
+      <p class="count">1 post</p>
+      <p><a href="/blog/posts/homelab-disaster-recovery">Homelab Disaster Recovery in Under an Hour</a></p>
+    </div>
+
+    <div class="section">
+      <h2 id="hardware-failure">Hardware Failure</h2>
+      <p class="count">1 post</p>
+      <p><a href="/blog/posts/homelab-double-disk-failure-without-parity">The Migration That Migrated Itself: Surviving a Double Disk Failure Without Parity</a></p>
+    </div>
+
+    <div class="section">
+      <h2 id="hermes-agent">Hermes Agent</h2>
+      <p class="count">1 post</p>
+      <p><a href="/blog/posts/homelab-ai-blog-images">Giving My Blog Posts a Visual Identity with Agnes AI and a Custom Hermes Skill</a></p>
+    </div>
+
+    <div class="section">
+      <h2 id="iac">IaC</h2>
+      <p class="count">1 post</p>
+      <p><a href="/blog/posts/immutable-infrastructure-journey">From Legacy to Immutable: A Practical IaC Maturity Journey</a></p>
+    </div>
+
+    <div class="section">
+      <h2 id="ktlo">KTLO</h2>
+      <p class="count">1 post</p>
+      <p><a href="/blog/posts/platform-engineering-at-scale">How Platform Engineering Creates Strategic Capacity</a></p>
+    </div>
+
+    <div class="section">
+      <h2 id="migration">Migration</h2>
+      <p class="count">1 post</p>
+      <p><a href="/blog/posts/homelab-nas-to-das-migration">From NAS to DAS: Retiring My Synology Before It Retired My Data</a></p>
+    </div>
+
+    <div class="section">
+      <h2 id="portfolio">Portfolio</h2>
+      <p class="count">1 post</p>
+      <p><a href="/blog/posts/homelab-ai-blog-images">Giving My Blog Posts a Visual Identity with Agnes AI and a Custom Hermes Skill</a></p>
+    </div>
+
+    <div class="section">
+      <h2 id="privacy">Privacy</h2>
+      <p class="count">1 post</p>
+      <p><a href="/blog/posts/homelab-unbound-recursive-dns">Your DNS Knows Too Much: Building a Private Recursive Resolver with Unbound</a></p>
+    </div>
+
+    <div class="section">
+      <h2 id="sso">SSO</h2>
+      <p class="count">1 post</p>
+      <p><a href="/blog/posts/homelab-sso-authentik">Single Sign-On for Homelabs: Authentik, Traefik Forward-Auth, and Cloudflare Tunnel</a></p>
+    </div>
+
+    <div class="section">
+      <h2 id="secrets-management">Secrets Management</h2>
+      <p class="count">1 post</p>
+      <p><a href="/blog/posts/homelab-secrets-management">Secrets Management for Homelabs: Redaction, Scanning, and Rehydration</a></p>
+    </div>
+
   </div>
 </body>
 

@@ -199,6 +199,16 @@
       display: inline-block;
       margin-right: 12px;
     }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+    .tag {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
   </style>
 
   <script type="application/ld+json">
@@ -263,6 +273,14 @@
     <article>
       <h1>Homelab Brain Transplant: Giving Hermes a Proper Linux Home</h1>
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> · July 12, 2026 · Homelab, AI, Proxmox, Self-Hosting, Automation</p>
+
+      <div class="tag-list">
+        <span class="tag">Homelab</span>
+        <span class="tag">AI</span>
+        <span class="tag">Proxmox</span>
+        <span class="tag">Self-Hosting</span>
+        <span class="tag">Automation</span>
+      </div>
 
       <figure class="post-hero-image">
         <img src="/blog/images/hermes-vm-migration-hero.png" alt="Anime illustration of a bald bearded man lifting a glowing cyan brain out of a cracked laptop and placing it into a Proxmox server rack" style="width:100%;border-radius:8px;margin-bottom:1.5rem;">

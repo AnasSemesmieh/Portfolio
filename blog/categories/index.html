@@ -5,8 +5,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Blog Categories | Anas Semesmieh</title>
-  <meta name="description" content="Browse blog categories: platform engineering, engineering leadership, digital transformation, and homelab field notes." />
+  <meta name="description" content="Browse blog categories: homelab field notes, platform engineering, engineering leadership, security, AI and automation, and cloud architecture." />
+  <meta name="author" content="Anas Semesmieh" />
   <link rel="canonical" href="https://anas.semesmieh.com/blog/categories/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Blog Categories | Anas Semesmieh" />
+  <meta property="og:description" content="Browse blog categories on platform engineering, homelab, AI, security, and more." />
+  <meta property="og:url" content="https://anas.semesmieh.com/blog/categories/" />
+  <meta property="og:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
   <style>
     :root {
       --bg: #0b1220; --card: #101a2c; --muted: #8ea0be; --text: #e6eef8;
@@ -22,14 +28,17 @@
     .nav { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:24px; }
     .nav a { color:var(--muted); text-decoration:none; padding:7px 13px; border-radius:10px; font-size:14px; transition: color 0.15s, background 0.15s; }
     .nav a:hover { color:var(--text); background:rgba(255,255,255,0.04); }
-    h1 { color: var(--heading); margin-bottom: 20px; font-size: 32px; }
+    h1 { color: var(--heading); margin-bottom: 8px; font-size: 32px; }
+    .subtitle { color: var(--muted); font-size: 15px; margin-bottom: 28px; }
     .grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap:16px; }
     .card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:22px 24px; transition: border-color 0.18s, transform 0.18s; }
     .card:hover { border-color: rgba(96,165,250,0.35); transform: translateY(-1px); }
-    .card h2 { color: var(--heading); font-size: 20px; margin-bottom: 12px; }
+    .card h2 { color: var(--heading); font-size: 20px; margin-bottom: 6px; }
+    .card .count { color: var(--muted); font-size: 13px; margin-bottom: 12px; }
     .card a { color: var(--accent); text-decoration: none; }
     .card a:hover { text-decoration: underline; }
     .card p { margin: 6px 0; font-size: 14px; }
+    .card .desc { color: var(--muted); font-size: 13px; margin-bottom: 14px; line-height: 1.5; }
     @media (max-width:700px) { .wrap { padding:16px 14px 48px; } .grid { grid-template-columns:1fr; } h1 { font-size:26px; } }
   </style>
 </head>
@@ -40,54 +49,112 @@
       <a href="/">Portfolio</a>
       <a href="/blog/">All Posts</a>
       <a href="/blog/tags/">Tags</a>
+      <a href="/blog/rss.xml">RSS</a>
     </nav>
 
     <h1>Categories</h1>
+    <p class="subtitle">30 posts across 8 categories — browsable by topic.</p>
 
     <div class="grid">
 
     <div class="card">
-      <h2>Platform Engineering</h2>
-      <p><a href="/blog/posts/cloudflare-frontend-standardization">The Edge-First Frontend: Standardizing Web Architecture on Cloudflare</a></p>
-      <p><a href="/blog/posts/dependabot-dependency-automation">Dependabot Without Pull Request Fatigue: Automating Dependency Hygiene the Right Way</a></p>
-      <p><a href="/blog/posts/git-flow-branching-strategy">Git Flow Without the Ceremony Tax: A Practical Branching Strategy for Growing Teams</a></p>
-      <p><a href="/blog/posts/platform-engineering-at-scale">How Platform Engineering Creates Strategic Capacity</a></p>
-      <p><a href="/blog/posts/platform-engineering-innovation-with-guardrails">Platform Engineering Works When Innovation Ships With Guardrails</a></p>
-      <p><a href="/blog/posts/immutable-infrastructure-journey">From Legacy to Immutable: A Practical IaC Maturity Journey</a></p>
-      <p><a href="/blog/posts/ai-adoption-platform-teams">Driving AI Adoption in Platform Teams Without Losing Engineering Discipline</a></p>
-    </div>
-
-    <div class="card">
-      <h2>Developer Experience</h2>
-      <p><a href="/blog/posts/backstage-idp-platform-capacity">The Ad-Hoc Tax: How Backstage Recovered Platform Capacity for Higher-Value Work</a></p>
-      <p><a href="/blog/posts/idp-self-service-playbook">Designing an Internal Developer Portal That Teams Actually Use</a></p>
-    </div>
-
-    <div class="card">
-      <h2>Engineering Leadership</h2>
-      <p><a href="/blog/posts/leading-through-uncertainty-engineering-teams">Leading Through Uncertainty Without Performing False Confidence</a></p>
-      <p><a href="/blog/posts/ai-amplifier-engineering-judgment">AI Is an Amplifier, Not a Substitute for Engineering Judgment</a></p>
-      <p><a href="/blog/posts/ai-adoption-platform-teams">Driving AI Adoption in Platform Teams Without Losing Engineering Discipline</a></p>
-    </div>
-    <div class="card">
-      <h2>Digital Transformation</h2>
-      <p><a href="/blog/posts/saas-wholesale-automotive">SaaS for Wholesale in Automotive: What Good Digital Transformation Looks Like</a></p>
-    </div>
-    <div class="card">
       <h2>Homelab</h2>
+      <p class="count">18 posts</p>
+      <p class="desc">Field notes from building and running a self-hosted homelab on Proxmox, Docker, and Unraid.</p>
+      <p><a href="/blog/posts/homelab-ai-blog-images">Giving My Blog Posts a Visual Identity with Agnes AI and a Custom Hermes Skill</a></p>
+      <p><a href="/blog/posts/homelab-unbound-recursive-dns">Your DNS Knows Too Much: Building a Private Recursive Resolver with Unbound</a></p>
+      <p><a href="/blog/posts/homelab-hermes-vm-migration">Homelab Brain Transplant: Giving Hermes a Proper Linux Home</a></p>
+      <p><a href="/blog/posts/homelab-double-disk-failure-without-parity">The Migration That Migrated Itself: Surviving a Double Disk Failure Without Parity</a></p>
+      <p><a href="/blog/posts/homelab-nas-to-das-migration">From NAS to DAS: Retiring My Synology Before It Retired My Data</a></p>
+      <p><a href="/blog/posts/homelab-hermes-ai-agent">I Gave My Homelab an AI Brain: Documenting Everything and Wiring It to Telegram with Hermes</a></p>
       <p><a href="/blog/posts/homelab-telegram-yt-dlp-bot">Challenge Accepted: Self-Hosting a Telegram Video Bot with n8n and yt-dlp</a></p>
       <p><a href="/blog/posts/homelab-full-lxc-migration">Finishing the Decomposition: Every Service Gets Its Own Container</a></p>
       <p><a href="/blog/posts/homelab-proxmox-lxc-decomposition">Decomposing the Monolith: Per-Service LXCs on Proxmox</a></p>
       <p><a href="/blog/posts/homelab-p2v-proxmox-migration">Bare-Metal to VM: A Pragmatic P2V Migration to Proxmox</a></p>
       <p><a href="/blog/posts/homelab-xcaddy-cloudflare-tunnel-adguard">Xcaddy + Cloudflare Tunnel + AdGuard Home: A Simpler Homelab Edge</a></p>
       <p><a href="/blog/posts/homelab-vaultwarden-self-hosted-passwords">Self-Hosting Vaultwarden: Ditching 1Password for Total Password Ownership</a></p>
-      <p><a href="/blog/posts/homelab-start-here">My Home Lab Journey: Start Here</a></p>
+      <p><a href="/blog/posts/homelab-sso-authentik">Single Sign-On for Homelabs: Authentik, Traefik Forward-Auth, and Cloudflare Tunnel</a></p>
+      <p><a href="/blog/posts/homelab-secrets-management">Secrets Management for Homelabs: Redaction, Scanning, and Rehydration</a></p>
+      <p><a href="/blog/posts/homelab-disaster-recovery">Homelab Disaster Recovery in Under an Hour</a></p>
       <p><a href="/blog/posts/homelab-backup-automation">Automated Config Backup with Secret Redaction</a></p>
       <p><a href="/blog/posts/homelab-docker-compose-stack">Docker Compose All The Things: Running 10+ Services on One Host</a></p>
-      <p><a href="/blog/posts/homelab-disaster-recovery">Homelab Disaster Recovery in Under an Hour</a></p>
-      <p><a href="/blog/posts/homelab-secrets-management">Secrets Management for Homelabs</a></p>
-      <p><a href="/blog/posts/homelab-sso-authentik">Single Sign-On for Homelabs: Authentik, Traefik Forward-Auth, and Cloudflare Tunnel</a></p>
+      <p><a href="/blog/posts/homelab-start-here">My Home Lab Journey: Start Here</a></p>
     </div>
+
+    <div class="card">
+      <h2>Platform Engineering</h2>
+      <p class="count">9 posts</p>
+      <p class="desc">Building platforms that multiply team capacity — IaC maturity, Backstage, automation, and reducing KTLO.</p>
+      <p><a href="/blog/posts/backstage-idp-platform-capacity">The Ad-Hoc Tax: How Backstage Recovered Platform Capacity for Higher-Value Work</a></p>
+      <p><a href="/blog/posts/platform-engineering-innovation-with-guardrails">Platform Engineering Works When Innovation Ships With Guardrails</a></p>
+      <p><a href="/blog/posts/ai-adoption-platform-teams">Driving AI Adoption in Platform Teams Without Losing Engineering Discipline</a></p>
+      <p><a href="/blog/posts/homelab-start-here">My Home Lab Journey: Start Here</a></p>
+      <p><a href="/blog/posts/immutable-infrastructure-journey">From Legacy to Immutable: A Practical IaC Maturity Journey</a></p>
+      <p><a href="/blog/posts/platform-engineering-at-scale">How Platform Engineering Creates Strategic Capacity</a></p>
+      <p><a href="/blog/posts/cloudflare-frontend-standardization">The Edge-First Frontend: Standardizing Web Architecture on Cloudflare</a></p>
+      <p><a href="/blog/posts/dependabot-dependency-automation">Dependabot Without Pull Request Fatigue: Automating Dependency Hygiene the Right Way</a></p>
+      <p><a href="/blog/posts/git-flow-branching-strategy">Git Flow Without the Ceremony Tax: A Practical Branching Strategy for Growing Teams</a></p>
+    </div>
+
+    <div class="card">
+      <h2>Engineering Leadership</h2>
+      <p class="count">4 posts</p>
+      <p class="desc">Leading engineering teams through uncertainty, AI adoption, and organisational change.</p>
+      <p><a href="/blog/posts/ai-adoption-platform-teams">Driving AI Adoption in Platform Teams Without Losing Engineering Discipline</a></p>
+      <p><a href="/blog/posts/leading-through-uncertainty-engineering-teams">Leading Through Uncertainty Without Performing False Confidence</a></p>
+      <p><a href="/blog/posts/ai-amplifier-engineering-judgment">AI Is an Amplifier, Not a Substitute for Engineering Judgment</a></p>
+      <p><a href="/blog/posts/saas-wholesale-automotive">SaaS for Wholesale in Automotive: What Good Digital Transformation Looks Like</a></p>
+    </div>
+
+    <div class="card">
+      <h2>Developer Experience</h2>
+      <p class="count">4 posts</p>
+      <p class="desc">Internal developer portals, self-service workflows, and removing friction for engineering teams.</p>
+      <p><a href="/blog/posts/backstage-idp-platform-capacity">The Ad-Hoc Tax: How Backstage Recovered Platform Capacity for Higher-Value Work</a></p>
+      <p><a href="/blog/posts/platform-engineering-innovation-with-guardrails">Platform Engineering Works When Innovation Ships With Guardrails</a></p>
+      <p><a href="/blog/posts/idp-self-service-playbook">Designing an Internal Developer Portal That Teams Actually Use</a></p>
+      <p><a href="/blog/posts/git-flow-branching-strategy">Git Flow Without the Ceremony Tax: A Practical Branching Strategy for Growing Teams</a></p>
+    </div>
+
+    <div class="card">
+      <h2>Security</h2>
+      <p class="count">7 posts</p>
+      <p class="desc">Secrets management, DevSecOps, password ownership, and zero-trust homelab networking.</p>
+      <p><a href="/blog/posts/homelab-xcaddy-cloudflare-tunnel-adguard">Xcaddy + Cloudflare Tunnel + AdGuard Home: A Simpler Homelab Edge</a></p>
+      <p><a href="/blog/posts/homelab-vaultwarden-self-hosted-passwords">Self-Hosting Vaultwarden: Ditching 1Password for Total Password Ownership</a></p>
+      <p><a href="/blog/posts/homelab-sso-authentik">Single Sign-On for Homelabs: Authentik, Traefik Forward-Auth, and Cloudflare Tunnel</a></p>
+      <p><a href="/blog/posts/homelab-secrets-management">Secrets Management for Homelabs: Redaction, Scanning, and Rehydration</a></p>
+      <p><a href="/blog/posts/homelab-backup-automation">Automated Config Backup with Secret Redaction</a></p>
+      <p><a href="/blog/posts/cloudflare-frontend-standardization">The Edge-First Frontend: Standardizing Web Architecture on Cloudflare</a></p>
+      <p><a href="/blog/posts/dependabot-dependency-automation">Dependabot Without Pull Request Fatigue: Automating Dependency Hygiene the Right Way</a></p>
+    </div>
+
+    <div class="card">
+      <h2>AI & Automation</h2>
+      <p class="count">5 posts</p>
+      <p class="desc">AI adoption, agent-driven workflows, and automating the boring parts of engineering.</p>
+      <p><a href="/blog/posts/homelab-ai-blog-images">Giving My Blog Posts a Visual Identity with Agnes AI and a Custom Hermes Skill</a></p>
+      <p><a href="/blog/posts/homelab-hermes-vm-migration">Homelab Brain Transplant: Giving Hermes a Proper Linux Home</a></p>
+      <p><a href="/blog/posts/homelab-hermes-ai-agent">I Gave My Homelab an AI Brain: Documenting Everything and Wiring It to Telegram with Hermes</a></p>
+      <p><a href="/blog/posts/ai-adoption-platform-teams">Driving AI Adoption in Platform Teams Without Losing Engineering Discipline</a></p>
+      <p><a href="/blog/posts/ai-amplifier-engineering-judgment">AI Is an Amplifier, Not a Substitute for Engineering Judgment</a></p>
+    </div>
+
+    <div class="card">
+      <h2>Cloud Architecture</h2>
+      <p class="count">2 posts</p>
+      <p class="desc">Edge-first frontends, immutable infrastructure, and Cloudflare-native architecture patterns.</p>
+      <p><a href="/blog/posts/immutable-infrastructure-journey">From Legacy to Immutable: A Practical IaC Maturity Journey</a></p>
+      <p><a href="/blog/posts/cloudflare-frontend-standardization">The Edge-First Frontend: Standardizing Web Architecture on Cloudflare</a></p>
+    </div>
+
+    <div class="card">
+      <h2>Digital Transformation</h2>
+      <p class="count">1 post</p>
+      <p class="desc">Practical digital transformation in operational industries — what good looks like on the ground.</p>
+      <p><a href="/blog/posts/saas-wholesale-automotive">SaaS for Wholesale in Automotive: What Good Digital Transformation Looks Like</a></p>
+    </div>
+
     </div>
   </div>
 </body>

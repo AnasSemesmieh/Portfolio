@@ -53,10 +53,20 @@
     .series-nav { margin-top:32px; padding-top:20px; border-top:1px solid var(--border); }
     .series-nav a { display:inline-block; margin-right:12px; }
     @media (max-width:700px) { .wrap { padding:16px 14px 48px; } h1 { font-size:28px; } article { padding:20px; } }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+    .tag {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
   </style>
   <script type="application/ld+json">
   {
-    "@context":"https://schema.org","@type":"BlogPosting",
+    "@context":"https://***@type":"BlogPosting",
     "headline":"Docker Compose All The Things: Running 10+ Services on One Host",
     "datePublished":"2026-04-20","dateModified":"2026-04-20",
     "author":{"@type":"Person","name":"Anas Semesmieh","url":"https://anas.semesmieh.com/about/"},
@@ -105,6 +115,12 @@
     <article>
       <h1>Docker Compose All The Things: Running 10+ Services on One Host</h1>
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> · April 20, 2026 · Homelab · Docker</p>
+
+      <div class="tag-list">
+        <span class="tag">Homelab</span>
+        <span class="tag">Docker</span>
+        <span class="tag">Self-Hosting</span>
+      </div>
 
       <p>My homelab runs entirely on Docker Compose — no Kubernetes, no Nomad, no Proxmox clustering. Just one Ubuntu Server, a dozen <code>docker-compose.yml</code> files, and a reverse proxy that ties it all together. Here's how each piece fits.</p>
 

@@ -51,6 +51,16 @@
     th, td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--border); }
     th { color:var(--muted); font-weight:600; font-size:13px; text-transform:uppercase; letter-spacing:0.5px; }
     @media (max-width:700px) { .wrap { padding:16px 14px 48px; } h1 { font-size:28px; } article { padding:20px; } }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+    .tag {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
   </style>
 
   <script type="application/ld+json">
@@ -114,6 +124,12 @@
     <article>
       <h1>Git Flow Without the Ceremony Tax: A Practical Branching Strategy for Growing Teams</h1>
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> · October 16, 2025 · Platform Engineering, Developer Experience</p>
+
+      <div class="tag-list">
+        <span class="tag">Platform Engineering</span>
+        <span class="tag">Developer Experience</span>
+        <span class="tag">Automation</span>
+      </div>
 
       <p>Branching strategy feels trivial right up until delivery starts slowing down. That was the actual problem behind the source document for this post: teams had overlapping release habits, different branch names for similar intents, and inconsistent promotion paths across environments. The result was predictable: release preparation became manual, hotfix handling became risky, and code-quality tooling produced misleading comparisons because branches were not behaving consistently.</p>
 

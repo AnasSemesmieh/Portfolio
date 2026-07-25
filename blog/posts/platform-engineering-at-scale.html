@@ -53,6 +53,16 @@
     .series-nav { margin-top:32px; padding-top:20px; border-top:1px solid var(--border); }
     .series-nav a { display:inline-block; margin-right:12px; }
     @media (max-width:700px) { .wrap { padding:16px 14px 48px; } h1 { font-size:28px; } article { padding:20px; } }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+    .tag {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
   </style>
 
   <script type="application/ld+json">
@@ -115,6 +125,13 @@
     <article>
       <h1>How Platform Engineering Creates Strategic Capacity</h1>
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> · March 15, 2026 · Platform Engineering</p>
+
+      <div class="tag-list">
+        <span class="tag">Platform Engineering</span>
+        <span class="tag">IDP</span>
+        <span class="tag">KTLO</span>
+        <span class="tag">Automation</span>
+      </div>
 
       <p>Platform engineering creates strategic capacity when it removes the work that repeatedly steals attention from engineers who should be solving higher-value problems. That sounds obvious, but it is where many platform programs lose clarity. They talk about developer experience, enablement, and internal platforms in broad terms, while teams still spend too much time on provisioning handoffs, missing ownership data, release coordination, documentation gaps, and repetitive operational support.</p>
 
