@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Giving My Blog Posts a Visual Identity with Agnes AI and a Custom Hermes Skill | Anas Semesmieh</title>
+  <meta name="description" content="How I built a custom Hermes skill to auto-generate and embed contextually relevant AI images into my blog posts using Agnes AI — and why plain text posts were holding back my portfolio." />
+  <meta name="author" content="Anas Semesmieh" />
+  <link rel="canonical" href="https://anas.semesmieh.com/blog/posts/homelab-ai-blog-images" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Giving My Blog Posts a Visual Identity with Agnes AI and a Custom Hermes Skill" />
+  <meta property="og:description" content="How I built a custom Hermes skill to auto-generate and embed contextually relevant AI images into my blog posts using Agnes AI — and why plain text posts were holding back my portfolio." />
+  <meta property="og:url" content="https://anas.semesmieh.com/blog/posts/homelab-ai-blog-images" />
+  <meta property="og:image" content="https://anas.semesmieh.com/blog/assets/ai-blog-images/hero.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Giving My Blog Posts a Visual Identity with Agnes AI and a Custom Hermes Skill" />
+  <meta name="twitter:description" content="How I built a custom Hermes skill to auto-generate and embed contextually relevant AI images into my blog posts using Agnes AI." />
+  <meta name="twitter:image" content="https://anas.semesmieh.com/blog/assets/ai-blog-images/hero.png" />
+
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #101a2c;
+      --muted: #8ea0be;
+      --text: #e6eef8;
+      --accent: #16a34a;
+      --border: rgba(255, 255, 255, 0.08);
+      --maxw: 800px;
+      --radius: 14px;
+      --font: "IBM Plex Sans", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.72;
+      background: var(--bg);
+    }
+
+    .wrap { max-width: var(--maxw); margin: 0 auto; padding: 30px 18px 80px; }
+    .nav { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+    .nav a { text-decoration: none; color: var(--muted); padding: 8px 12px; border-radius: 10px; }
+    .nav a:hover { color: var(--text); background: rgba(255, 255, 255, 0.03); }
+    article { border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; background: var(--card); }
+    h1 { margin-top: 0; font-size: 34px; line-height: 1.2; }
+    .meta { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+    h2 { margin-top: 36px; font-size: 22px; }
+    h3 { margin-top: 24px; font-size: 18px; color: var(--text); }
+    p { margin: 0 0 16px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code {
+      font-family: "IBM Plex Mono", "Fira Code", monospace;
+      background: rgba(255,255,255,0.07);
+      border-radius: 5px;
+      padding: 2px 6px;
+      font-size: 0.88em;
+    }
+    pre {
+      background: #0d1829;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+      overflow-x: auto;
+      font-size: 0.87em;
+      line-height: 1.6;
+      margin: 20px 0;
+    }
+    pre code { background: none; padding: 0; font-size: inherit; }
+
+    .post-img {
+      width: 100%;
+      border-radius: 12px;
+      margin: 24px 0;
+      border: 1px solid var(--border);
+      display: block;
+      object-fit: cover;
+    }
+    .post-img-diagram {
+      width: 100%;
+      border-radius: 12px;
+      margin: 24px 0;
+      border: 1px solid var(--border);
+      display: block;
+      object-fit: contain;
+      background: #0d1829;
+    }
+    .img-caption {
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: -16px;
+      margin-bottom: 24px;
+    }
+
+    .callout {
+      border-left: 3px solid var(--accent);
+      background: rgba(22, 163, 74, 0.07);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px;
+      margin: 24px 0;
+      font-size: 0.95em;
+    }
+    .callout strong { color: var(--accent); }
+
+    .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+    .tag {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    ul, ol { padding-left: 22px; margin: 0 0 16px; }
+    li { margin-bottom: 6px; }
+
+    .related-posts {
+      margin-top: 48px;
+      border-top: 1px solid var(--border);
+      padding-top: 28px;
+    }
+    .related-posts h2 { margin-top: 0; font-size: 18px; color: var(--muted); }
+    .related-posts a {
+      display: block;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 10px;
+      color: var(--text);
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .related-posts a:hover { background: rgba(255,255,255,0.03); }
+    .related-posts .rp-title { font-weight: 600; margin-bottom: 2px; }
+    .related-posts .rp-meta { font-size: 13px; color: var(--muted); }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Giving My Blog Posts a Visual Identity with Agnes AI and a Custom Hermes Skill",
+    "datePublished": "2026-07-25",
+    "dateModified": "2026-07-25",
+    "author": {
+      "@type": "Person",
+      "name": "Anas Semesmieh",
+      "url": "https://anas.semesmieh.com/about/"
+    },
+    "publisher": {
+      "@type": "Person",
+      "name": "Anas Semesmieh"
+    },
+    "mainEntityOfPage": "https://anas.semesmieh.com/blog/posts/homelab-ai-blog-images",
+    "image": "https://anas.semesmieh.com/blog/assets/ai-blog-images/hero.png",
+    "description": "How I built a custom Hermes skill to auto-generate and embed contextually relevant AI images into my blog posts using Agnes AI — and why plain text posts were holding back my portfolio."
+  }
+  </script>
+</head>
+
+<body>
+  <div class="wrap">
+    <nav class="nav" aria-label="Post navigation">
+      <a href="/">Portfolio</a>
+      <a href="/blog/">All Posts</a>
+    </nav>
+
+    <article>
+      <h1>Giving My Blog Posts a Visual Identity with Agnes AI and a Custom Hermes Skill</h1>
+      <p class="meta">July 25, 2026 &nbsp;·&nbsp; Anas Semesmieh &nbsp;·&nbsp; 8 min read</p>
+
+      <div class="tag-list">
+        <span class="tag">AI</span>
+        <span class="tag">Hermes Agent</span>
+        <span class="tag">Agnes AI</span>
+        <span class="tag">Homelab</span>
+        <span class="tag">Portfolio</span>
+        <span class="tag">Automation</span>
+      </div>
+
+      <img
+        src="/blog/assets/ai-blog-images/hero.png"
+        alt="Developer at a dual-monitor setup, before and after blog post visual upgrade"
+        class="post-img"
+      />
+      <p class="img-caption">Before → after: plain text-only blog posts enriched with AI-generated contextual illustrations.</p>
+
+      <p>
+        For a long time, my blog posts were walls of text. Good content, I think — writeups on
+        <a href="/blog/posts/homelab-unbound-recursive-dns">self-hosted recursive DNS</a>,
+        <a href="/blog/posts/homelab-start-here">how I run my homelab</a>,
+        infrastructure migrations — but visually flat. No images, no diagrams beyond the occasional code block.
+        I knew it mattered. I just never had a workflow that made it feel worth the friction.
+      </p>
+
+      <p>
+        That changed when I wired up <strong>Agnes AI</strong> as an image generation provider and built a
+        <strong>custom Hermes skill</strong> to automate the whole process — reading a post, identifying natural
+        image slots, generating contextually relevant illustrations, getting my approval, and embedding them
+        directly into the HTML. This post walks through how that system works and what I learned building it.
+      </p>
+
+      <h2>Why Plain Text Posts Were a Problem</h2>
+
+      <p>
+        My portfolio is a technical signal. Hiring managers and engineering leaders who land on it are forming
+        an impression fast — and a wall of text, even well-written text, signals "rough notes" not "senior engineer."
+        Images do a lot of work: they break up the reading rhythm, signal that the author cared enough to go further,
+        and in technical posts, a good diagram or illustration often communicates faster than three paragraphs.
+      </p>
+
+      <p>
+        The friction wasn't skill — it was time. Finding stock photos that aren't generic garbage, creating diagrams
+        in draw.io, resizing and optimizing — it adds up. For a post that takes me two hours to write, the image
+        workflow was another hour I didn't have on a weeknight.
+      </p>
+
+      <div class="callout">
+        <strong>The goal:</strong> zero-friction image enrichment. Read the post, understand the context,
+        generate relevant images, get my sign-off, embed them. Done.
+      </div>
+
+      <h2>The Architecture: Hermes + Agnes AI</h2>
+
+      <img
+        src="/blog/assets/ai-blog-images/integration-pipeline.png"
+        alt="Integration pipeline diagram: Hermes Agent → Agnes AI → Blog HTML"
+        class="post-img-diagram"
+      />
+      <p class="img-caption">The full enrichment pipeline — from reading a post to committing illustrated HTML.</p>
+
+      <p>
+        <a href="https://hermes-agent.nousresearch.com" target="_blank" rel="noopener">Hermes Agent</a> is the AI
+        agent framework I run locally for homelab automation, coding tasks, and now content workflows. It supports
+        pluggable image providers through a skill system — you write a <code>SKILL.md</code> that defines
+        the workflow, and Hermes loads it as a reusable procedure.
+      </p>
+
+      <p>
+        <strong>Agnes AI</strong> is the image generation API I picked for this project. It exposes an OpenAI-compatible
+        endpoint at <code>https://apihub.agnes-ai.com/v1</code>, which made integration with Hermes straightforward —
+        just configure it as a custom provider with an API key. The model I settled on is
+        <code>agnes-image-2.1-flash</code>, which produces solid results in around 20 seconds per image.
+      </p>
+
+      <h3>Configuring Agnes AI in Hermes</h3>
+
+      <p>Adding Agnes AI as a custom provider took one config change:</p>
+
+      <pre><code># ~/.hermes/config.yaml
+custom_providers:
+  agnes-ai:
+    base_url: https://apihub.agnes-ai.com/v1
+    api_key: &lt;your-key&gt;</code></pre>
+
+      <p>
+        From there, Hermes can hit the <code>/images/generations</code> and <code>/images/edits</code> endpoints
+        during a skill run — no extra tooling needed.
+      </p>
+
+      <h2>The Blog Image Enrichment Skill</h2>
+
+      <p>
+        The skill lives at <code>~/.hermes/skills/blog-image-enrichment/SKILL.md</code>. At a high level, here's
+        what it does:
+      </p>
+
+      <ol>
+        <li><strong>Read the target post</strong> — load the HTML, understand the narrative structure and section headings.</li>
+        <li><strong>Identify image slots</strong> — find 3–5 natural insertion points where an image would add value, not just fill space.</li>
+        <li><strong>Generate prompts</strong> — craft specific, contextual prompts for each slot. Not generic stock-photo prompts — prompts that reflect what <em>this specific section</em> is about.</li>
+        <li><strong>Call Agnes AI</strong> — generate each image, download it locally.</li>
+        <li><strong>Show me for approval</strong> — every image gets surfaced before anything is embedded. No auto-commits.</li>
+        <li><strong>Embed and commit</strong> — once approved, patch the HTML, add the assets, and push.</li>
+      </ol>
+
+      <p>
+        The approval step was non-negotiable. AI image generation is still inconsistent — good composition 80% of
+        the time, completely wrong 20%. I want human eyes on every image before it goes live.
+      </p>
+
+      <h3>What Good Prompts Look Like for Technical Posts</h3>
+
+      <p>
+        Generic prompts produce generic images. The skill enforces specificity. For my post on
+        <a href="/blog/posts/homelab-unbound-recursive-dns">self-hosted recursive DNS with Unbound</a>,
+        instead of prompting "a server diagram," the skill generated:
+      </p>
+
+      <pre><code>"Dark-themed network topology diagram. Devices at the top connect to two AdGuard Home nodes
+(primary + replica). Both forward to a single Unbound CT110 node. Unbound connects downward
+to Root, TLD, and Authoritative DNS servers. Clean arrows, neon green labels, dark background.
+Technical infrastructure illustration style."</code></pre>
+
+      <p>
+        That specificity — CT110, the topology, the actual component names — is what makes the image earn its
+        place in the post rather than just decorating it.
+      </p>
+
+      <h2>The Before and After</h2>
+
+      <img
+        src="/blog/assets/ai-blog-images/before-after.png"
+        alt="Side-by-side comparison: plain text blog post versus the same post with AI-generated images"
+        class="post-img-diagram"
+      />
+      <p class="img-caption">Left: a typical blog post before enrichment. Right: the same post after — images woven into the narrative, not bolted on.</p>
+
+      <p>
+        The difference is real. Posts that previously looked like internal documentation now feel like proper
+        technical writing. The
+        <a href="/blog/posts/homelab-unbound-recursive-dns">Unbound DNS post</a> got a hero image, a
+        DNS forwarding vs. recursive resolution comparison, and a topology result diagram. The
+        <a href="/blog/posts/homelab-start-here">homelab start-here guide</a> got four images — a hero,
+        a "what I run" visual, a backup philosophy illustration, and a career context closer.
+      </p>
+
+      <p>
+        Each image was generated from the section's actual content — not repurposed stock art — so they reinforce
+        the writing rather than existing in parallel to it.
+      </p>
+
+      <h2>What I Learned (and What Still Needs Work)</h2>
+
+      <h3>What worked well</h3>
+      <ul>
+        <li><strong>Contextual prompts beat generic ones every time.</strong> Investing 30 seconds in a specific prompt saves regeneration cycles.</li>
+        <li><strong>The approval gate pays off.</strong> About 1 in 5 generations was wrong — wrong tone, wrong level of abstraction, or just aesthetically off. Having the gate meant those never made it to the post.</li>
+        <li><strong>Self-hosted assets.</strong> Downloading images to <code>/blog/assets/</code> instead of hotlinking means the blog doesn't break if Agnes AI's CDN URL expires.</li>
+        <li><strong>Diagrams with <code>object-fit: contain</code>.</strong> Technical diagrams need room to breathe — forcing them into a fixed-height cover crop garbles the labels.</li>
+      </ul>
+
+      <h3>What I'm still iterating on</h3>
+      <ul>
+        <li><strong>Likeness generation.</strong> The <code>/images/edits</code> endpoint supports reference photos for face preservation — when it's available. It's intermittently down, and the fallback <code>/generations</code> endpoint uses the reference loosely. The hero images across these posts don't quite look like me yet, and that's the next thing to fix.</li>
+        <li><strong>Image sizing.</strong> I settled on <code>1536×1024</code> for hero images and wide diagrams, but I haven't optimized for load time yet. These are 1–1.5 MB uncompressed PNGs. A <code>srcset</code> pipeline and WebP conversion is on the list.</li>
+        <li><strong>Batch generation.</strong> Right now the skill generates images one at a time. A concurrent approach would cut the enrichment session time significantly.</li>
+      </ul>
+
+      <div class="callout">
+        <strong>The skill is a living document.</strong> Every time I run it and hit a new edge case, I patch
+        the <code>SKILL.md</code> immediately. Hermes makes this easy — the skill is just a markdown file with
+        frontmatter that loads into any session on demand.
+      </div>
+
+      <h2>Why This Matters Beyond Aesthetics</h2>
+
+      <p>
+        There's a compounding effect here that I didn't fully anticipate. When posts look better, I'm more
+        motivated to write them. When I'm more motivated to write them, the portfolio grows. A better portfolio
+        is a better career signal. This started as a "make the blog prettier" project and turned into
+        infrastructure for consistent technical writing.
+      </p>
+
+      <p>
+        That's the pattern I keep finding in homelab automation — the value isn't the automation itself,
+        it's the behaviour it enables that wouldn't otherwise happen at all.
+      </p>
+
+      <p>
+        If you're running Hermes and want to set up something similar,
+        the full skill is available — drop me a message via the
+        <a href="/#contact">contact section</a> of my portfolio and I'll share it directly.
+      </p>
+
+      <div class="related-posts">
+        <h2>Related Posts</h2>
+        <a href="/blog/posts/homelab-unbound-recursive-dns">
+          <div class="rp-title">Your DNS Knows Too Much — So I Made It Forget</div>
+          <div class="rp-meta">Self-hosted recursive DNS with Unbound, AdGuard Home, and a replica setup</div>
+        </a>
+        <a href="/blog/posts/homelab-start-here">
+          <div class="rp-title">Where to Start With a Homelab</div>
+          <div class="rp-meta">The philosophy, the hardware, and why I run what I run</div>
+        </a>
+        <a href="/blog/posts/homelab-hermes-ai-agent">
+          <div class="rp-title">Running Hermes AI Agent in My Homelab</div>
+          <div class="rp-meta">How I use a local AI agent for infrastructure automation and technical writing</div>
+        </a>
+      </div>
+    </article>
+  </div>
+</body>
+
+</html>
