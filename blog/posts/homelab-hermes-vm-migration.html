@@ -264,6 +264,10 @@
       <h1>Homelab Brain Transplant: Giving Hermes a Proper Linux Home</h1>
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> · July 12, 2026 · Homelab, AI, Proxmox, Self-Hosting, Automation</p>
 
+      <figure class="post-hero-image">
+        <img src="/blog/images/hermes-vm-migration-hero.png" alt="Anime illustration of a bald bearded man lifting a glowing cyan brain out of a cracked laptop and placing it into a Proxmox server rack" style="width:100%;border-radius:8px;margin-bottom:1.5rem;">
+      </figure>
+
       <p>
         Earlier this year I <a href="/blog/posts/homelab-hermes-ai-agent">wired Hermes into my homelab</a> — an AI agent running locally, connected to Telegram, with memory, skills, cron jobs, and a Mnemosyne dashboard. It worked well. It worked from my Windows laptop. And that was quietly the problem all along.
       </p>
@@ -272,6 +276,10 @@
       </p>
 
       <h2>Why the transplant was overdue</h2>
+      <figure style="margin:1.5rem 0;">
+        <img src="/blog/images/hermes-vm-migration-fragile-setup.png" alt="Split cyberpunk illustration: chaotic Windows laptop with Gateway DEAD warnings vs clean Proxmox VM terminal showing services running" style="width:100%;border-radius:8px;">
+        <figcaption style="font-size:0.85rem;color:#888;margin-top:0.5rem;text-align:center;">Left: the fragile Windows setup. Right: the new Proxmox VM — a proper home for a production agent.</figcaption>
+      </figure>
       <p>There were four compounding reasons, each enough on its own:</p>
       <ul>
         <li><strong>Single point of failure.</strong> The Telegram gateway ran as a Windows startup script. Laptop closed, lid down, or Windows Update deciding it's reboot time at 3am? Gateway dead. No messages delivered, no cron jobs fired, no agent.</li>
@@ -354,6 +362,10 @@ h-mem.semesmieh.com {
       </p>
 
       <h2>The gotchas</h2>
+      <figure style="margin:1.5rem 0;">
+        <img src="/blog/images/hermes-vm-migration-gotchas.png" alt="Three-panel cyberpunk diagram showing the three gotchas: Tailscale MagicDNS blocking HuggingFace CDN, Electron crashing on RDP, and two conflicting gateway services" style="width:100%;border-radius:8px;">
+        <figcaption style="font-size:0.85rem;color:#888;margin-top:0.5rem;text-align:center;">Three gotchas that turned a 2-hour migration into a full-day job.</figcaption>
+      </figure>
       <p>The happy path took about two hours. The gotchas took another two. Here's what bit me:</p>
 
       <h3>1. Tailscale MagicDNS blocking HuggingFace CDN</h3>
@@ -397,6 +409,10 @@ systemctl --user reset-failed 2>/dev/null || true</code></pre>
       </p>
 
       <h2>The result</h2>
+      <figure style="margin:1.5rem 0;">
+        <img src="/blog/images/hermes-vm-migration-result-architecture.png" alt="Architecture diagram showing hermes-vm as the central node with Telegram gateway, Mnemosyne dashboard, XFCE desktop, Chromium browser, and cron jobs — all connected via Tailscale, with Caddy TLS and PBS backup" style="width:100%;border-radius:8px;">
+        <figcaption style="font-size:0.85rem;color:#888;margin-top:0.5rem;text-align:center;">The new architecture: Hermes fully resident on hermes-vm, the Windows laptop decommissioned.</figcaption>
+      </figure>
       <p>
         As of today, Hermes runs entirely from <code>hermes-vm</code>:
       </p>
