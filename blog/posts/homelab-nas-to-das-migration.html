@@ -330,6 +330,10 @@
       <h1>From NAS to DAS: Retiring My Synology Before It Retired My Data</h1>
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> &middot; June 28, 2026 &middot; Homelab, Storage, Unraid, Migration, Self-Hosting</p>
 
+      <figure class="post-hero-image">
+        <img src="/blog/images/nas-to-das-hero.png" alt="Bald bearded man at a homelab desk transitioning from a Synology NAS to a QNAP DAS enclosure" style="width:100%;border-radius:8px;margin-bottom:1.5rem;">
+      </figure>
+
       <p>There is a category of risk in a homelab that is easy to ignore because nothing has gone wrong yet. Your drives spin, your Plex library loads, your backups run. The system works &mdash; you can see that much. What you cannot see is that the architecture underneath has no tolerance for failure, and that the longer it keeps working, the more data you have accumulated on a foundation that will not survive a single bad sector on the wrong disk.</p>
 
       <p>That was my Synology DS416play. Four drives, four Basic volumes, zero parity. ~16 TB of media and backups with no redundancy at all. I knew this. I had known it for a while. What finally forced the decision was not a scare &mdash; it was three pressures landing at the same time, each one reasonable on its own, together making the status quo untenable.</p>
@@ -337,6 +341,10 @@
       <p>This post is a status report on the migration in progress: what drove the decision, how I evaluated the options, why Unraid won, how the transfer is being executed, and where things stand right now as of this week. Part two will cover the app migration off the Synology and the before/after performance numbers once we have a week of runtime on the new stack.</p>
 
       <h2>Three Pressures, One Decision</h2>
+      <figure style="margin:1.5rem 0;">
+        <img src="/blog/images/nas-to-das-risk.png" alt="Synology NAS with four Basic volumes and zero redundancy, 16TB of data at risk with no parity protection" style="width:100%;border-radius:8px;">
+        <figcaption style="font-size:0.85rem;color:#888;margin-top:0.5rem;text-align:center;">Four drives, four Basic volumes, zero parity — 16 TB with no redundancy at all.</figcaption>
+      </figure>
 
       <h3>1. The Risk Was Real and Growing</h3>
 
