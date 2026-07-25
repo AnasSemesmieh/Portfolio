@@ -154,6 +154,34 @@
       transform: translateY(-1px);
     }
 
+    .navlink--blog {
+      color: var(--accent);
+      border: 1px solid rgba(34, 197, 94, 0.35);
+      background: rgba(34, 197, 94, 0.07);
+      font-weight: 600;
+      position: relative;
+    }
+    .navlink--blog::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 10px;
+      background: transparent;
+      box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+      animation: blog-pulse 2.8s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes blog-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.35); }
+      50%       { box-shadow: 0 0 0 5px rgba(34, 197, 94, 0); }
+    }
+    .navlink--blog:hover {
+      background: rgba(34, 197, 94, 0.15);
+      border-color: rgba(34, 197, 94, 0.6);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
     .hero {
       display: grid;
       grid-template-columns: 1fr 360px;
@@ -558,6 +586,14 @@
       background-position: 100% 0%;
     }
 
+    a.button--blog {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      box-shadow: 0 4px 18px rgba(34, 197, 94, 0.35);
+    }
+    a.button--blog:hover {
+      box-shadow: 0 6px 28px rgba(34, 197, 94, 0.55);
+    }
+
     .edu {
       display: flex;
       gap: 12px;
@@ -720,7 +756,7 @@
           <a class="navlink" href="#about">About</a>
           <a class="navlink" href="#experience">Experience</a>
           <a class="navlink" href="#skills">Skills</a>
-          <a class="navlink" href="/blog/">Blog</a>
+          <a class="navlink navlink--blog" href="/blog/">Blog ✦</a>
           <a class="navlink" href="#contact">Contact</a>
         </nav>
         <!-- <button id="themeToggle" class="toggle" aria-label="Toggle theme">Toggle</button> -->
@@ -964,7 +1000,7 @@
             <li style="margin-bottom:6px"><a href="/blog/posts/ai-amplifier-engineering-judgment" style="color:var(--accent);text-decoration:none">AI Is an Amplifier, Not a Substitute for Engineering Judgment</a></li>
           </ul>
           <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
-            <a class="button" href="/blog/">Read the Blog</a>
+            <a class="button button--blog" href="/blog/">Read the Blog →</a>
           </div>
         </div>
 
