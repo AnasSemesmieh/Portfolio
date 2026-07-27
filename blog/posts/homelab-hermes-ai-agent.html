@@ -342,6 +342,11 @@
         <a href="/blog/?tag=Proxmox" class="tag">Proxmox</a>
       </div>
 
+      <figure style="margin: 0 0 32px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border);">
+        <img src="../images/hermes-agent-hero.png" alt="AI agent working at a terminal in a moody homelab environment" style="width: 100%; display: block; max-height: 420px; object-fit: cover;" loading="lazy" />
+        <figcaption style="padding: 10px 14px; font-size: 13px; color: var(--muted); background: var(--card);">The homelab AI brain — Hermes Agent running on the desktop, SSHing into every container to verify live state.</figcaption>
+      </figure>
+
       <p>At some point, every homelab builder reaches the same moment. You&rsquo;re explaining your setup to someone and they ask &ldquo;wait, where does Plex actually run?&rdquo; and you pause for a second longer than you should. The architecture lives in your head &mdash; assembled piece by piece over months of migrations, refactors, and late-night experiments. It works, you know <em>that</em> much. But is what you think is running actually what&rsquo;s running?</p>
 
       <p>That pause led to a two-day project: using <a href="https://github.com/NousResearch/hermes-agent" target="_blank">Hermes Agent</a> to read every blog post, config file, and note I had, build a structured knowledge base about my homelab, SSH into every container to verify the facts against live state &mdash; and then wire the whole thing to a Telegram bot so I can query, control, and automate it from my phone. This post covers the full journey: the documentation sprint, the real discrepancies that SSH verification surfaced, the Hermes installation, the Telegram gateway setup, and what the AI brain can actually do today.</p>
@@ -418,6 +423,11 @@ Both Plex and Jellyfin share the Intel UHD iGPU via:
       <div class="callout">
         The Caddy stale-route cleanup was a side-effect bonus. Eight ghost reverse proxy routes had been accumulating since the first VM100 decomposition. They weren&rsquo;t breaking anything &mdash; Caddy just proxied to IPs that no longer responded &mdash; but they were noise in the config and a future confusion vector. The verification pass caught them all.
       </div>
+
+      <figure style="margin: 28px 0; border-radius: 12px; overflow: hidden; border: 1px solid var(--border);">
+        <img src="../images/hermes-agent-ssh.png" alt="Dark terminal with glowing padlock representing SSH verification" style="width: 100%; display: block; max-height: 380px; object-fit: cover;" loading="lazy" />
+        <figcaption style="padding: 10px 14px; font-size: 13px; color: var(--muted); background: var(--card);">SSH verification in progress — Hermes Agent SSHing into each container and comparing documented state against live reality.</figcaption>
+      </figure>
 
       <p>After two days of verification and correction, the wiki reflected actual live state for every container. Confidence levels updated, discrepancies documented, stale config cleaned up. The knowledge base went from &ldquo;probably right&rdquo; to &ldquo;SSH-verified.&rdquo;</p>
 
@@ -541,6 +551,11 @@ Hermes Gateway (Windows desktop — always-on service)
               Persistent Knowledge Base (memory + wiki)              │
               Verified: SSH-confirmed, June 2026 ─────────────────────┘</pre>
 
+      <figure style="margin: 28px 0; border-radius: 12px; overflow: hidden; border: 1px solid var(--border);">
+        <img src="../images/hermes-agent-architecture.png" alt="Futuristic architecture diagram showing AI agent at the center of a homelab network" style="width: 100%; display: block; max-height: 380px; object-fit: cover;" loading="lazy" />
+        <figcaption style="padding: 10px 14px; font-size: 13px; color: var(--muted); background: var(--card);">The full architecture — one agent with complete context, SSHing outward to every node rather than running fragmented agents inside each container.</figcaption>
+      </figure>
+
       <h2>What the Brain Can Do: Real Examples</h2>
 
       <h3>Plex Monitoring</h3>
@@ -619,6 +634,11 @@ Hermes: Opens https://home.semesmieh.com in a headless browser →
           </tr>
         </tbody>
       </table>
+
+      <figure style="margin: 28px 0; border-radius: 12px; overflow: hidden; border: 1px solid var(--border);">
+        <img src="../images/hermes-agent-capabilities.png" alt="Futuristic showcase of AI capabilities controlling a homelab from a phone" style="width: 100%; display: block; max-height: 380px; object-fit: cover;" loading="lazy" />
+        <figcaption style="padding: 10px 14px; font-size: 13px; color: var(--muted); background: var(--card);">Capabilities in practice — querying Plex sessions, triggering n8n workflows, and running container commands all from a single Telegram thread.</figcaption>
+      </figure>
 
       <h2>Memory and Context Persistence</h2>
 
