@@ -334,6 +334,10 @@
       <h1>I Gave My Homelab an AI Brain: Documenting Everything and Wiring It to Telegram with Hermes</h1>
       <p class="meta">By <a href="/about/">Anas Semesmieh</a> &middot; June 19, 2026</p>
 
+      <figure class="post-hero-image">
+        <img src="/blog/images/hermes-agent-hero.png" alt="Bald bearded man at a glowing keyboard in a cyberpunk server room with matrix code raining down and a Telegram hologram in the air" style="width:100%;border-radius:8px;margin-bottom:1.5rem;">
+      </figure>
+
       <div class="tag-list">
         <a href="/blog/?tag=Homelab" class="tag">Homelab</a>
         <a href="/blog/?tag=AI" class="tag">AI</a>
@@ -381,6 +385,10 @@ Both Plex and Jellyfin share the Intel UHD iGPU via:
       <p>The wiki took about forty minutes to scaffold. That was the easy part.</p>
 
       <h2>Step 2 &mdash; SSH Verification: Where the Reality Diverged</h2>
+      <figure style="margin:1.5rem 0;">
+        <img src="/blog/images/hermes-agent-ssh-verify.png" alt="Cyberpunk terminal windows showing SSH connections to nine LXC containers with green health check output" style="width:100%;border-radius:8px;">
+        <figcaption style="font-size:0.85rem;color:#888;margin-top:0.5rem;text-align:center;">SSH into every container to verify the documented facts against live state — not everything matched.</figcaption>
+      </figure>
 
       <p>With the wiki skeleton complete, Hermes SSH&rsquo;d into each container in turn and ran targeted verification commands: checking systemd units, Docker container states, listening ports, disk usage, service versions. The goal was to either confirm every documented fact or flag a discrepancy.</p>
 
@@ -516,6 +524,10 @@ hermes gateway logs --tail 50
       </div>
 
       <h2>The Architecture: What the Brain Can See</h2>
+      <figure style="margin:1.5rem 0;">
+        <img src="/blog/images/hermes-agent-architecture.png" alt="Architecture diagram showing Hermes AI agent connected to Proxmox, nine LXC containers, Telegram bot, knowledge base, and SSH shell" style="width:100%;border-radius:8px;">
+        <figcaption style="font-size:0.85rem;color:#888;margin-top:0.5rem;text-align:center;">Hermes at the center: Proxmox, nine containers, Telegram gateway, knowledge base, and live SSH access all wired together.</figcaption>
+      </figure>
 
       <pre class="diagram">Telegram (phone)
        │
@@ -542,6 +554,10 @@ Hermes Gateway (Windows desktop — always-on service)
               Verified: SSH-confirmed, June 2026 ─────────────────────┘</pre>
 
       <h2>What the Brain Can Do: Real Examples</h2>
+      <figure style="margin:1.5rem 0;">
+        <img src="/blog/images/hermes-agent-capabilities.png" alt="Holographic cyberpunk dashboard showing AI homelab queries, Telegram bot responses, container health readouts, and automation scripts" style="width:100%;border-radius:8px;">
+        <figcaption style="font-size:0.85rem;color:#888;margin-top:0.5rem;text-align:center;">Query the homelab, control containers, and run automations — all from Telegram, all through Hermes.</figcaption>
+      </figure>
 
       <h3>Plex Monitoring</h3>
 
