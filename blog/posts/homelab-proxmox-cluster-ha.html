@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>From One Box to a Cluster: Building Homelab HA with Proxmox, ZFS, and a Lot of Patience | Anas Semesmieh</title>
+  <meta name="description" content="How I added a second Proxmox node, formed a 3-vote cluster, converted to ZFS, set up replication, and achieved full high availability for every service in my homelab — including all the gotchas." />
+  <meta name="keywords" content="Anas Semesmieh, Proxmox, high availability, ZFS replication, homelab cluster, HA, QDevice, corosync, pve2, self-hosting" />
+  <meta name="author" content="Anas Semesmieh" />
+  <link rel="canonical" href="https://anas.semesmieh.com/blog/posts/homelab-proxmox-cluster-ha" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="From One Box to a Cluster: Building Homelab HA with Proxmox, ZFS, and a Lot of Patience" />
+  <meta property="og:description" content="How I added a second Proxmox node, formed a 3-vote cluster, converted to ZFS, set up replication, and achieved full high availability for every service in my homelab." />
+  <meta property="og:url" content="https://anas.semesmieh.com/blog/posts/homelab-proxmox-cluster-ha" />
+  <meta property="og:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="From One Box to a Cluster: Building Homelab HA with Proxmox, ZFS, and a Lot of Patience" />
+  <meta name="twitter:description" content="How I added a second Proxmox node, formed a 3-vote cluster, converted to ZFS, set up replication, and achieved full HA for every homelab service." />
+  <meta name="twitter:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #101a2c;
+      --muted: #8ea0be;
+      --text: #e6eef8;
+      --accent: #22c55e;
+      --heading: #60a5fa;
+      --border: rgba(255, 255, 255, 0.08);
+      --maxw: 800px;
+      --radius: 14px;
+      --font: "Inter", "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.72;
+      background:
+        radial-gradient(ellipse at 15% 0%, #13203a 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 15%, #0e1a32 0%, transparent 45%),
+        var(--bg);
+    }
+
+    .wrap { max-width: var(--maxw); margin: 0 auto; padding: 30px 18px 80px; }
+    .nav { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+    .nav a { text-decoration: none; color: var(--muted); padding: 8px 12px; border-radius: 10px; }
+    .nav a:hover { color: var(--text); background: rgba(255, 255, 255, 0.03); }
+    article { border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; background: var(--card); }
+    h1 { margin-top: 0; font-size: 34px; line-height: 1.2; color: var(--heading); }
+    .meta { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+    h2 { margin-top: 36px; font-size: 22px; color: var(--heading); }
+    h3 { margin-top: 24px; font-size: 18px; color: var(--heading); }
+    p { margin: 0 0 16px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code {
+      font-family: "IBM Plex Mono", "Fira Code", monospace;
+      background: rgba(255,255,255,0.07);
+      border-radius: 5px;
+      padding: 2px 6px;
+      font-size: 0.88em;
+    }
+    pre {
+      background: #0d1829;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+      overflow-x: auto;
+      font-size: 0.87em;
+      line-height: 1.6;
+      margin: 20px 0;
+    }
+    pre code { background: none; padding: 0; font-size: inherit; }
+
+    .callout {
+      border-left: 3px solid var(--accent);
+      background: rgba(22, 163, 74, 0.07);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px;
+      margin: 24px 0;
+      font-size: 0.95em;
+    }
+    .callout strong { color: var(--accent); }
+
+    .callout-warn {
+      border-left: 3px solid #f59e0b;
+      background: rgba(245, 158, 11, 0.07);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px;
+      margin: 24px 0;
+      font-size: 0.95em;
+    }
+    .callout-warn strong { color: #f59e0b; }
+
+    .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+    .tag {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 12px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    a.tag:hover {
+      border-color: rgba(34,197,94,0.4);
+      color: var(--accent);
+    }
+
+    ul, ol { padding-left: 22px; margin: 0 0 16px; }
+    li { margin-bottom: 6px; }
+
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.9em; }
+    th { background: rgba(255,255,255,0.05); color: var(--heading); padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+    td { padding: 9px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    tr:last-child td { border-bottom: none; }
+
+    .series-nav {
+      margin-top: 40px;
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 2;
+    }
+    .series-nav strong { display: block; margin-bottom: 6px; }
+    .series-nav a { color: var(--accent); margin-right: 8px; }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "From One Box to a Cluster: Building Homelab HA with Proxmox, ZFS, and a Lot of Patience",
+    "datePublished": "2026-08-03",
+    "dateModified": "2026-08-03",
+    "author": {
+      "@type": "Person",
+      "name": "Anas Semesmieh",
+      "url": "https://anas.semesmieh.com/about/"
+    },
+    "publisher": {
+      "@type": "Person",
+      "name": "Anas Semesmieh"
+    },
+    "mainEntityOfPage": "https://anas.semesmieh.com/blog/posts/homelab-proxmox-cluster-ha",
+    "image": "https://anas.semesmieh.com/profile-wide.jpg",
+    "description": "How I added a second Proxmox node, formed a 3-vote cluster, converted to ZFS, set up replication, and achieved full high availability for every service in my homelab — including all the gotchas."
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://anas.semesmieh.com"},
+      {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://anas.semesmieh.com/blog/"},
+      {"@type": "ListItem", "position": 3, "name": "Post", "item": "https://anas.semesmieh.com/blog/posts/homelab-proxmox-cluster-ha"}
+    ]
+  }
+  </script>
+</head>
+
+<body>
+<div class="wrap">
+  <nav class="nav">
+    <a href="/">Portfolio</a>
+    <a href="/blog/">All Posts</a>
+    <a href="/blog/categories/">Categories</a>
+    <a href="/blog/tags/">Tags</a>
+    <a href="/blog/rss.xml">RSS</a>
+  </nav>
+
+  <article>
+    <h1>From One Box to a Cluster: Building Homelab HA with Proxmox, ZFS, and a Lot of Patience</h1>
+    <p class="meta">By <a href="/about/">Anas Semesmieh</a> · August 3, 2026</p>
+
+    <div class="tag-list">
+      <a href="/blog/?tag=Homelab" class="tag">Homelab</a>
+      <a href="/blog/?tag=Proxmox" class="tag">Proxmox</a>
+      <a href="/blog/?tag=High+Availability" class="tag">High Availability</a>
+      <a href="/blog/?tag=ZFS" class="tag">ZFS</a>
+      <a href="/blog/?tag=Self-Hosting" class="tag">Self-Hosting</a>
+      <a href="/blog/?tag=Networking" class="tag">Networking</a>
+    </div>
+
+    <p>There's a certain stage in every homelab journey where optimism stops being a strategy. For a long time, my single Dell OptiPlex running Proxmox was a calculated bet: the hardware was small, efficient, and had never failed me. I kept backups. I had PBS. If something went wrong, I could restore in 15–30 minutes. That felt acceptable.</p>
+
+    <p>Then I had a <a href="/blog/posts/homelab-double-disk-failure-without-parity">double disk failure during a migration</a>. Not a single disk — two, simultaneously, while I was in the middle of moving data. I got lucky. Nothing was permanently lost. But the experience crystallised something: my reliance on the homelab had grown well beyond what a single-node setup could responsibly support. Hermes, my AI agent, lives there. My DNS, my reverse proxy, my camera NVR — all of it was on one box. One hardware failure away from being completely dark.</p>
+
+    <p>The disk failure wasn't a reason to panic. It was a reason to fix things <em>before</em> the next incident rather than after. So I bought a second machine, added it to a shelf, and eventually spent a very long day turning my single-node Proxmox into a proper two-node HA cluster with ZFS replication. This post is the full story of how that went — the plan, the pivots, the gotchas, and the final state.</p>
+
+    <h2>The Hardware</h2>
+
+    <p>The second node is an HP EliteDesk 800 G5 Mini — a small form-factor machine with an Intel Core i5-9600 (6-core, 9th gen), 32 GB DDR4, and a 256 GB SSD. I picked it up for around $200 AUD. It sits next to the OptiPlex on the same shelf, connected to the same switch.</p>
+
+    <p>Why does the CPU generation matter? Because Proxmox live migration requires the same CPU microarchitecture flags on both nodes. The i5-9600 and the i7-9700T in the OptiPlex are both Skylake/Coffee Lake 9th gen — same flags, live migration just works without any custom CPU masking.</p>
+
+    <p>Before installing anything, I went into the HP BIOS and verified:</p>
+    <ul>
+      <li>VT-x (virtualisation) → enabled</li>
+      <li>VT-d (IOMMU) → enabled</li>
+      <li>Secure Boot → disabled</li>
+      <li>Legacy Support → disabled (UEFI only)</li>
+    </ul>
+
+    <p>For the Proxmox install, I used Rufus in <strong>DD Image mode</strong> (not ISO mode — DD is the correct choice for Proxmox ISOs). The one key decision during install: the ZFS pool name. More on why this matters in a moment.</p>
+
+    <h2>The Two-Node Quorum Problem</h2>
+
+    <p>Before forming the cluster, there's something every Proxmox operator needs to understand about two-node clusters: <strong>without a tiebreaker, two nodes is worse than one node.</strong></p>
+
+    <p>Proxmox uses Corosync for cluster membership, which requires quorum — a majority agreement among members. With two nodes, each holding one vote, you only have 2 total votes. If either node goes offline (even for a reboot), the surviving node has 1 vote out of 2 — no majority — and fences itself. Your services go down on the surviving node, which is the exact opposite of HA.</p>
+
+    <p>The solution is a <strong>QDevice</strong>: a lightweight third voter that breaks ties. It doesn't run any VMs or CTs — it just participates in quorum decisions. The maths:</p>
+
+    <pre><code>pve (1 vote) + pve2 (1 vote) + QDevice (1 vote) = 3 total
+Any single node failure → 2 remaining votes → quorum maintained ✅</code></pre>
+
+    <p>For my QDevice, I used my Unraid NAS. It's always on, it's local LAN (no Tailscale latency), and it runs Docker — so deploying a <code>corosync-qnetd</code> container was straightforward. The catch: the <code>mgrzybek/corosync-qnetd</code> image that every tutorial references is no longer on Docker Hub. You have to build it yourself:</p>
+
+    <pre><code>mkdir -p /tmp/qnetd-build
+cat > /tmp/qnetd-build/Dockerfile << 'EOF'
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y corosync-qnetd && rm -rf /var/lib/apt/lists/*
+RUN mkdir -p /etc/corosync/qnetd/nssdb
+EXPOSE 5403
+CMD ["/usr/bin/corosync-qnetd", "-f"]
+EOF
+docker build -t corosync-qnetd /tmp/qnetd-build/
+
+# Initialise the NSS cert database first
+docker run --rm -v /etc/corosync/qnetd:/etc/corosync/qnetd \
+  corosync-qnetd /usr/bin/corosync-qnetd-certutil -i
+
+# Start the container with both /tmp and cert dir mounted
+docker run -d --name corosync-qnetd \
+  --restart=unless-stopped \
+  -p 5403:5403 \
+  -v /etc/corosync/qnetd:/etc/corosync/qnetd \
+  -v /tmp:/tmp \
+  corosync-qnetd /usr/bin/corosync-qnetd -f</code></pre>
+
+    <div class="callout-warn">
+      <strong>⚠️ Two important NSS gotchas:</strong> You must initialise the cert database <em>before</em> starting the daemon, or it will restart-loop with <code>NSS error (-8174): bad database</code>. And you must mount <code>/tmp</code> from the host — <code>pvecm qdevice setup</code> SCPs cert files to the host's <code>/tmp</code> before calling certutil inside Docker, and without the volume mount the exchange fails silently.
+    </div>
+
+    <p>You also need to install <code>corosync-qdevice</code> on both Proxmox nodes before running <code>pvecm qdevice setup</code> — it provides <code>corosync-qdevice-net-certutil</code> which the setup command calls:</p>
+
+    <pre><code># On both pve and pve2
+apt install -y corosync-qdevice</code></pre>
+
+    <h2>Forming the Cluster</h2>
+
+    <p>The cluster formation order matters. QDevice must be set up <em>before</em> pve2 joins, because the cert exchange assumes an existing cluster on the source node:</p>
+
+    <pre><code># 1. Create the cluster on pve
+pvecm create homelab-cluster
+
+# 2. Set up QDevice (while still single-node)
+pvecm qdevice setup 192.168.20.200 -f
+
+# 3. Join pve2 via the web UI
+# pve UI → Datacenter → Cluster → Join Information → copy
+# pve2 UI → Datacenter → Cluster → Join Cluster → paste + pve root password
+
+# 4. Verify 3 votes
+pvecm status</code></pre>
+
+    <p>When it's working, <code>pvecm status</code> shows this:</p>
+
+    <pre><code>Membership information
+----------------------
+    Nodeid      Votes    Qdevice Name
+0x00000001          1    A,V,NMW 192.168.20.99 (local)
+0x00000002          1    A,V,NMW 192.168.20.97
+0x00000000          1            Qdevice</code></pre>
+
+    <p><code>A,V,NMW</code> = Alive, Voting, Not Master Weight. Both nodes voting, one QDevice. Three total votes, quorum at 2. Any single failure is safe.</p>
+
+    <h3>The IP Conflict I Didn't See Coming</h3>
+
+    <p>I had originally assigned pve2 the IP <code>192.168.20.98</code>. Only after the cluster was formed did I realise that <code>.98</code> was already taken — by the PBS VM running on Unraid. Lesson: always scan the ARP table before assigning new IPs in a homelab. I checked from pve with <code>arp -n</code> to see what was actually in use.</p>
+
+    <p>Changing a node's IP after cluster formation requires updating several places in the right order: <code>/etc/network/interfaces</code>, <code>/etc/corosync/corosync.conf</code> on <em>both</em> nodes, then restarting corosync on both. The SSL cert embedded in <code>/etc/pve/local/pve-ssl.pem</code> also contains the IP, so you need to regenerate it with <code>pvecm updatecerts --force</code> — but the auto-update command reads from the running corosync config, so fix corosync first.</p>
+
+    <h2>The Storage Architecture</h2>
+
+    <p>This is the part that took the most thinking. Proxmox replication — the mechanism that makes HA possible for local-disk guests — only works with ZFS storage. LVM-thin, which my original setup used for almost everything, cannot be replicated. That's a hard constraint in the codebase, not a configuration option.</p>
+
+    <p>I had two options: reinstall Proxmox on pve from scratch with ZFS, or find a cleverer path. I found a cleverer path.</p>
+
+    <h3>The Pool Rename Pivot</h3>
+
+    <p>My plan was to wipe the SATA SSD on pve (256 GB Samsung) and create a ZFS pool there, while keeping the OS on the NVMe. This would give me:</p>
+    <ul>
+      <li>ZFS pool on SATA SSD for CT/VM storage (replicable to pve2)</li>
+      <li>NVMe for OS + empty LVM pool (clean slate)</li>
+    </ul>
+
+    <p>The catch: Proxmox replication requires the <strong>same storage ID</strong> on both nodes. My pve2 had its ZFS pool named <code>rpool</code> (the Proxmox installer default). If I created a pool named anything else on pve, replication would fail because the storage configuration is cluster-wide and can only hold one pool path per ID.</p>
+
+    <p>Rather than reinstalling pve2 just to rename its pool, I renamed <em>pve's</em> new pool to match:</p>
+
+    <pre><code># After emptying the SSD of all CT disks...
+pvesm remove ssd-zfs          # remove old storage from Proxmox
+zpool export ssd-zfs          # export the pool
+zpool import -d /dev/disk/by-id/ ssd-zfs rpool  # reimport with new name
+pvesm add zfspool rpool --pool rpool --content images,rootdir</code></pre>
+
+    <p>Both nodes now have a ZFS pool named <code>rpool</code>. Replication can proceed.</p>
+
+    <h3>The Two-Tier HA Strategy</h3>
+
+    <p>Not every service needs the same HA approach. I split my CTs into two tiers based on their relationship to Unraid:</p>
+
+    <table>
+      <tr><th>Tier</th><th>Services</th><th>Storage</th><th>HA mechanism</th></tr>
+      <tr><td><strong>Critical</strong></td><td>adguard, caddy, hermes-vm, scrypted, utilities, unbound</td><td>rpool ZFS</td><td>ZFS replication → HA failover (~1-2 min)</td></tr>
+      <tr><td><strong>Media</strong></td><td>arrstack, media-servers, telegram-bot</td><td>proxmox-ha NFS</td><td>Shared NFS HA (Unraid cache SSD)</td></tr>
+    </table>
+
+    <p>The critical services have zero Unraid dependency — they should survive even if the NAS is down. Moving their root disks to Unraid NFS would make Unraid a single point of failure for DNS and the reverse proxy, which defeats the purpose. ZFS replication is the right answer here.</p>
+
+    <p>The media CTs are already Unraid-dependent. Their actual data — movies, series, media files — lives on Unraid NFS. If Unraid goes down, these services can't function regardless of where their root disk lives. So I moved their root disks to a dedicated NFS share on Unraid's cache SSD (<code>proxmox-ha</code>, set to cache-only so it never moves to spinning disks), and both cluster nodes mount it. Proxmox can restart these CTs on either node automatically because both can reach the disk over NFS.</p>
+
+    <h2>Setting Up ZFS Replication</h2>
+
+    <p>With both nodes having a <code>rpool</code> storage and pve2 also having <code>rpool/data</code> as a receive target (created as a dataset under the default <code>rpool</code>), I created replication jobs in Proxmox:</p>
+
+    <pre><code># One job per guest, 5-minute schedule
+pvesh create /cluster/replication \
+  --id 101-0 --target pve2 --type local --schedule '*/5'
+# Repeat for 100, 102, 106, 108, 110</code></pre>
+
+    <p>The first sync copies the full ZFS dataset to pve2. Subsequent syncs are incremental — they only send the delta since the last snapshot. Once established, my incremental syncs run in around 2 seconds each. The initial syncs ranged from a few seconds (small CTs) to ~2.5 minutes for hermes-vm at 41 GB.</p>
+
+    <h3>The Privileged Container Freeze Problem</h3>
+
+    <p>One CT gave me trouble: CT108 (utilities), which is a privileged container running Docker. Proxmox replication freezes the guest filesystem briefly before taking a ZFS snapshot to ensure consistency. For unprivileged containers this works fine. For a privileged container with Docker's overlay mounts, the freeze call hangs indefinitely — Docker doesn't respond to the LXC freeze mechanism, and <code>pvesr run</code> just blocks with no timeout.</p>
+
+    <p>The workaround: stop the container for the initial sync, then start it again. Subsequent incremental syncs are brief enough that the freeze window (a fraction of a second) completes before Docker's overlay has time to cause problems.</p>
+
+    <pre><code># For CT108 initial sync only:
+pct stop 108
+pvesr schedule-now 108-0
+# Wait for sync to complete...
+pct start 108</code></pre>
+
+    <h2>Enabling HA</h2>
+
+    <p>With replication running and datasets present on pve2, enabling HA is anticlimactic — it's just a few commands:</p>
+
+    <pre><code>ha-manager add ct:101 --state started --max_restart 3 --max_relocate 3
+ha-manager add ct:102 --state started --max_restart 3 --max_relocate 3
+# ...and so on for all guests</code></pre>
+
+    <p>The HA manager arms the corosync watchdog, starts monitoring heartbeats, and will restart any managed resource on the surviving node if its primary node goes offline. The <code>fencing armed</code> line in <code>ha-manager status</code> is the signal that it's live:</p>
+
+    <pre><code>quorum OK
+master pve2 (active, ...)
+fencing armed (CRM watchdog active)
+lrm pve (active, watchdog active)
+lrm pve2 (active, watchdog active)
+service ct:101 (pve, started)
+service ct:102 (pve, started)
+service vm:100 (pve, started)
+...</code></pre>
+
+    <h3>Gotchas Along the Way</h3>
+
+    <p>A few things that burned time and are worth documenting:</p>
+
+    <p><strong>The ct105-watchdog loop.</strong> After migrating CT105 (telegram-bot) to pve2, I noticed <code>hastart</code> tasks firing every two minutes in the Proxmox task log. The culprit: a <code>ct105-watchdog.service</code> systemd timer I had created months earlier as a one-off workaround to auto-restart CT105 if NFS dropped. The watchdog called <code>pct start 105</code> on pve — which pve could no longer see (the config had moved to pve2) — and the HA manager treated each call as a start request. Fix: <code>systemctl disable --now ct105-watchdog</code>.</p>
+
+    <p><strong>The NFS health worker needed a cluster-aware patch.</strong> I run a custom NFS health worker on pve that auto-starts CTs with <code>onboot=1</code> if NFS comes back healthy after a dropout. After clustering, this worker would try to start CTs that now live on pve2 — their LXC config files don't exist on pve anymore, but the worker iterated over all VMIDs it knew about. I patched <code>start_ct_if_ready()</code> on both nodes to check for a local config file before attempting a start:</p>
+
+    <pre><code># Skip CTs that have no config on this node (they live on the other node)
+[ ! -f "/etc/pve/nodes/$(hostname -s)/lxc/${ct}.conf" ] && return 0</code></pre>
+
+    <p><strong>The stale pvesr.lck.</strong> ZFS replication uses a global lock file at <code>/var/lock/pvesr.lck</code>. If a replication run dies mid-job (which happened a few times during the PBS backup window), the lock file persists and blocks all subsequent replication runs indefinitely. The fix is just <code>rm -f /var/lock/pvesr.lck</code>, but it's not obvious why all your replication jobs suddenly show "pending" and never progress.</p>
+
+    <p><strong>The storage ID naming constraint.</strong> Proxmox replication requires both nodes to have a storage entry with the <em>exact same ID</em> pointing to a ZFS pool. The storage config is cluster-wide (stored in pmxcfs), so you can't have different pool paths for the same ID per node. Both nodes must have identically named ZFS pools. This is why the pool rename was necessary — and why it's worth setting the ZFS pool name explicitly during install instead of accepting the default <code>rpool</code> blindly.</p>
+
+    <h2>The Final Architecture</h2>
+
+    <p>After a very long day, this is where everything landed:</p>
+
+    <table>
+      <tr><th>Resource</th><th>Primary node</th><th>Failover</th><th>Storage</th></tr>
+      <tr><td>VM100 hermes-vm</td><td>pve</td><td>pve2</td><td>rpool ZFS + replication</td></tr>
+      <tr><td>CT101 adguard</td><td>pve</td><td>pve2</td><td>rpool ZFS + replication</td></tr>
+      <tr><td>CT102 caddy</td><td>pve</td><td>pve2</td><td>rpool ZFS + replication</td></tr>
+      <tr><td>CT106 scrypted</td><td>pve</td><td>pve2</td><td>rpool ZFS + replication</td></tr>
+      <tr><td>CT108 utilities</td><td>pve2</td><td>pve</td><td>rpool ZFS + replication</td></tr>
+      <tr><td>CT110 unbound</td><td>pve</td><td>pve2</td><td>rpool ZFS + replication</td></tr>
+      <tr><td>CT103 media-servers</td><td>pve2</td><td>pve</td><td>proxmox-ha NFS (Unraid)</td></tr>
+      <tr><td>CT105 telegram-bot</td><td>pve2</td><td>pve</td><td>proxmox-ha NFS (Unraid)</td></tr>
+      <tr><td>CT107 arrstack</td><td>pve2</td><td>pve</td><td>proxmox-ha NFS (Unraid)</td></tr>
+    </table>
+
+    <p>ZFS replication runs every 5 minutes. Incremental syncs take about 2 seconds once established. If pve's hardware fails, pve2 will restart the critical services (DNS, reverse proxy, Hermes, NVR) automatically within 1–2 minutes. No manual intervention required.</p>
+
+    <div class="callout">
+      <strong>Before vs After:</strong> Single node, no redundancy, 15–30 min manual restore from PBS → Two-node cluster, automatic failover, ~1-2 min RTO for all critical services.
+    </div>
+
+    <h2>Was It Worth It?</h2>
+
+    <p>The question I asked myself throughout this was: am I over-engineering a homelab? The honest answer is that it depends entirely on how much you rely on it.</p>
+
+    <p>If Hermes (my AI agent) goes down, my daily workflows break. If AdGuard goes down, nothing on my LAN resolves DNS. If Caddy goes down, none of my self-hosted services are reachable. These aren't just nice-to-haves anymore — they're infrastructure I depend on every day. At that level of reliance, HA stops being over-engineering and starts being basic operational hygiene.</p>
+
+    <p>The disk failure taught me that I had been lucky, not good. Building HA was removing risk that had been silently accumulating while I optimistically assumed nothing would break. The whole point is to do this <em>before</em> the incident, not after.</p>
+
+    <p>The cluster, the QDevice, the ZFS replication, the HA policies — none of it is glamorous. Most of the day was spent on edge cases: wrong pool names, stale lock files, cert IP mismatches, a rogue watchdog service. But the result is a homelab that can lose a node and keep running. That's worth a lot of patience.</p>
+
+    <div class="series-nav">
+        <strong>Homelab Series:</strong>
+        <a href="/blog/posts/homelab-start-here">Start Here</a>
+        <a href="/blog/posts/homelab-docker-compose-stack">Docker Compose Stack</a>
+        <a href="/blog/posts/homelab-sso-authentik">SSO with Authentik</a>
+        <a href="/blog/posts/homelab-backup-automation">Backup Automation</a>
+        <a href="/blog/posts/homelab-disaster-recovery">Disaster Recovery</a>
+        <a href="/blog/posts/homelab-secrets-management">Secrets Management</a>
+        <a href="/blog/posts/homelab-xcaddy-cloudflare-tunnel-adguard">Xcaddy + Tunnel + AdGuard</a>
+        <a href="/blog/posts/homelab-vaultwarden-self-hosted-passwords">Vaultwarden</a>
+        <a href="/blog/posts/homelab-p2v-proxmox-migration">P2V to Proxmox</a>
+        <a href="/blog/posts/homelab-proxmox-lxc-decomposition">LXC Decomposition</a>
+        <a href="/blog/posts/homelab-full-lxc-migration">Full LXC Migration</a>
+        <a href="/blog/posts/homelab-telegram-yt-dlp-bot">Telegram Video Bot</a>
+        <a href="/blog/posts/homelab-hermes-ai-agent">AI Brain with Hermes</a>
+        <a href="/blog/posts/homelab-nas-to-das-migration">NAS to DAS Migration</a>
+        <a href="/blog/posts/homelab-double-disk-failure-without-parity">Double Disk Failure Without Parity</a>
+        <a href="/blog/posts/homelab-hermes-vm-migration">Hermes VM Migration</a>
+        <a href="/blog/posts/homelab-unbound-recursive-dns">Private Recursive DNS</a>
+        <a href="/blog/posts/homelab-ai-blog-images">AI Blog Images</a>
+        <a href="/blog/posts/homelab-proxmox-cluster-ha">Proxmox HA Cluster</a>
+      </div>
+  </article>
+</div>
+</body>
+</html>

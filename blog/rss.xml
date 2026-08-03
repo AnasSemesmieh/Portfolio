@@ -5,7 +5,15 @@
     <link>https://anas.semesmieh.com/blog/</link>
     <description>Platform engineering, Azure architecture, DevSecOps, and engineering leadership insights.</description>
     <language>en-au</language>
-    <lastBuildDate>Fri, 25 Jul 2026 12:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 03 Aug 2026 12:00:00 +0000</lastBuildDate>
+
+    <item>
+      <title>From One Box to a Cluster: Building Homelab HA with Proxmox, ZFS, and a Lot of Patience</title>
+      <link>https://anas.semesmieh.com/blog/posts/homelab-proxmox-cluster-ha</link>
+      <guid>https://anas.semesmieh.com/blog/posts/homelab-proxmox-cluster-ha</guid>
+      <pubDate>Sun, 03 Aug 2026 12:00:00 +0000</pubDate>
+      <description>How I added a second Proxmox node, formed a 3-vote cluster with QDevice, converted to ZFS, set up replication, and achieved full HA for every service — including all the gotchas.</description>
+    </item>
 
     <item>
       <title>Giving My Blog Posts a Visual Identity with Agnes AI and a Custom Hermes Skill</title>
