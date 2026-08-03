@@ -181,6 +181,12 @@
     <h1>From One Box to a Cluster: Building Homelab HA with Proxmox, ZFS, and a Lot of Patience</h1>
     <p class="meta">By <a href="/about/">Anas Semesmieh</a> · August 3, 2026</p>
 
+    <figure class="post-hero-image">
+      <img src="/blog/images/homelab-proxmox-cluster-ha-hero.png"
+           alt="Cyberpunk illustration of Anas at a holographic command station with two Proxmox nodes connected by ZFS replication streams"
+           style="width:100%;border-radius:8px;margin-bottom:1.5rem;" loading="lazy">
+    </figure>
+
     <div class="tag-list">
       <a href="/blog/?tag=Homelab" class="tag">Homelab</a>
       <a href="/blog/?tag=Proxmox" class="tag">Proxmox</a>
@@ -213,6 +219,13 @@
     <p>For the Proxmox install, I used Rufus in <strong>DD Image mode</strong> (not ISO mode — DD is the correct choice for Proxmox ISOs). The one key decision during install: the ZFS pool name. More on why this matters in a moment.</p>
 
     <h2>The Two-Node Quorum Problem</h2>
+
+    <figure style="margin:1.5rem 0;">
+      <img src="/blog/images/homelab-proxmox-cluster-ha-quorum.png"
+           alt="Three holographic nodes in a triangle — pve, pve2, and QDevice — connected by glowing neon voting beams"
+           style="width:100%;border-radius:8px;" loading="lazy">
+      <figcaption style="font-size:0.85rem;color:#888;margin-top:0.5rem;text-align:center;">Three voters, quorum at 2 — any single node failure leaves the cluster intact</figcaption>
+    </figure>
 
     <p>Before forming the cluster, there's something every Proxmox operator needs to understand about two-node clusters: <strong>without a tiebreaker, two nodes is worse than one node.</strong></p>
 
@@ -291,6 +304,13 @@ pvecm status</code></pre>
     <p>Changing a node's IP after cluster formation requires updating several places in the right order: <code>/etc/network/interfaces</code>, <code>/etc/corosync/corosync.conf</code> on <em>both</em> nodes, then restarting corosync on both. The SSL cert embedded in <code>/etc/pve/local/pve-ssl.pem</code> also contains the IP, so you need to regenerate it with <code>pvecm updatecerts --force</code> — but the auto-update command reads from the running corosync config, so fix corosync first.</p>
 
     <h2>The Storage Architecture</h2>
+
+    <figure style="margin:1.5rem 0;">
+      <img src="/blog/images/homelab-proxmox-cluster-ha-storage.png"
+           alt="Split-screen showing ZFS pool with blue replication streams on the left versus NFS network share with orange cables on the right"
+           style="width:100%;border-radius:8px;" loading="lazy">
+      <figcaption style="font-size:0.85rem;color:#888;margin-top:0.5rem;text-align:center;">Two-tier storage strategy — ZFS replication for critical services, NFS HA for media</figcaption>
+    </figure>
 
     <p>This is the part that took the most thinking. Proxmox replication — the mechanism that makes HA possible for local-disk guests — only works with ZFS storage. LVM-thin, which my original setup used for almost everything, cannot be replicated. That's a hard constraint in the codebase, not a configuration option.</p>
 
@@ -389,6 +409,13 @@ service vm:100 (pve, started)
     <p><strong>The storage ID naming constraint.</strong> Proxmox replication requires both nodes to have a storage entry with the <em>exact same ID</em> pointing to a ZFS pool. The storage config is cluster-wide (stored in pmxcfs), so you can't have different pool paths for the same ID per node. Both nodes must have identically named ZFS pools. This is why the pool rename was necessary — and why it's worth setting the ZFS pool name explicitly during install instead of accepting the default <code>rpool</code> blindly.</p>
 
     <h2>The Final Architecture</h2>
+
+    <figure style="margin:1.5rem 0;">
+      <img src="/blog/images/homelab-proxmox-cluster-ha-final-arch.png"
+           alt="Two cyberpunk server racks — pve (blue) and pve2 (purple) — with replication beams connecting containers, and Unraid NAS below with NFS cables to media containers"
+           style="width:100%;border-radius:8px;" loading="lazy">
+      <figcaption style="font-size:0.85rem;color:#888;margin-top:0.5rem;text-align:center;">Final HA architecture — critical services on ZFS replication, media CTs on NFS HA</figcaption>
+    </figure>
 
     <p>After a very long day, this is where everything landed:</p>
 
