@@ -825,6 +825,14 @@
       const initTag = new URLSearchParams(window.location.search).get('tag');
       if (initTag) {
         setActiveFilter(initTag);
+        // Prevent Google from indexing ?tag= filtered views (no real content for crawlers)
+        const noindexMeta = document.createElement('meta');
+        noindexMeta.name = 'robots';
+        noindexMeta.content = 'noindex, follow';
+        document.head.appendChild(noindexMeta);
+        // Point canonical back to the base blog URL
+        const canonical = document.querySelector('link[rel="canonical"]');
+        if (canonical) canonical.href = 'https://anas.semesmieh.com/blog/';
       }
       applyFilters();
     })();
