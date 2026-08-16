@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Production Grade Homelab #1: Seeing Everything — Prometheus, Grafana, Loki &amp; Alertmanager | Anas Semesmieh</title>
+  <meta name="description" content="After two weeks of HA cluster incidents and missed alerts, I built a full observability stack on a dedicated Proxmox LXC: Prometheus scraping 18 targets, Grafana dashboards, Loki log aggregation, and Alertmanager firing to Telegram. Part 1 of a series on treating your homelab like production." />
+  <meta name="keywords" content="Anas Semesmieh, Prometheus, Grafana, Loki, Alertmanager, homelab observability, Proxmox monitoring, self-hosting, IaC, Production Grade Homelab" />
+  <meta name="author" content="Anas Semesmieh" />
+  <link rel="canonical" href="https://anas.semesmieh.com/blog/posts/homelab-production-grade-observability" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Production Grade Homelab #1: Seeing Everything — Prometheus, Grafana, Loki &amp; Alertmanager" />
+  <meta property="og:description" content="After HA cluster incidents I couldn't detect fast enough, I built a full observability stack: Prometheus + Grafana + Loki + Alertmanager on a dedicated LXC, scraping every host in my homelab." />
+  <meta property="og:url" content="https://anas.semesmieh.com/blog/posts/homelab-production-grade-observability" />
+  <meta property="og:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Production Grade Homelab #1: Seeing Everything" />
+  <meta name="twitter:description" content="Prometheus + Grafana + Loki + Alertmanager on Proxmox. 18 targets, Telegram alerts, Docker log tailing — full observability weekend build." />
+  <meta name="twitter:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Production Grade Homelab #1: Seeing Everything — Prometheus, Grafana, Loki & Alertmanager",
+    "datePublished": "2026-08-16",
+    "dateModified": "2026-08-16",
+    "author": {"@type": "Person", "name": "Anas Semesmieh", "url": "https://anas.semesmieh.com/about/"},
+    "publisher": {"@type": "Person", "name": "Anas Semesmieh"},
+    "mainEntityOfPage": "https://anas.semesmieh.com/blog/posts/homelab-production-grade-observability",
+    "image": "https://anas.semesmieh.com/profile-wide.jpg",
+    "description": "After two weeks of HA cluster incidents and missed alerts, I built a full observability stack: Prometheus scraping 18 targets, Grafana dashboards, Loki log aggregation, and Alertmanager firing to Telegram."
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://anas.semesmieh.com"},
+      {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://anas.semesmieh.com/blog/"},
+      {"@type": "ListItem", "position": 3, "name": "Production Grade Homelab #1", "item": "https://anas.semesmieh.com/blog/posts/homelab-production-grade-observability"}
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #101a2c;
+      --muted: #8ea0be;
+      --text: #e6eef8;
+      --accent: #22c55e;
+      --heading: #60a5fa;
+      --border: rgba(255, 255, 255, 0.08);
+      --maxw: 800px;
+      --radius: 14px;
+      --font: "Inter", "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.72;
+      background:
+        radial-gradient(ellipse at 15% 0%, #13203a 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 15%, #0e1a32 0%, transparent 45%),
+        var(--bg);
+    }
+
+    .wrap { max-width: var(--maxw); margin: 0 auto; padding: 30px 18px 80px; }
+    .nav { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+    .nav a { text-decoration: none; color: var(--muted); padding: 8px 12px; border-radius: 10px; }
+    .nav a:hover { color: var(--text); background: rgba(255, 255, 255, 0.03); }
+    article { border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; background: var(--card); }
+    h1 { margin-top: 0; font-size: 34px; line-height: 1.2; color: var(--heading); }
+    .meta { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+    h2 { margin-top: 36px; font-size: 22px; color: var(--heading); }
+    h3 { margin-top: 24px; font-size: 18px; color: var(--heading); }
+    p { margin: 0 0 16px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code {
+      font-family: "IBM Plex Mono", "Fira Code", monospace;
+      background: rgba(255,255,255,0.07);
+      border-radius: 5px;
+      padding: 2px 6px;
+      font-size: 0.88em;
+    }
+    pre {
+      background: #0d1829;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+      overflow-x: auto;
+      font-size: 0.87em;
+      line-height: 1.6;
+      margin: 20px 0;
+    }
+    pre code { background: none; padding: 0; font-size: inherit; }
+
+    .callout {
+      border-left: 3px solid var(--accent);
+      background: rgba(22, 163, 74, 0.07);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px;
+      margin: 24px 0;
+      font-size: 0.95em;
+    }
+    .callout strong { color: var(--accent); }
+
+    .callout-warn {
+      border-left: 3px solid #f59e0b;
+      background: rgba(245, 158, 11, 0.07);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px;
+      margin: 24px 0;
+      font-size: 0.95em;
+    }
+    .callout-warn strong { color: #f59e0b; }
+
+    .callout-info {
+      border-left: 3px solid var(--heading);
+      background: rgba(96, 165, 250, 0.07);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px;
+      margin: 24px 0;
+      font-size: 0.95em;
+    }
+    .callout-info strong { color: var(--heading); }
+
+    .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+    .tag {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 12px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    a.tag:hover { border-color: rgba(34,197,94,0.4); color: var(--accent); }
+
+    ul, ol { padding-left: 22px; margin: 0 0 16px; }
+    li { margin-bottom: 6px; }
+
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.9em; }
+    th { background: rgba(255,255,255,0.05); color: var(--heading); padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+    td { padding: 9px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    tr:last-child td { border-bottom: none; }
+
+    .series-nav {
+      margin-top: 40px;
+      padding: 16px;
+      background: rgba(255,255,255,0.02);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      font-size: 13px;
+      line-height: 2;
+    }
+    .series-nav strong { display: block; margin-bottom: 6px; }
+    .series-nav a { color: var(--accent); margin-right: 8px; }
+  </style>
+</head>
+
+<body>
+<div class="wrap">
+  <nav class="nav">
+    <a href="/">Portfolio</a>
+    <a href="/blog/">All Posts</a>
+    <a href="/blog/categories/">Categories</a>
+    <a href="/blog/tags/">Tags</a>
+    <a href="/blog/rss.xml">RSS</a>
+  </nav>
+
+  <article>
+    <h1>Production Grade Homelab #1: Seeing Everything</h1>
+    <p class="meta">By <a href="/about/">Anas Semesmieh</a> · August 16, 2026</p>
+
+    <div class="tag-list">
+      <a href="/blog/?tag=Homelab" class="tag">Homelab</a>
+      <a href="/blog/?tag=Observability" class="tag">Observability</a>
+      <a href="/blog/?tag=Prometheus" class="tag">Prometheus</a>
+      <a href="/blog/?tag=Grafana" class="tag">Grafana</a>
+      <a href="/blog/?tag=Self-Hosting" class="tag">Self-Hosting</a>
+      <a href="/blog/?tag=IaC" class="tag">IaC</a>
+    </div>
+
+    <p>It started with a 3am incident I didn't know about until I woke up.</p>
+
+    <p>In early August, I expanded my Proxmox setup into a proper 2-node HA cluster — the previous post covers that. What it doesn't cover is what came after: a series of operational failures that I discovered hours late, by manually SSHing around and reading logs. The backup wrapper crashed nodes at 3am. A helper script wasn't deployed to the second node. Three containers sat stopped overnight. Every single one of these was invisible until I went looking.</p>
+
+    <p>If this were a work system, those failures would have pages. There would have been alerts, dashboards, escalations. But for my homelab? I was flying completely dark.</p>
+
+    <p>That's what this post is about fixing. This is the first entry in a new series — <strong>Production Grade Homelab</strong> — where I start treating my homelab infrastructure the same way I'd treat production at work. The three pillars: observability first, then Ansible for configuration management, then Terraform for provisioning. This post covers phase 1: getting full visibility.</p>
+
+    <h2>The Stack</h2>
+
+    <p>The goal was a single dedicated LXC that gives me:</p>
+    <ul>
+      <li><strong>Prometheus</strong> — scraping metrics from every host in the lab</li>
+      <li><strong>Grafana</strong> — dashboards and a single pane of glass</li>
+      <li><strong>Alertmanager</strong> — routing critical alerts to Telegram immediately, warnings during business hours only</li>
+      <li><strong>Loki</strong> — log aggregation from all containers and hosts</li>
+      <li><strong>Promtail</strong> — log shipping from each host to Loki</li>
+      <li><strong>pve_exporter</strong> — Proxmox API metrics: HA state, guest status, storage</li>
+    </ul>
+
+    <p>Everything runs as Docker containers on a single LXC (CT111) using a <code>docker-compose.yml</code>. The whole stack starts with one command.</p>
+
+    <h2>CT111 — The Monitoring Container</h2>
+
+    <p>Created as an unprivileged LXC on the primary Proxmox node, HA-enabled so it survives a node failure:</p>
+
+    <pre><code>pct create 111 local:vztmpl/debian-12-standard_12.12-1_amd64.tar.zst \
+  --hostname monitoring \
+  --storage rpool \
+  --rootfs rpool:60 \
+  --cores 4 \
+  --memory 4096 \
+  --net0 name=eth0,bridge=vmbr0,ip=192.168.20.81/24,gw=192.168.20.1 \
+  --nameserver 192.168.20.70 \
+  --unprivileged 1 \
+  --onboot 1 \
+  --features nesting=1
+
+pct start 111
+ha-manager add ct:111 --state started</code></pre>
+
+    <p>I gave it 60 GB of disk — 30 days of Prometheus metrics for 18 targets at 30s scrape interval uses about 4 GB, and Loki logs add another 3-4 GB/month. Plenty of headroom.</p>
+
+    <div class="callout-info">
+      <strong>Note on Tailscale and Tailnet addresses:</strong> CT111 needed to scrape Jarvis, which lives on an Oracle Cloud VM accessible only via Tailscale (<code>100.x.x.x</code>). Rather than installing Tailscale inside CT111, I added a static route pointing the Tailscale CGNAT range (<code>100.64.0.0/10</code>) via the Proxmox host, which is already a Tailscale subnet router. Simple, clean, no extra daemon inside the container.
+      <br><br>
+      <code>ip route add 100.64.0.0/10 via 192.168.20.99</code>
+    </div>
+
+    <h2>The Compose Stack</h2>
+
+    <p>All six services in one file at <code>/opt/monitoring/docker-compose.yml</code>:</p>
+
+    <pre><code>services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    ports: ["9090:9090"]
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/rules:/etc/prometheus/rules:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.enable-lifecycle'
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    ports: ["3000:3000"]
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+      - GF_SERVER_ROOT_URL=https://monitoring.semesmieh.com
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: alertmanager
+    restart: unless-stopped
+    ports: ["9093:9093"]
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    restart: unless-stopped
+    ports: ["3100:3100"]
+    volumes:
+      - ./loki/loki-config.yml:/etc/loki/loki-config.yml:ro
+      - loki_data:/loki
+    command: -config.file=/etc/loki/loki-config.yml
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail
+    restart: unless-stopped
+    volumes:
+      - /var/log:/var/log:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./promtail/promtail-config.yml:/etc/promtail/promtail-config.yml:ro
+    command: -config.file=/etc/promtail/promtail-config.yml
+
+  pve_exporter:
+    image: prompve/prometheus-pve-exporter:latest
+    container_name: pve_exporter
+    restart: unless-stopped
+    ports: ["9221:9221"]
+    volumes:
+      - ./pve_exporter/pve.yml:/etc/prometheus/pve.yml:ro
+
+volumes:
+  prometheus_data:
+  grafana_data:
+  loki_data:</code></pre>
+
+    <p>A few things worth noting about this config:</p>
+    <ul>
+      <li><strong>Grafana anonymous access</strong> — this is LAN-only (no Cloudflare Tunnel), so I turned off the login form entirely. No password prompts on an internal-only dashboard.</li>
+      <li><strong>Promtail mounts the Docker socket</strong> — so it can discover and tail container logs automatically. Every container that starts gets picked up within 5 seconds.</li>
+      <li><strong>pve_exporter config path</strong> — the container expects <code>/etc/prometheus/pve.yml</code>, not <code>/etc/pve.yml</code>. Caught that one the hard way.</li>
+    </ul>
+
+    <h2>Scraping 18 Targets</h2>
+
+    <p>node_exporter gets deployed to every host. For standard Debian/Ubuntu systems it's a binary + systemd service:</p>
+
+    <pre><code>wget -q https://github.com/prometheus/node_exporter/releases/download/v1.8.2/node_exporter-1.8.2.linux-amd64.tar.gz
+tar xzf node_exporter-1.8.2.linux-amd64.tar.gz
+cp node_exporter-1.8.2.linux-amd64/node_exporter /usr/local/bin/
+useradd -rs /bin/false node_exporter
+
+cat > /etc/systemd/system/node_exporter.service &lt;&lt; 'EOF'
+[Unit]
+Description=Node Exporter
+After=network.target
+
+[Service]
+User=node_exporter
+ExecStart=/usr/local/bin/node_exporter --collector.systemd --collector.processes
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload &amp;&amp; systemctl enable --now node_exporter</code></pre>
+
+    <div class="callout-warn">
+      <strong>ARM64 gotcha:</strong> Jarvis runs on Oracle Cloud on an ARM (aarch64) instance. Using the amd64 binary gives you a silent <code>Exec format error</code>. Always check <code>uname -m</code> on your target before downloading.
+    </div>
+
+    <p>For Unraid, which uses a non-standard OS without systemd services in the usual sense, Docker is cleaner:</p>
+
+    <pre><code>docker run -d --name node_exporter --restart unless-stopped \
+  --net=host --pid=host \
+  prom/node-exporter:latest</code></pre>
+
+    <p>The Prometheus scrape config covers all 14 node_exporter targets plus the pve_exporter scraping both Proxmox nodes:</p>
+
+    <pre><code>scrape_configs:
+  - job_name: 'node_exporter'
+    static_configs:
+      - targets:
+          - '192.168.20.99:9100'   # pve
+          - '192.168.20.97:9100'   # pve2
+          - '192.168.20.69:9100'   # hermes-vm
+          - '192.168.20.200:9100'  # unraid
+          - '100.126.123.7:9100'   # jarvis (via Tailscale route)
+          - '192.168.20.70:9100'   # CT101 adguard
+          # ... all 14 hosts
+
+  - job_name: 'pve_exporter'
+    metrics_path: /pve
+    params:
+      module: [default]
+    static_configs:
+      - targets: ['192.168.20.99', '192.168.20.97']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: pve_exporter:9221</code></pre>
+
+    <p>End result: 18/18 targets green on first try after deploying to all hosts.</p>
+
+    <h2>Alerting — What Fires and When</h2>
+
+    <p>The alert rules cover the things that actually caused pain in August, plus the obvious operational concerns:</p>
+
+    <table>
+      <thead><tr><th>Alert</th><th>Condition</th><th>Severity</th></tr></thead>
+      <tbody>
+        <tr><td><code>HostDown</code></td><td>node_exporter unreachable &gt;2min</td><td>Critical</td></tr>
+        <tr><td><code>ProxmoxGuestDown</code></td><td>CT or VM offline &gt;3min</td><td>Critical</td></tr>
+        <tr><td><code>DiskSpaceCritical</code></td><td>Any mount &lt;5% free</td><td>Critical</td></tr>
+        <tr><td><code>BackupMissed</code></td><td>No PBS backup in &gt;48h</td><td>Critical</td></tr>
+        <tr><td><code>TelegramBotWorkflowFailed</code></td><td>n8n workflow fails</td><td>Critical</td></tr>
+        <tr><td><code>TelegramBotDown</code></td><td>n8n unreachable &gt;2min</td><td>Critical</td></tr>
+        <tr><td><code>DiskSpaceWarning</code></td><td>Any mount &lt;15% free</td><td>Warning</td></tr>
+        <tr><td><code>HighMemoryUsage</code></td><td>RAM &lt;10% free &gt;5min</td><td>Warning</td></tr>
+        <tr><td><code>HighCPUUsage</code></td><td>CPU &gt;90% for 10min</td><td>Warning</td></tr>
+        <tr><td><code>ZFSPoolWarning</code></td><td>ZFS pool &gt;80% full</td><td>Warning</td></tr>
+        <tr><td><code>DiskTempHigh</code></td><td>Disk temp &gt;60°C</td><td>Warning</td></tr>
+      </tbody>
+    </table>
+
+    <p>Routing in Alertmanager separates critical and warning delivery:</p>
+
+    <pre><code>time_intervals:
+  - name: business_hours
+    time_intervals:
+      - times:
+          - start_time: '09:00'
+            end_time: '23:00'
+        location: 'Australia/Sydney'
+
+route:
+  receiver: 'telegram-critical'
+  routes:
+    - matchers: [severity = critical]
+      receiver: 'telegram-critical'
+      repeat_interval: 1h
+    - matchers: [severity = warning]
+      receiver: 'telegram-warning'
+      active_time_intervals: [business_hours]
+      repeat_interval: 6h</code></pre>
+
+    <p>Critical alerts fire immediately, 24/7. Warnings are silenced overnight (11pm–9am Sydney time) so a disk temp spike at 2am doesn't wake anyone up. The repeat intervals prevent alert storms — critical fires every hour, warnings every 6 hours if the condition persists.</p>
+
+    <div class="callout">
+      <strong>The ProxmoxGuestDown rule needs the right label selector.</strong> The <code>pve_exporter</code> exposes guest state via <code>pve_up{id="lxc/101"}</code> — the label is <code>id</code>, not <code>type</code>. The commonly-seen <code>pve_up{type=~"lxc|qemu"}</code> returns zero results because there is no <code>type</code> label in this exporter version. The correct expression is:
+      <br><br>
+      <code>pve_up{id=~"lxc/.*|qemu/.*"} == 0</code>
+    </div>
+
+    <h2>n8n Metrics for Bot Failure Alerts</h2>
+
+    <p>The Telegram download bot runs on CT105 (n8n + yt-dlp). I wanted an alert when a workflow fails — not just when the container is down, but when a download silently errors. n8n has a built-in Prometheus metrics endpoint, you just need to enable it:</p>
+
+    <pre><code># In the n8n service environment variables:
+- N8N_METRICS=true
+- N8N_METRICS_PREFIX=n8n_
+- N8N_METRICS_INCLUDE_WORKFLOW_ID_LABEL=true</code></pre>
+
+    <p>Then add it as a Prometheus scrape target and write an alert on the failure counter:</p>
+
+    <pre><code>- alert: TelegramBotWorkflowFailed
+  expr: increase(n8n_workflow_execution_duration_seconds_count{status="failed"}[5m]) > 0
+  for: 0m
+  labels:
+    severity: critical
+  annotations:
+    summary: "Telegram bot workflow failed"
+    description: "n8n workflow failed — download likely broken"</code></pre>
+
+    <h2>Log Aggregation with Loki</h2>
+
+    <p>Loki runs alongside Prometheus and Grafana in the same compose stack. Promtail ships logs from CT111 itself — both system logs and Docker container logs via the Docker socket discovery feature:</p>
+
+    <pre><code>scrape_configs:
+  - job_name: varlogs
+    static_configs:
+      - targets: [localhost]
+        labels:
+          job: varlogs
+          host: monitoring
+          __path__: /var/log/**/*.log
+
+  - job_name: docker
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s
+    relabel_configs:
+      - source_labels: [__meta_docker_container_name]
+        regex: /(.*)
+        target_label: container
+      - target_label: host
+        replacement: monitoring
+      - target_label: job
+        replacement: docker</code></pre>
+
+    <p>The Docker SD config automatically discovers every container and streams its logs. In Grafana's Explore view, you can query <code>{container="alertmanager"}</code> to see exactly what Alertmanager was doing when a delivery failed — or <code>{job="docker"}</code> to see everything at once.</p>
+
+    <div class="callout-warn">
+      <strong>Loki ready endpoint timing:</strong> After startup, <code>curl localhost:3100/ready</code> returns <em>"Ingester not ready: waiting for 15s after being ready"</em> for about 20 seconds before returning <code>ready</code>. This is normal — it's not an error. Don't mistake the startup message for a crash loop.
+    </div>
+
+    <p>Phase 2 (Ansible) will deploy Promtail to every other host in the lab, so logs from pve, pve2, CT103 (Jellyfin/Plex), CT107 (arr-stack) and the rest all flow into the same Loki instance.</p>
+
+    <h2>The Homelab Overview Dashboard</h2>
+
+    <p>Rather than just importing community dashboards (though I did that too — Node Exporter Full ID 1860 is excellent), I built a custom overview dashboard that gives the full homelab picture at a glance:</p>
+
+    <ul>
+      <li><strong>Active Alerts row</strong> — live firing/pending alerts, always at the top</li>
+      <li><strong>Nodes row</strong> — CPU % and RAM % stat tiles for pve, pve2, Unraid, Hermes VM — color coded green/yellow/red</li>
+      <li><strong>HA Guests table</strong> — every CT and VM with UP/DOWN status pulled from pve_exporter, color-coded</li>
+      <li><strong>Storage row</strong> — disk fill gauges for pve rpool, pve2 rpool, Unraid cache SSD, CT111</li>
+      <li><strong>Network row</strong> — time-series charts for in/out across pve, pve2, Unraid</li>
+      <li><strong>Recent Logs row</strong> — live container log stream at the bottom</li>
+    </ul>
+
+    <p>The dashboard auto-refreshes every 30 seconds and is set as the Grafana home page. Open <code>monitoring.semesmieh.com</code> and everything is right there.</p>
+
+    <h2>What This Catches That I Was Missing</h2>
+
+    <p>The first real test came immediately. Within minutes of the rules loading, two things fired:</p>
+
+    <ol>
+      <li><strong>DiskTempHigh</strong> — several hosts were sitting above 45°C. Not a problem (I raised the threshold to 60°C after seeing the noise), but I genuinely didn't know those temperatures without digging into individual SMART data.</li>
+      <li><strong>ProxmoxGuestDown for qemu/104</strong> — the Windows 11 VM I'd just created and stopped. Expected, silenced it.</li>
+    </ol>
+
+    <p>More importantly: if the August incident (CT103/105/107 left stopped overnight after the backup wrapper bug) happened today, I'd get a Telegram message within 3 minutes. Not the next morning.</p>
+
+    <h2>What's Next</h2>
+
+    <p>Phase 2 is Ansible. The monitoring stack is now the motivation: I want <code>ansible-playbook site.yml</code> to enforce known-good state across every host — the same way Prometheus now shows me when that state drifts. Promtail deployed to all hosts, helper scripts enforced on both PVE nodes, Caddy and AdGuard managed as templates.</p>
+
+    <p>After that, Terraform for new resource provisioning. The whole series:</p>
+    <ul>
+      <li><strong>Phase 1</strong> — Observability ✅ (this post)</li>
+      <li><strong>Phase 2</strong> — Ansible: codifying existing configuration</li>
+      <li><strong>Phase 3</strong> — Terraform: declarative resource provisioning</li>
+      <li><strong>Phase 4</strong> — Importing existing infrastructure into Terraform state</li>
+    </ul>
+
+    <div class="callout">
+      <strong>TL;DR:</strong> One LXC, six containers, one <code>docker compose up -d</code>. Prometheus scraping 18 targets, Grafana with a custom homelab dashboard, Alertmanager routing to Telegram with business-hours silencing for warnings, Loki ingesting Docker container logs from day one. The hardest part wasn't the tooling — it was accepting that the homelab deserves the same visibility as production.
+    </div>
+
+    <div class="series-nav">
+        <strong>Homelab Series:</strong>
+        <a href="/blog/posts/homelab-start-here">Start Here</a>
+        <a href="/blog/posts/homelab-docker-compose-stack">Docker Compose Stack</a>
+        <a href="/blog/posts/homelab-sso-authentik">SSO with Authentik</a>
+        <a href="/blog/posts/homelab-backup-automation">Backup Automation</a>
+        <a href="/blog/posts/homelab-disaster-recovery">Disaster Recovery</a>
+        <a href="/blog/posts/homelab-secrets-management">Secrets Management</a>
+        <a href="/blog/posts/homelab-xcaddy-cloudflare-tunnel-adguard">Xcaddy + Tunnel + AdGuard</a>
+        <a href="/blog/posts/homelab-vaultwarden-self-hosted-passwords">Vaultwarden</a>
+        <a href="/blog/posts/homelab-p2v-proxmox-migration">P2V to Proxmox</a>
+        <a href="/blog/posts/homelab-proxmox-lxc-decomposition">LXC Decomposition</a>
+        <a href="/blog/posts/homelab-full-lxc-migration">Full LXC Migration</a>
+        <a href="/blog/posts/homelab-telegram-yt-dlp-bot">Telegram Video Bot</a>
+        <a href="/blog/posts/homelab-hermes-ai-agent">AI Brain with Hermes</a>
+        <a href="/blog/posts/homelab-nas-to-das-migration">NAS to DAS Migration</a>
+        <a href="/blog/posts/homelab-double-disk-failure-without-parity">Double Disk Failure Without Parity</a>
+        <a href="/blog/posts/homelab-hermes-vm-migration">Hermes VM Migration</a>
+        <a href="/blog/posts/homelab-unbound-recursive-dns">Private Recursive DNS</a>
+        <a href="/blog/posts/homelab-ai-blog-images">AI Blog Images</a>
+        <a href="/blog/posts/homelab-proxmox-cluster-ha">Proxmox HA Cluster</a>
+        <a href="/blog/posts/homelab-production-grade-observability">Production Grade Observability</a>
+      </div>
+  </article>
+</div>
+</body>
+</html>

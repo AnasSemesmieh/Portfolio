@@ -5,9 +5,16 @@
     <link>https://anas.semesmieh.com/blog/</link>
     <description>Platform engineering, Azure architecture, DevSecOps, and engineering leadership insights.</description>
     <language>en-au</language>
-    <lastBuildDate>Sun, 03 Aug 2026 12:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 16 Aug 2026 12:00:00 +0000</lastBuildDate>
 
     <item>
+      <title>Production Grade Homelab #1: Seeing Everything — Prometheus, Grafana, Loki &amp; Alertmanager</title>
+      <link>https://anas.semesmieh.com/blog/posts/homelab-production-grade-observability</link>
+      <guid>https://anas.semesmieh.com/blog/posts/homelab-production-grade-observability</guid>
+      <pubDate>Sat, 16 Aug 2026 12:00:00 +0000</pubDate>
+      <description>After HA cluster incidents I couldn&apos;t detect fast enough, I built a full observability stack: Prometheus scraping 18 targets, Grafana dashboards, Loki log aggregation, and Alertmanager firing to Telegram.</description>
+    </item>
+        <item>
       <title>From One Box to a Cluster: Building Homelab HA with Proxmox, ZFS, and a Lot of Patience</title>
       <link>https://anas.semesmieh.com/blog/posts/homelab-proxmox-cluster-ha</link>
       <guid>https://anas.semesmieh.com/blog/posts/homelab-proxmox-cluster-ha</guid>
