@@ -191,6 +191,12 @@
       <a href="/blog/?tag=IaC" class="tag">IaC</a>
     </div>
 
+    <figure class="post-hero-image">
+      <img src="/blog/images/homelab-production-grade-observability-hero.png"
+           alt="Anas at a cyberpunk monitoring command center with Grafana and Prometheus dashboards"
+           style="width:100%;border-radius:8px;margin-bottom:1.5rem;" loading="lazy">
+    </figure>
+
     <p>It started with a 3am incident I didn't know about until I woke up.</p>
 
     <p>In early August, I expanded my Proxmox setup into a proper 2-node HA cluster — the previous post covers that. What it doesn't cover is what came after: a series of operational failures that I discovered hours late, by manually SSHing around and reading logs. The backup wrapper crashed nodes at 3am. A helper script wasn't deployed to the second node. Three containers sat stopped overnight. Every single one of these was invisible until I went looking.</p>
@@ -200,6 +206,13 @@
     <p>That's what this post is about fixing. This is the first entry in a new series — <strong>Production Grade Homelab</strong> — where I start treating my homelab infrastructure the same way I'd treat production at work. The three pillars: observability first, then Ansible for configuration management, then Terraform for provisioning. This post covers phase 1: getting full visibility.</p>
 
     <h2>The Stack</h2>
+
+    <figure style="margin:1.5rem 0;">
+      <img src="/blog/images/homelab-production-grade-observability-stack.png"
+           alt="Six glowing Docker containers — Prometheus, Grafana, Alertmanager, Loki, Promtail, pve_exporter — connected by neon data streams in a cyberpunk server room"
+           style="width:100%;border-radius:8px;" loading="lazy">
+      <figcaption style="font-size:0.85rem;color:#888;margin-top:0.5rem;text-align:center;">Six containers, one compose file — the complete observability stack on CT111</figcaption>
+    </figure>
 
     <p>The goal was a single dedicated LXC that gives me:</p>
     <ul>
@@ -389,6 +402,13 @@ systemctl daemon-reload &amp;&amp; systemctl enable --now node_exporter</code></
 
     <h2>Alerting — What Fires and When</h2>
 
+    <figure style="margin:1.5rem 0;">
+      <img src="/blog/images/homelab-production-grade-observability-alerting.png"
+           alt="Neon Telegram notification icon surrounded by floating alert cards in a cyberpunk server environment"
+           style="width:100%;border-radius:8px;" loading="lazy">
+      <figcaption style="font-size:0.85rem;color:#888;margin-top:0.5rem;text-align:center;">Critical alerts fire immediately to Telegram — warnings silenced overnight</figcaption>
+    </figure>
+
     <p>The alert rules cover the things that actually caused pain in August, plus the obvious operational concerns:</p>
 
     <table>
@@ -492,6 +512,13 @@ route:
     <p>Phase 2 (Ansible) will deploy Promtail to every other host in the lab, so logs from pve, pve2, CT103 (Jellyfin/Plex), CT107 (arr-stack) and the rest all flow into the same Loki instance.</p>
 
     <h2>The Homelab Overview Dashboard</h2>
+
+    <figure style="margin:1.5rem 0;">
+      <img src="/blog/images/homelab-production-grade-observability-dashboard.png"
+           alt="Holographic Grafana homelab overview dashboard with stat panels, HA guest table, storage gauges and network charts in a cyberpunk command center"
+           style="width:100%;border-radius:8px;" loading="lazy">
+      <figcaption style="font-size:0.85rem;color:#888;margin-top:0.5rem;text-align:center;">The custom Homelab Overview dashboard — everything at a glance, auto-refreshing every 30s</figcaption>
+    </figure>
 
     <p>Rather than just importing community dashboards (though I did that too — Node Exporter Full ID 1860 is excellent), I built a custom overview dashboard that gives the full homelab picture at a glance:</p>
 
