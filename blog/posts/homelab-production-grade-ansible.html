@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Production Grade Homelab #2: Ansible — No More SSH and Pray | Anas Semesmieh</title>
+  <meta name="description" content="After Prometheus showed me exactly what was broken, I needed a way to fix it without SSHing into 14 boxes. So I built a full Ansible layer: 7 roles, Gitea Actions CI, a Jinja2 Caddyfile, and a Semaphore UI. No more SSH and pray." />
+  <meta name="keywords" content="Anas Semesmieh, Ansible homelab, Ansible Gitea CI, Jinja2 Caddyfile, Semaphore UI, homelab IaC, Proxmox Ansible, self-hosting automation, Production Grade Homelab" />
+  <meta name="author" content="Anas Semesmieh" />
+  <link rel="canonical" href="https://anas.semesmieh.com/blog/posts/homelab-production-grade-ansible" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Production Grade Homelab #2: Ansible — No More SSH and Pray" />
+  <meta property="og:description" content="After Prometheus showed me what was broken, I needed a way to fix it without SSHing into 14 boxes. 7 Ansible roles, Gitea Actions CI, Jinja2 Caddyfile, and a Semaphore web UI." />
+  <meta property="og:url" content="https://anas.semesmieh.com/blog/posts/homelab-production-grade-ansible" />
+  <meta property="og:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Production Grade Homelab #2: Ansible — No More SSH and Pray" />
+  <meta name="twitter:description" content="7 Ansible roles, Gitea Actions CI, Jinja2 Caddyfile, 14 hosts idempotent. Plus a Semaphore web UI so you don't need a terminal to run a playbook." />
+  <meta name="twitter:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Production Grade Homelab #2: Ansible — No More SSH and Pray",
+    "datePublished": "2026-08-22",
+    "dateModified": "2026-08-22",
+    "author": {"@type": "Person", "name": "Anas Semesmieh", "url": "https://anas.semesmieh.com/about/"},
+    "publisher": {"@type": "Person", "name": "Anas Semesmieh"},
+    "mainEntityOfPage": "https://anas.semesmieh.com/blog/posts/homelab-production-grade-ansible",
+    "image": "https://anas.semesmieh.com/profile-wide.jpg",
+    "description": "After Prometheus showed me exactly what was broken, I needed a way to fix it without SSHing into 14 boxes. So I built a full Ansible layer: 7 roles, Gitea Actions CI, a Jinja2 Caddyfile, and a Semaphore UI."
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://anas.semesmieh.com"},
+      {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://anas.semesmieh.com/blog/"},
+      {"@type": "ListItem", "position": 3, "name": "Production Grade Homelab #2", "item": "https://anas.semesmieh.com/blog/posts/homelab-production-grade-ansible"}
+    ]
+  }
+  </script>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #101a2c;
+      --muted: #8ea0be;
+      --text: #e6eef8;
+      --accent: #22c55e;
+      --heading: #60a5fa;
+      --border: rgba(255, 255, 255, 0.08);
+      --maxw: 800px;
+      --radius: 14px;
+      --font: "Inter", "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.72;
+      background:
+        radial-gradient(ellipse at 15% 0%, #13203a 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 15%, #0e1a32 0%, transparent 45%),
+        var(--bg);
+    }
+    .wrap { max-width: var(--maxw); margin: 0 auto; padding: 30px 18px 80px; }
+    .nav { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+    .nav a { text-decoration: none; color: var(--muted); padding: 8px 12px; border-radius: 10px; }
+    .nav a:hover { color: var(--text); background: rgba(255, 255, 255, 0.03); }
+    article { border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; background: var(--card); }
+    h1 { margin-top: 0; font-size: 34px; line-height: 1.2; color: var(--heading); }
+    .meta { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+    h2 { margin-top: 36px; font-size: 22px; color: var(--heading); }
+    h3 { margin-top: 24px; font-size: 18px; color: var(--heading); }
+    p { margin: 0 0 16px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    pre {
+      background: rgba(0,0,0,0.35);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      overflow-x: auto;
+      font-size: 13.5px;
+      line-height: 1.6;
+      margin: 0 0 20px;
+    }
+    pre code { background: none; padding: 0; font-size: inherit; }
+    code {
+      background: rgba(255,255,255,0.06);
+      border-radius: 5px;
+      padding: 2px 6px;
+      font-size: 13px;
+      font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
+    }
+    ul, ol { margin: 0 0 16px; padding-left: 24px; }
+    li { margin-bottom: 6px; }
+    table { width: 100%; border-collapse: collapse; margin: 0 0 20px; font-size: 14px; }
+    th { background: rgba(255,255,255,0.04); color: var(--heading); text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+    td { padding: 9px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: top; }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+    .tag {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 12px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    a.tag:hover { border-color: rgba(34,197,94,0.4); color: var(--accent); }
+    .callout {
+      background: rgba(34,197,94,0.05);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px;
+      margin: 0 0 20px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .callout.warn {
+      background: rgba(251,191,36,0.05);
+      border-left-color: #fbbf24;
+    }
+    .series-nav {
+      margin-top: 40px;
+      padding: 16px;
+      background: rgba(255,255,255,0.02);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      font-size: 13px;
+      line-height: 2;
+    }
+    .series-nav strong { display: block; margin-bottom: 6px; }
+    .series-nav a { color: var(--accent); margin-right: 8px; }
+    .post-hero-image { margin: 0 0 28px; border-radius: 10px; overflow: hidden; }
+    .post-hero-image img { width: 100%; display: block; }
+  </style>
+</head>
+
+<body>
+<div class="wrap">
+  <nav class="nav">
+    <a href="/">Portfolio</a>
+    <a href="/blog/">All Posts</a>
+    <a href="/blog/categories/">Categories</a>
+    <a href="/blog/tags/">Tags</a>
+    <a href="/blog/rss.xml">RSS</a>
+  </nav>
+
+  <article>
+    <h1>Production Grade Homelab #2: Ansible — No More SSH and Pray</h1>
+    <p class="meta">By <a href="/about/">Anas Semesmieh</a> · August 22, 2026</p>
+
+    <div class="tag-list">
+      <a href="/blog/?tag=Homelab" class="tag">Homelab</a>
+      <a href="/blog/?tag=Ansible" class="tag">Ansible</a>
+      <a href="/blog/?tag=IaC" class="tag">IaC</a>
+      <a href="/blog/?tag=Self-Hosting" class="tag">Self-Hosting</a>
+      <a href="/blog/?tag=Automation" class="tag">Automation</a>
+      <a href="/blog/?tag=Proxmox" class="tag">Proxmox</a>
+    </div>
+
+    <p>
+      <a href="/blog/posts/homelab-production-grade-observability">Part 1</a> gave me eyes.
+      Prometheus was scraping 18 targets, Grafana showed me every container state, and Alertmanager was firing
+      Telegram messages when things went wrong. But there was a problem: when Prometheus told me something
+      needed fixing, I still had to SSH into a box and do it by hand.
+    </p>
+    <p>
+      Fourteen boxes. Nine groups. One SSH session per fix. And if I ever needed to enforce something
+      consistently across all of them — a masked systemd service, a timezone, a helper script —
+      I was doing it manually, trusting memory, and hoping I hadn't missed a host.
+    </p>
+    <p>
+      That's not production grade. That's just a monitoring-flavoured form of chaos.
+    </p>
+    <p>
+      So Part 2 is about fixing the other half: if Part 1 is <em>seeing</em>, Part 2 is <em>doing</em>.
+      This weekend I built a full Ansible layer for the homelab — 7 roles, a Jinja2-templated Caddyfile,
+      Gitea Actions CI, and a Semaphore web UI so I don't even need a terminal to trigger a playbook.
+    </p>
+
+    <h2>The Goal</h2>
+    <p>
+      One command — <code>ansible-playbook playbooks/site.yml</code> — should enforce known-good state
+      across every host. Run it once, it applies what's needed. Run it again, it changes nothing.
+      That's the idempotency bar. Anything short of that isn't IaC, it's just a script with a fancy name.
+    </p>
+
+    <h2>The Inventory: 15 Hosts, 9 Groups</h2>
+    <p>
+      The homelab has grown to 15 systems: two Proxmox nodes, nine LXC containers, a VM, two storage nodes,
+      and a cloud VPS. Ansible organises them into role-based groups that map directly to how I think about the stack:
+    </p>
+    <table>
+      <thead><tr><th>Group</th><th>Hosts</th></tr></thead>
+      <tbody>
+        <tr><td><code>role_hypervisor</code></td><td>pve, pve2</td></tr>
+        <tr><td><code>role_dns</code></td><td>adguard (CT101)</td></tr>
+        <tr><td><code>role_proxy</code></td><td>caddy (CT102)</td></tr>
+        <tr><td><code>role_media</code></td><td>media-servers (CT103)</td></tr>
+        <tr><td><code>role_automation</code></td><td>telegram-bot (CT105)</td></tr>
+        <tr><td><code>role_nvr</code></td><td>scrypted (CT106)</td></tr>
+        <tr><td><code>role_download</code></td><td>arrstack (CT107)</td></tr>
+        <tr><td><code>role_utilities</code></td><td>utilities (CT108)</td></tr>
+        <tr><td><code>role_services</code></td><td>unbound (CT110), monitoring (CT111)</td></tr>
+        <tr><td><code>role_ai</code></td><td>hermes-vm (VM100)</td></tr>
+        <tr><td><code>role_storage</code></td><td>unraid, pbs</td></tr>
+        <tr><td><code>jarvis_group</code></td><td>jarvis (Oracle Cloud ARM — ubuntu user, sudo)</td></tr>
+      </tbody>
+    </table>
+    <p>
+      Unraid isn't managed by Ansible — it's BusyBox Linux with no Python, no apt, no systemd. Its
+      <code>node_exporter</code> was already deployed via Docker in Part 1, and Ansible can't do anything
+      useful there that I'm not already doing another way. So it's excluded from all plays with
+      <code>all:!unraid</code> and documented as intentional.
+    </p>
+
+    <h2>The Roles</h2>
+    <p>
+      Seven roles, each with a tight scope. Nothing sprawling, nothing that does "everything".
+    </p>
+
+    <h3>common</h3>
+    <p>Timezone and base packages. One pitfall immediately: <code>community.general.timezone</code> throws
+    "Access denied" on unprivileged LXC containers. The module tries to write to systemd's clock interfaces
+    which aren't available inside a container. Fix: use the raw <code>timedatectl</code> command with
+    <code>failed_when: false</code> — it works on the containers that support it and silently skips the rest.</p>
+
+    <h3>systemd-masks</h3>
+    <p>
+      This one exists because of an incident. After the August 11 HA maintenance window, three containers
+      (CT103/105/107) failed to come back up reliably because <code>ifupdown-wait-online.service</code> was
+      blocking Docker for several minutes on each boot. And CT108 had a <code>docker.socket</code> issue
+      causing systemd deadlocks. Both are now permanently masked by this role — enforced on every run,
+      verified idempotently.
+    </p>
+
+    <h3>helper-scripts</h3>
+    <p>
+      <code>ha-reenable.sh</code> and <code>pve2-backup-wrapper.sh</code> — both extracted directly from
+      pve2 and committed to the repo. These scripts were previously "somewhere on pve2" with no version
+      control. Now they're in git, and Ansible deploys them to both hypervisor nodes every run.
+    </p>
+
+    <h3>node-exporter</h3>
+    <p>
+      Idempotent adoption of the Phase 1 manual installs. Detects whether v1.8.2 is already present and
+      skips the download if it is. ARM64-aware (Jarvis runs on Oracle Cloud ARM). One wrinkle: the
+      download → extract → install chain fails in <code>--check</code> mode because <code>--check</code>
+      pretends the download happened but doesn't actually write the file. Fix: wrap the entire install block
+      with <code>when: not ansible_check_mode</code> — a pattern I ended up applying to the promtail role too.
+    </p>
+
+    <h3>promtail</h3>
+    <p>
+      Phase 1 only had Promtail on CT111 (the monitoring host itself). This role extends Loki log ingestion
+      to all 14 Debian hosts. Same <code>ansible_check_mode</code> guard as node-exporter. Handlers also
+      need <code>ignore_errors: "{{ ansible_check_mode }}"</code> — if the service doesn't exist yet (first
+      install), the handler fails in check mode when it tries to restart a nonexistent service.
+    </p>
+
+    <h3>caddy</h3>
+    <p>
+      This is the one I was most nervous about. The Caddyfile has 38 vhosts. Getting it wrong takes down
+      every service. The role uses a Jinja2 template that splits the config into two parts: a loop over
+      <code>caddy_simple_vhosts</code> (the straightforward <code>reverse_proxy</code> entries) and a set
+      of hardcoded special blocks for the complex cases — Plex with header rewrites, Scrypted with
+      <code>tls_insecure_skip_verify</code>, the Telegram webhook with path-based routing, Prometheus with
+      <code>header_up Host {upstream_hostport}</code> (skip this and Prometheus returns redirect loops).
+    </p>
+    <p>
+      One thing to avoid: Ansible's <code>validate:</code> parameter on template tasks. Caddy's validator
+      is strict about formatting — it rejects templates that aren't run through <code>caddy fmt</code> first,
+      even when the config is functionally valid. Remove <code>validate:</code> and rely on the
+      <code>caddy reload</code> handler to surface real errors instead.
+    </p>
+    <p>
+      After the template landed, I verified every service was still reachable. All 38 up.
+    </p>
+
+    <h3>adguard</h3>
+    <p>
+      Currently a health probe — it calls the AdGuard API to confirm it's reachable and logs the rewrite
+      count. Full template management (Jinja2 for all DNS rewrites, atomic with Caddy changes) is planned
+      for the next iteration. Getting it right without a test environment means being deliberate, and the
+      existing setup is stable.
+    </p>
+
+    <h2>The site.yml Playbook</h2>
+    <p>Running everything in sequence, hosts targeted by group:</p>
+    <pre><code>- import_playbook: ping.yml          # all:!unraid
+
+- name: Common — all Debian hosts
+  hosts: all:!unraid
+  roles: [common]
+
+- name: Node Exporter + Promtail — all Debian hosts
+  hosts: all:!unraid
+  roles: [node-exporter, promtail]
+
+- name: Systemd masks — pve2 CTs
+  hosts: role_media:role_automation:role_download:role_utilities
+  roles: [systemd-masks]
+
+- name: Helper scripts — hypervisors
+  hosts: role_hypervisor
+  roles: [helper-scripts]
+
+- name: Caddy — CT102
+  hosts: caddy
+  roles: [caddy]
+
+- name: AdGuard — CT101
+  hosts: adguard
+  roles: [adguard]</code></pre>
+
+    <p>
+      The idempotency test: run it twice. Second run must show <code>changed=0, failed=0</code> across
+      all 14 hosts. It does.
+    </p>
+
+    <h2>The CI: Gitea Actions on hermes-vm</h2>
+    <p>
+      Every push to <code>ansible/**</code> triggers an <code>ansible-playbook --check</code> run.
+      The runner is <code>act_runner v0.2.11</code> running as a systemd service on hermes-vm.
+    </p>
+
+    <div class="callout warn">
+      <strong>Pitfall: self-hosted runners can't reach github.com.</strong>
+      The standard <code>actions/checkout@v4</code> action pulls from GitHub. When your runner is behind
+      a private network, that fails silently — the step completes but your code is never fetched.
+      Fix: skip the checkout action entirely and use a direct <code>git pull</code> in the workflow step.
+      The repo is already cloned on hermes-vm at <code>~/homelab-iac</code>.
+    </div>
+
+    <pre><code>- name: Pull latest code
+  run: cd /root/homelab-iac && git pull origin main
+
+- name: Run ansible --check
+  run: |
+    cd /root/homelab-iac/ansible
+    echo "${{ secrets.VAULT_PASS }}" > .vault_pass
+    chmod 600 .vault_pass
+    ansible-playbook playbooks/site.yml --check
+    rm -f .vault_pass</code></pre>
+
+    <p>
+      Also: the act_runner download URL matters. The <code>/latest/</code> path on
+      <code>dl.gitea.com</code> returns a 0-byte file. Use the versioned URL:
+      <code>https://dl.gitea.com/act_runner/0.2.11/act_runner-0.2.11-linux-amd64</code>.
+    </p>
+
+    <h2>Vault and Secrets</h2>
+    <p>
+      Ansible Vault encrypts <code>inventory/group_vars/all/vault.yml</code>. The vault password lives
+      in <code>.vault_pass</code> on hermes-vm (gitignored). In CI, it's injected via a Gitea repo secret.
+      The workflow writes it to a temp file, runs the playbook, then deletes it — even on failure, via
+      the always-runs <code>rm -f</code>.
+    </p>
+
+    <h2>LXC Containers Are Not VMs</h2>
+    <p>
+      A few Ansible modules that work fine on VMs will quietly fail on unprivileged LXC containers. The ones
+      I hit:
+    </p>
+    <ul>
+      <li><strong><code>community.general.timezone</code></strong> — "Access denied". Use <code>command: timedatectl set-timezone ...</code> with <code>failed_when: false</code> instead.</li>
+      <li><strong><code>ansible.posix.sysctl</code></strong> — "permission denied on key vm.swappiness". Containers share the host kernel's sysctl namespace. Skip it entirely for LXC hosts, or guard with <code>ansible_virtualization_type not in ['lxc', 'container']</code>.</li>
+      <li><strong>Handlers for services that don't exist yet</strong> — in <code>--check</code> mode, if a service isn't installed, the handler that tries to restart it will fail. Add <code>ignore_errors: "{{ ansible_check_mode }}"</code> to the handler.</li>
+    </ul>
+
+    <h2>The Caddyfile Is Now in Git</h2>
+    <p>
+      This is the change I'm happiest about. Before, adding a new service meant SSHing into CT102, editing
+      the Caddyfile by hand, hoping I didn't break indentation, reloading Caddy, and then separately SSHing
+      into CT101 to add the AdGuard DNS rewrite. Now it's: add the upstream to <code>caddy_vars.yml</code>,
+      push to git. CI validates it. The next playbook run deploys it.
+    </p>
+    <p>
+      The fact that the Caddyfile is a Jinja2 template and all 38 vhosts are declared in variables means
+      I can read the entire reverse proxy config from one YAML file without touching a server.
+    </p>
+
+    <h2>Semaphore: A Web UI for When You Don't Want a Terminal</h2>
+    <p>
+      Ansible is CLI-native. That's fine most of the time. But sometimes you want to trigger a playbook
+      from a phone, or hand off a specific run to someone who doesn't know Ansible, or just have a
+      browsable history of "what ran when and what changed."
+    </p>
+    <p>
+      <a href="https://semaphore.semesmieh.com" target="_blank">Semaphore UI</a> is a lightweight Go web
+      app (single Docker container, SQLite backend) that wraps Ansible playbooks in a clean interface.
+      It runs on CT108 alongside Homepage and Dockhand. Deploy it:
+    </p>
+    <pre><code>services:
+  semaphore:
+    image: semaphoreui/semaphore:latest
+    container_name: semaphore
+    ports:
+      - 3002:3000
+    environment:
+      - SEMAPHORE_DB_DIALECT=sqlite
+      - SEMAPHORE_ADMIN=anas
+      - SEMAPHORE_ADMIN_PASSWORD=P@ssw0rd
+      - SEMAPHORE_ACCESS_KEY_ENCRYPTION=&lt;base64-32-bytes&gt;
+      - TZ=Australia/Sydney
+    volumes:
+      - semaphore_data:/var/lib/semaphore
+      - /root/.ssh:/root/.ssh:ro
+      - /root/homelab-iac:/home/runner/homelab-iac:ro
+    restart: unless-stopped</code></pre>
+
+    <div class="callout warn">
+      <strong>The encryption key must be valid base64.</strong> Semaphore panics on startup if
+      <code>SEMAPHORE_ACCESS_KEY_ENCRYPTION</code> contains characters outside the base64 alphabet.
+      Generate it with: <code>python3 -c "import base64,os; print(base64.b64encode(os.urandom(32)).decode())"</code>
+    </div>
+
+    <p>
+      Once it's up: create a Project, add your SSH key to the Key Store, point a Repository at the
+      <code>homelab-iac</code> Gitea repo, create an Inventory pointing at <code>ansible/inventory/hosts.yml</code>,
+      then create Task Templates (type: Task) for each playbook. You can now run <code>site.yml</code> or
+      <code>caddy-adguard.yml</code> or any health check playbook from a browser.
+    </p>
+
+    <h2>What's Actually in Git Now</h2>
+    <p>The <code>anas/homelab-iac</code> repo on Gitea currently has:</p>
+    <ul>
+      <li><strong>7 roles</strong>: common, systemd-masks, helper-scripts, node-exporter, promtail, caddy, adguard</li>
+      <li><strong>6 playbooks</strong>: site.yml, ping.yml, caddy-adguard.yml, docker-health.yml, backup-verify.yml, nfs-health.yml</li>
+      <li><strong>Encrypted vault.yml</strong> committed — secrets never in plaintext</li>
+      <li><strong>Ansible.cfg</strong> with roles_path, vault_password_file, pipelining enabled</li>
+      <li><strong>Gitea Actions CI</strong> — green badge on every push to <code>ansible/**</code></li>
+      <li><strong>ha-reenable.sh + pve2-backup-wrapper.sh</strong> — previously only lived on pve2, now version-controlled</li>
+    </ul>
+
+    <h2>What I Didn't Do (Yet)</h2>
+    <p>
+      The <code>docker-stacks</code> role exists in the repo but isn't implemented. Docker Compose stacks
+      are currently managed by <code>homelab-compose</code> + a compose-sync cron on CT108 — that works
+      well and Ansible replacing it adds complexity without much gain at this stage. Same with full
+      AdGuard template management — the API requires credentials and the current setup is stable, so
+      that's a Phase 2 v2 item.
+    </p>
+
+    <h2>Done Gates</h2>
+    <ul>
+      <li>&#10003; <code>ansible all -m ping</code> → 14/14 green (Unraid excluded by design)</li>
+      <li>&#10003; <code>ansible-playbook site.yml</code> → idempotent (second run: changed=0, failed=0)</li>
+      <li>&#10003; Caddy Jinja2 template live — all 38 vhosts serving, verified after deploy</li>
+      <li>&#10003; ha-reenable.sh committed to git and deployed to both hypervisors</li>
+      <li>&#10003; systemd-masks enforced on CT103/105/107 (ifupdown) and CT108 (docker.socket)</li>
+      <li>&#10003; node_exporter + promtail on all 14 Debian hosts (Loki getting logs from everywhere)</li>
+      <li>&#10003; Gitea Actions CI — green badge</li>
+    </ul>
+
+    <p>
+      Next up: <strong>Phase 3 — Terraform</strong>. New CTs and VMs declared in HCL,
+      provisioned via <code>terraform apply</code>, state in Gitea HTTP backend.
+      No more clicking through the Proxmox UI.
+    </p>
+
+    <div class="series-nav">
+        <strong>Homelab Series:</strong>
+        <a href="/blog/posts/homelab-start-here">Start Here</a>
+        <a href="/blog/posts/homelab-docker-compose-stack">Docker Compose Stack</a>
+        <a href="/blog/posts/homelab-sso-authentik">SSO with Authentik</a>
+        <a href="/blog/posts/homelab-backup-automation">Backup Automation</a>
+        <a href="/blog/posts/homelab-disaster-recovery">Disaster Recovery</a>
+        <a href="/blog/posts/homelab-secrets-management">Secrets Management</a>
+        <a href="/blog/posts/homelab-xcaddy-cloudflare-tunnel-adguard">Xcaddy + Tunnel + AdGuard</a>
+        <a href="/blog/posts/homelab-vaultwarden-self-hosted-passwords">Vaultwarden</a>
+        <a href="/blog/posts/homelab-p2v-proxmox-migration">P2V to Proxmox</a>
+        <a href="/blog/posts/homelab-proxmox-lxc-decomposition">LXC Decomposition</a>
+        <a href="/blog/posts/homelab-full-lxc-migration">Full LXC Migration</a>
+        <a href="/blog/posts/homelab-telegram-yt-dlp-bot">Telegram Video Bot</a>
+        <a href="/blog/posts/homelab-hermes-ai-agent">AI Brain with Hermes</a>
+        <a href="/blog/posts/homelab-nas-to-das-migration">NAS to DAS Migration</a>
+        <a href="/blog/posts/homelab-double-disk-failure-without-parity">Double Disk Failure Without Parity</a>
+        <a href="/blog/posts/homelab-hermes-vm-migration">Hermes VM Migration</a>
+        <a href="/blog/posts/homelab-unbound-recursive-dns">Private Recursive DNS</a>
+        <a href="/blog/posts/homelab-ai-blog-images">AI Blog Images</a>
+        <a href="/blog/posts/homelab-proxmox-cluster-ha">Proxmox HA Cluster</a>
+        <a href="/blog/posts/homelab-production-grade-observability">Production Grade Observability</a>
+        <a href="/blog/posts/homelab-production-grade-ansible">Production Grade Ansible</a>
+      </div>
+
+  </article>
+</div>
+</body>
+</html>

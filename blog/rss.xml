@@ -8,6 +8,14 @@
     <lastBuildDate>Sat, 16 Aug 2026 12:00:00 +0000</lastBuildDate>
 
     <item>
+      <title>Production Grade Homelab #2: Ansible — No More SSH and Pray</title>
+      <link>https://anas.semesmieh.com/blog/posts/homelab-production-grade-ansible</link>
+      <guid>https://anas.semesmieh.com/blog/posts/homelab-production-grade-ansible</guid>
+      <pubDate>Fri, 22 Aug 2026 12:00:00 +0000</pubDate>
+      <description>After Prometheus showed me what was broken, I needed a way to fix 14 boxes without SSHing into each one. 7 Ansible roles, Gitea Actions CI, Jinja2 Caddyfile, and a Semaphore web UI.</description>
+    </item>
+
+    <item>
       <title>Production Grade Homelab #1: Seeing Everything — Prometheus, Grafana, Loki &amp; Alertmanager</title>
       <link>https://anas.semesmieh.com/blog/posts/homelab-production-grade-observability</link>
       <guid>https://anas.semesmieh.com/blog/posts/homelab-production-grade-observability</guid>

@@ -14,9 +14,9 @@ about/index.html        → Full profile page
 blog/index.html         → Blog index with tag filtering
 blog/categories/        → Posts browsable by category
 blog/tags/              → Posts browsable by tag (29 tags)
-blog/posts/*.html       → Individual blog posts (30 posts)
+blog/posts/*.html       → Individual blog posts (32 posts)
 blog/rss.xml            → RSS feed
-sitemap.xml             → Sitemap (35 URLs)
+sitemap.xml             → Sitemap (37 URLs)
 robots.txt              → Search engine directives
 anas-semesmieh-resume.pdf → Current resume (linked from the site)
 ```
@@ -25,7 +25,7 @@ anas-semesmieh-resume.pdf → Current resume (linked from the site)
 
 ## Blog
 
-30 posts across two content pillars — the full archive at **[anas.semesmieh.com/blog/](https://anas.semesmieh.com/blog/)**.
+32 posts across two content pillars — the full archive at **[anas.semesmieh.com/blog/](https://anas.semesmieh.com/blog/)**.
 
 ### 🏠 Homelab Series
 
@@ -48,7 +48,10 @@ Field notes from building and running a self-hosted homelab on Proxmox, Docker, 
 15. [The Migration That Migrated Itself: Surviving a Double Disk Failure Without Parity](https://anas.semesmieh.com/blog/posts/homelab-double-disk-failure-without-parity)
 16. [Homelab Brain Transplant: Giving Hermes a Proper Linux Home](https://anas.semesmieh.com/blog/posts/homelab-hermes-vm-migration)
 17. [Your DNS Knows Too Much: Building a Private Recursive Resolver with Unbound](https://anas.semesmieh.com/blog/posts/homelab-unbound-recursive-dns)
-18. [Giving My Blog Posts a Visual Identity with Agnes AI and a Custom Hermes Skill](https://anas.semesmieh.com/blog/posts/homelab-ai-blog-images) ← latest
+18. [Giving My Blog Posts a Visual Identity with Agnes AI and a Custom Hermes Skill](https://anas.semesmieh.com/blog/posts/homelab-ai-blog-images)
+19. [From One Box to a Cluster: Building Homelab HA with Proxmox, ZFS, and a Lot of Patience](https://anas.semesmieh.com/blog/posts/homelab-proxmox-cluster-ha)
+20. [Production Grade Homelab #1: Seeing Everything — Prometheus, Grafana, Loki & Alertmanager](https://anas.semesmieh.com/blog/posts/homelab-production-grade-observability)
+21. [Production Grade Homelab #2: Ansible — No More SSH and Pray](https://anas.semesmieh.com/blog/posts/homelab-production-grade-ansible) ← latest
 
 ### 💼 Platform Engineering & Leadership
 
