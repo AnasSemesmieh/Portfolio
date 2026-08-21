@@ -139,6 +139,9 @@
     .series-nav a { color: var(--accent); margin-right: 8px; }
     .post-hero-image { margin: 0 0 28px; border-radius: 10px; overflow: hidden; }
     .post-hero-image img { width: 100%; display: block; }
+    .post-hero-image { margin: 0 0 28px; border-radius: 10px; overflow: hidden; }
+    .post-hero-image img { width: 100%; display: block; }
+    .post-img-diagram { width: 100%; border-radius: 10px; display: block; }
   </style>
 </head>
 
@@ -155,6 +158,12 @@
   <article>
     <h1>Production Grade Homelab #2: Ansible — No More SSH and Pray</h1>
     <p class="meta">By <a href="/about/">Anas Semesmieh</a> · August 22, 2026</p>
+
+    <figure class="post-hero-image">
+      <img src="/blog/images/homelab-production-grade-ansible-hero.png"
+           alt="Anas at a cyberpunk command center with Ansible PLAY RECAP output on monitors, green matrix code rain"
+           loading="lazy">
+    </figure>
 
     <div class="tag-list">
       <a href="/blog/?tag=Homelab" class="tag">Homelab</a>
@@ -214,6 +223,15 @@
         <tr><td><code>jarvis_group</code></td><td>jarvis (Oracle Cloud ARM — ubuntu user, sudo)</td></tr>
       </tbody>
     </table>
+    <figure style="margin: 1.5rem 0;">
+      <img src="/blog/images/homelab-production-grade-ansible-diagram.png"
+           alt="Ansible homelab topology diagram — 14 hosts, 9 groups, 7 roles, CI pipeline"
+           class="post-img-diagram" loading="lazy">
+      <figcaption style="font-size:0.85rem;color:#8ea0be;margin-top:0.5rem;text-align:center;">
+        Full Ansible topology: control node → 9 host groups → 7 roles → CI pipeline
+      </figcaption>
+    </figure>
+
     <p>
       Unraid isn't managed by Ansible — it's BusyBox Linux with no Python, no apt, no systemd. Its
       <code>node_exporter</code> was already deployed via Docker in Part 1, and Ansible can't do anything
