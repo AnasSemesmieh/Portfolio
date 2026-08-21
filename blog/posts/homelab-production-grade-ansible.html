@@ -159,6 +159,22 @@
     <h1>Production Grade Homelab #2: Ansible — No More SSH and Pray</h1>
     <p class="meta">By <a href="/about/">Anas Semesmieh</a> · August 22, 2026</p>
 
+    <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:20px;">
+      <img src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/ansible.png"
+           alt="Ansible" title="Ansible" width="36" height="36"
+           style="border-radius:8px;opacity:0.9;">
+      <img src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/proxmox.png"
+           alt="Proxmox" title="Proxmox" width="36" height="36"
+           style="border-radius:8px;opacity:0.9;">
+      <img src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/semaphore.png"
+           alt="Semaphore" title="Semaphore" width="36" height="36"
+           style="border-radius:8px;opacity:0.9;">
+      <img src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/gitea.png"
+           alt="Gitea" title="Gitea" width="36" height="36"
+           style="border-radius:8px;opacity:0.9;">
+      <span style="font-size:26px;" title="Idempotent!">👍</span>
+    </div>
+
     <figure class="post-hero-image">
       <img src="/blog/images/homelab-production-grade-ansible-hero.png"
            alt="Anas at a cyberpunk command center with Ansible PLAY RECAP output on monitors, green matrix code rain"
@@ -224,11 +240,17 @@
       </tbody>
     </table>
     <figure style="margin: 1.5rem 0;">
-      <img src="/blog/images/homelab-production-grade-ansible-diagram.png"
-           alt="Ansible homelab topology diagram — 14 hosts, 9 groups, 7 roles, CI pipeline"
-           class="post-img-diagram" loading="lazy">
+      <a href="/blog/images/homelab-production-grade-ansible-diagram.png" target="_blank"
+         title="Click to view full size" style="display:block;cursor:zoom-in;">
+        <img src="/blog/images/homelab-production-grade-ansible-diagram.png"
+             alt="Ansible homelab topology diagram — 14 hosts, 9 groups, 7 roles, CI pipeline"
+             class="post-img-diagram" loading="lazy"
+             style="width:100%;border-radius:10px;display:block;transition:opacity 0.2s;"
+             onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+      </a>
       <figcaption style="font-size:0.85rem;color:#8ea0be;margin-top:0.5rem;text-align:center;">
         Full Ansible topology: control node → 9 host groups → 7 roles → CI pipeline
+        <span style="color:#22c55e;"> · click to view full size</span>
       </figcaption>
     </figure>
 
