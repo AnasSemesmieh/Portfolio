@@ -1,0 +1,734 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Run a Real AI Agent for $0: Hermes + Agnes 3 Flash + Nous Free Models | Anas Semesmieh</title>
+  <meta name="description" content="A complete, copy-paste tutorial for standing up Hermes Agent and Hermes Desktop for $0 — Agnes 3 Flash as your main model, a Nous Portal free model as the automatic fallback, and free Agnes image generation. The one thing that costs money (video) is flagged clearly." />
+  <meta name="keywords" content="Anas Semesmieh, Hermes Agent, Agnes 3 Flash, Nous Portal, free AI agent, Agnes AI, agnes-3.0-flash, fallback providers, Hermes Desktop, AI agent tutorial, free LLM, image generation" />
+  <meta name="author" content="Anas Semesmieh" />
+  <link rel="canonical" href="https://anas.semesmieh.com/blog/posts/free-ai-agent-hermes-agnes-nous" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Run a Real AI Agent for $0: Hermes + Agnes 3 Flash + Nous Free Models" />
+  <meta property="og:description" content="Stand up a full tool-calling AI agent — CLI and desktop — for $0. Agnes 3 Flash as the main model, a Nous free model as automatic fallback, free image generation, and an honest breakdown of the one feature that costs cents." />
+  <meta property="og:url" content="https://anas.semesmieh.com/blog/posts/free-ai-agent-hermes-agnes-nous" />
+  <meta property="og:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Run a Real AI Agent for $0: Hermes + Agnes 3 Flash + Nous Free Models" />
+  <meta name="twitter:description" content="A complete copy-paste tutorial: Hermes Agent + Hermes Desktop, Agnes 3 Flash main model, Nous free-tier fallback, free Agnes image generation. Zero dollars." />
+  <meta name="twitter:image" content="https://anas.semesmieh.com/profile-wide.jpg" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Run a Real AI Agent for $0: Hermes + Agnes 3 Flash + Nous Free Models",
+    "datePublished": "2026-10-06",
+    "dateModified": "2026-10-06",
+    "author": {"@type": "Person", "name": "Anas Semesmieh", "url": "https://anas.semesmieh.com/about/"},
+    "publisher": {"@type": "Person", "name": "Anas Semesmieh"},
+    "mainEntityOfPage": "https://anas.semesmieh.com/blog/posts/free-ai-agent-hermes-agnes-nous",
+    "image": "https://anas.semesmieh.com/profile-wide.jpg",
+    "description": "A complete, copy-paste tutorial for standing up Hermes Agent and Hermes Desktop for $0 — Agnes 3 Flash as your main model, a Nous Portal free model as the automatic fallback, and free Agnes image generation."
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://anas.semesmieh.com"},
+      {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://anas.semesmieh.com/blog/"},
+      {"@type": "ListItem", "position": 3, "name": "Run a Real AI Agent for $0", "item": "https://anas.semesmieh.com/blog/posts/free-ai-agent-hermes-agnes-nous"}
+    ]
+  }
+  </script>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #101a2c;
+      --muted: #8ea0be;
+      --text: #e6eef8;
+      --accent: #22c55e;
+      --heading: #60a5fa;
+      --border: rgba(255, 255, 255, 0.08);
+      --maxw: 800px;
+      --radius: 14px;
+      --font: "Inter", "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.72;
+      background:
+        radial-gradient(ellipse at 15% 0%, #13203a 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 15%, #0e1a32 0%, transparent 45%),
+        var(--bg);
+    }
+    .wrap { max-width: var(--maxw); margin: 0 auto; padding: 30px 18px 80px; }
+    .nav { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+    .nav a { text-decoration: none; color: var(--muted); padding: 8px 12px; border-radius: 10px; }
+    .nav a:hover { color: var(--text); background: rgba(255, 255, 255, 0.03); }
+    article { border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; background: var(--card); }
+    h1 { margin-top: 0; font-size: 34px; line-height: 1.2; color: var(--heading); }
+    .meta { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+    h2 { margin-top: 36px; font-size: 22px; color: var(--heading); }
+    h3 { margin-top: 24px; font-size: 18px; color: var(--heading); }
+    p { margin: 0 0 16px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    pre {
+      background: rgba(0,0,0,0.35);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      overflow-x: auto;
+      font-size: 13.5px;
+      line-height: 1.6;
+      margin: 0 0 20px;
+    }
+    pre code { background: none; padding: 0; font-size: inherit; }
+    code {
+      background: rgba(255,255,255,0.06);
+      border-radius: 5px;
+      padding: 2px 6px;
+      font-size: 13px;
+      font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
+    }
+    ul, ol { margin: 0 0 16px; padding-left: 24px; }
+    li { margin-bottom: 6px; }
+    table { width: 100%; border-collapse: collapse; margin: 0 0 20px; font-size: 14px; }
+    th { background: rgba(255,255,255,0.04); color: var(--heading); text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+    td { padding: 9px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: top; }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+    .tag {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 12px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    a.tag:hover { border-color: rgba(34,197,94,0.4); color: var(--accent); }
+    .callout {
+      background: rgba(34,197,94,0.05);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px;
+      margin: 0 0 20px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .callout.warn {
+      background: rgba(251,191,36,0.05);
+      border-left-color: #fbbf24;
+    }
+    .callout strong { color: var(--text); }
+    .series-nav {
+      margin-top: 40px;
+      padding: 16px;
+      background: rgba(255,255,255,0.02);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      font-size: 13px;
+      line-height: 2;
+    }
+    .series-nav strong { display: block; margin-bottom: 6px; }
+    .series-nav a { color: var(--accent); margin-right: 8px; }
+    .post-hero-image { margin: 0 0 28px; border-radius: 10px; overflow: hidden; }
+    .post-hero-image img { width: 100%; display: block; }
+    .post-img-diagram { width: 100%; border-radius: 10px; display: block; }
+  </style>
+</head>
+
+<body>
+<div class="wrap">
+  <nav class="nav">
+    <a href="/">Portfolio</a>
+    <a href="/blog/">All Posts</a>
+    <a href="/blog/categories/">Categories</a>
+    <a href="/blog/tags/">Tags</a>
+    <a href="/blog/rss.xml">RSS</a>
+  </nav>
+
+  <article>
+    <h1>Run a Real AI Agent for $0: Hermes + Agnes 3 Flash + Nous Free Models</h1>
+    <p class="meta">By <a href="/about/">Anas Semesmieh</a> · October 6, 2026</p>
+
+    <div class="tag-list">
+      <a href="/blog/?tag=AI" class="tag">AI</a>
+      <a href="/blog/?tag=Hermes Agent" class="tag">Hermes Agent</a>
+      <a href="/blog/?tag=Agnes AI" class="tag">Agnes AI</a>
+      <a href="/blog/?tag=Nous Research" class="tag">Nous Research</a>
+      <a href="/blog/?tag=Tutorial" class="tag">Tutorial</a>
+      <a href="/blog/?tag=Self-Hosting" class="tag">Self-Hosting</a>
+    </div>
+
+    <figure class="post-hero-image">
+      <img src="/blog/images/free-ai-agent-hero.png"
+           alt="A glowing AI agent core in cyberspace with a primary model node, a fast fallback node, and a safety-net node, a zero price tag floating above, green matrix code rain"
+           loading="lazy">
+    </figure>
+
+    <p>
+      Most "get started with AI agents" guides quietly assume you'll hand a credit card to OpenAI or
+      Anthropic before you've even seen the thing run. That's a bad first step. You shouldn't have to pay to
+      find out whether a tool-calling agent is useful to <em>you</em> — and in late 2026 you genuinely don't
+      have to.
+    </p>
+    <p>
+      This is a complete, copy-paste walkthrough for standing up a real agent — not a toy chat box, a full
+      tool-calling agent with a terminal, a filesystem, web search, and image generation, on both the
+      command line and a native desktop app — for <strong>$0</strong>. The stack:
+    </p>
+    <ul>
+      <li><strong><a href="https://hermes-agent.nousresearch.com/docs/" target="_blank" rel="noopener">Hermes Agent</a></strong> — the open-source agent framework from Nous Research (CLI + desktop + 20 messaging platforms).</li>
+      <li><strong><a href="https://wiki.agnes-ai.com/en/docs/agnes-30-flash" target="_blank" rel="noopener">Agnes 3.0 Flash</a></strong> — a 512K-context, tool-call-tuned text model that is <em>free</em> during its preview period. This is your main brain.</li>
+      <li><strong><a href="https://portal.nousresearch.com/" target="_blank" rel="noopener">Nous Portal free tier</a></strong> — a $0/month, no-card subscription that gives you a rotating catalog of free models. This is your automatic safety net when Agnes rate-limits you.</li>
+      <li><strong>Agnes image generation</strong> — also free, same API key. Your agent can draw.</li>
+    </ul>
+    <div class="callout warn">
+      <strong>One honest caveat up front.</strong> Exactly one capability in this guide costs money:
+      Agnes <em>video</em> generation (roughly 2.5–5.5 cents per output second). Everything else — the agent,
+      the main model, the fallback, image generation — is $0. I've put video in its own clearly-flagged
+      "optional paid extra" section near the end so budget readers can skip it entirely and still have a
+      fully working agent.
+    </div>
+    <p>
+      This is written for someone setting up Hermes for the first time who wants to keep spend at zero while
+      they learn. I'll link the official Nous and Agnes docs at every step so you can verify everything
+      against the source rather than taking my word for it.
+    </p>
+
+    <h2>The architecture: two brains and a safety net</h2>
+    <p>
+      Before the commands, here's the shape of what you're building. There are two things people conflate —
+      the <em>agent</em> (Hermes, the thing that runs tools in a loop) and the <em>model</em> (the LLM that
+      does the thinking). Hermes is provider-agnostic: it speaks the OpenAI-compatible wire format, so any
+      endpoint that does can be slotted in. We exploit that twice.
+    </p>
+    <figure style="margin: 1.5rem 0;">
+      <a href="/blog/images/free-ai-agent-architecture.png" target="_blank"
+         title="Click to view full size" style="display:block;cursor:zoom-in;">
+        <img src="/blog/images/free-ai-agent-architecture.png"
+             alt="Architecture diagram: Hermes terminal hub splitting into an Agnes primary pipeline and a Nous free fallback net, with Agnes image generation branching off"
+             class="post-img-diagram" loading="lazy"
+             style="width:100%;border-radius:10px;display:block;transition:opacity 0.2s;"
+             onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+      </a>
+      <figcaption style="font-size:0.85rem;color:#8ea0be;margin-top:0.5rem;text-align:center;">
+        Agnes 3 Flash as the primary brain, a Nous free model as the automatic fallback, Agnes image
+        generation on the same key <span style="color:#22c55e;"> · click to view full size</span>
+      </figcaption>
+    </figure>
+    <ul>
+      <li><strong>Primary model → Agnes 3.0 Flash.</strong> Free, 512K context, tuned for multi-step tool
+        use. It handles your day-to-day agent work.</li>
+      <li><strong>Fallback → a Nous Portal free model.</strong> When Agnes hits a rate limit or has a bad
+        minute, Hermes transparently swaps to a free Nous model mid-session without losing your
+        conversation. You don't notice the hand-off.</li>
+      <li><strong>Image generation → Agnes.</strong> The same Agnes key that runs your text model also
+        serves <code>/v1/images/generations</code> for free.</li>
+    </ul>
+    <p>
+      The result is an agent that keeps working even when one free provider gets grumpy — which is exactly
+      the failure mode you hit when you lean on free tiers. Redundancy is the price of admission for $0.
+    </p>
+
+    <h2>Step 1 — Install Hermes (Linux, macOS, Windows)</h2>
+    <p>
+      Hermes ships a one-line installer that sets up <code>uv</code>, a managed Python, the virtualenv, and
+      the <code>hermes</code> launcher. Pick your platform.
+    </p>
+
+    <h3>Linux / macOS</h3>
+    <pre><code>curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash</code></pre>
+
+    <h3>Windows (PowerShell)</h3>
+    <pre><code>iex (irm https://hermes-agent.nousresearch.com/install.ps1)</code></pre>
+
+    <p>
+      Prefer a package manager? <code>pip install hermes-agent</code> (or <code>uv pip install
+      hermes-agent</code>) works on all three and ships the TUI bundle. Once it's in, confirm the install is
+      healthy:
+    </p>
+    <pre><code>hermes doctor</code></pre>
+    <p>
+      <code>hermes doctor</code> checks dependencies and config and tells you what's missing. Fix anything it
+      flags before moving on. Full install reference:
+      <a href="https://hermes-agent.nousresearch.com/docs/getting-started/installation" target="_blank" rel="noopener">Installation docs</a>.
+    </p>
+
+    <h3>The desktop app</h3>
+    <p>
+      Hermes has a native Electron desktop app (macOS, Linux, Windows) with streaming chat, a session list,
+      drag-and-drop file attach, a Cmd+K palette, a status-bar model picker, and live subagent watch-windows.
+      Two ways to get it:
+    </p>
+    <ul>
+      <li><strong>From the installer:</strong> download the desktop package for your OS from the
+        <a href="https://hermes-agent.nousresearch.com/" target="_blank" rel="noopener">Hermes website</a> —
+        Windows opens the <code>.appinstaller</code> with Windows App Installer, macOS mounts a DMG and you
+        drag <code>Hermes.app</code> to Applications.</li>
+      <li><strong>From an existing CLI install:</strong> just run it.</li>
+    </ul>
+    <pre><code>hermes desktop     # alias: hermes gui</code></pre>
+    <p>
+      Everything below is configured once and shared by both the CLI and the desktop app — they read the same
+      <code>~/.hermes/config.yaml</code>. Set it up in the terminal, use it anywhere.
+    </p>
+
+    <h2>Step 2 — Get your two free keys</h2>
+    <p>
+      You need two credentials, both free, both no-card.
+    </p>
+
+    <h3>Agnes API key (free — covers text, image, and video)</h3>
+    <p>
+      Sign up at <a href="https://agnes-ai.com/" target="_blank" rel="noopener">agnes-ai.com</a> and create
+      an API key. One key covers every Agnes model — the text models, image generation, and video — so this
+      is the only Agnes credential you'll ever need. Agnes 3.0 Flash is served on an OpenAI-compatible gateway
+      at <code>https://apihub.agnes-ai.com/v1</code>, and calling it today adds nothing to your balance
+      (verified against Agnes's own billing meter by
+      <a href="https://openclawlaunch.com/guides/agnes-3-0-flash" target="_blank" rel="noopener">independent testing</a>).
+    </p>
+
+    <h3>Nous Portal free tier (OAuth, no credit card)</h3>
+    <p>
+      The Nous Portal free plan is <strong>$0/month with $0 in monthly credits</strong> — it gives you the
+      free-model catalog and standard rate limits (50 requests/min, 500K tokens/min), no card required. Sign
+      up at <a href="https://portal.nousresearch.com/manage-subscription" target="_blank" rel="noopener">portal.nousresearch.com</a>,
+      then wire it into Hermes with one command:
+    </p>
+    <pre><code>hermes setup --portal</code></pre>
+    <p>
+      That opens your browser for OAuth, stores a refresh token at <code>~/.hermes/auth.json</code>, and sets
+      Nous as a provider. Verify it:
+    </p>
+    <pre><code>hermes portal info</code></pre>
+    <div class="callout">
+      <strong>On a headless box?</strong> OAuth needs a browser. Either forward the callback port
+      (<code>ssh -N -L 8642:127.0.0.1:8642 user@host</code>) or use device-code login with
+      <code>hermes auth add nous --type oauth</code>. The
+      <a href="https://hermes-agent.nousresearch.com/docs/guides/oauth-over-ssh" target="_blank" rel="noopener">OAuth over SSH</a>
+      guide has the full walkthrough.
+    </div>
+    <p>
+      We'll use Agnes as the <em>main</em> provider (next step) and keep Nous as the <em>fallback</em> (step
+      4). If you'd rather flip it — Nous free model as primary, Agnes as backup — the config is symmetric;
+      swap the two blocks.
+    </p>
+
+    <h2>Step 3 — Wire Agnes 3 Flash as your main model</h2>
+    <p>
+      Hermes has <strong>no native Agnes provider</strong>. That's fine — Agnes rides the generic
+      <code>custom</code> OpenAI-compatible slot, which is a first-class provider in Hermes, not a hack. Open
+      your config:
+    </p>
+    <pre><code>hermes config edit</code></pre>
+    <p>
+      Set the <code>model</code> block to:
+    </p>
+    <pre><code>model:
+  default: agnes-3.0-flash
+  provider: custom
+  base_url: https://apihub.agnes-ai.com/v1
+  api_key: YOUR_AGNES_KEY
+  context_length: 512000</code></pre>
+    <div class="callout warn">
+      <strong>Two things people get wrong here.</strong>
+      <br>(1) The model name is <strong>bare</strong> — <code>agnes-3.0-flash</code>, not
+      <code>agnes/agnes-3.0-flash</code>. The prefixed form is OpenClaw's convention, not Hermes's; it'll
+      give you a 404.
+      <br>(2) Once <code>base_url</code> is set it takes precedence and decides where the request actually
+      goes — so double-check it points at <code>apihub.agnes-ai.com/v1</code>.
+    </div>
+    <p>
+      Prefer not to hand-edit YAML? <code>hermes model</code> → <em>Custom endpoint</em> walks you through the
+      same four values interactively. Now prove it works:
+    </p>
+    <pre><code>hermes chat -q "In one sentence, what model are you and what's your context window?"</code></pre>
+    <p>
+      If you get a coherent answer back, Agnes is your brain. One behavioural note:
+      <strong>Agnes 3.0 Flash is a reasoning model</strong> — it spends output tokens on internal thinking
+      before the visible answer. If replies ever come back empty, your max-output budget is too small and the
+      whole budget went to thinking; give it room. On self-hosted Hermes there's no Agnes output cap by
+      default, so this is rarely an issue. Full model spec:
+      <a href="https://wiki.agnes-ai.com/en/docs/agnes-30-flash" target="_blank" rel="noopener">Agnes 3.0 Flash docs</a>.
+    </p>
+
+    <h2>Step 4 — Add the Nous free-model fallback</h2>
+    <p>
+      Free tiers rate-limit. The whole point of this architecture is that a rate limit on Agnes shouldn't
+      stop your agent — Hermes should quietly reach for a free Nous model and carry on. That's exactly what
+      <a href="https://hermes-agent.nousresearch.com/docs/user-guide/features/fallback-providers/" target="_blank" rel="noopener">fallback providers</a>
+      do: when the main provider throws a rate-limit, server error, or auth failure, Hermes swaps the
+      provider:model pair <em>mid-session without losing your conversation</em>.
+    </p>
+    <p>
+      The interactive way:
+    </p>
+    <pre><code>hermes fallback add</code></pre>
+    <p>
+      It reuses the same provider picker as <code>hermes model</code> — choose <strong>Nous</strong>, then
+      pick a free model. Or edit the YAML directly; fallback lives in a top-level
+      <code>fallback_providers:</code> list:
+    </p>
+    <pre><code>fallback_providers:
+  - provider: nous
+    model: inclusionai/ling-3.1-flash</code></pre>
+    <div class="callout">
+      <strong>Pick a current free model — the list rotates.</strong> Nous rotates the free-for-subscribers
+      catalog month to month, so don't hard-depend on one slug forever. Run <code>hermes model</code>, select
+      Nous, and look for anything tagged <strong>(free)</strong> or priced <strong>$0.00/1M</strong>. At the
+      time of writing the free, tool-call-capable options include <em>inclusionAI: Ling 3.1 Flash</em>,
+      <em>Meituan: LongCat 2.5 Preview</em>, and <em>Poolside: Laguna S 2.1</em>. The live list is on the
+      <a href="https://portal.nousresearch.com/models" target="_blank" rel="noopener">Portal models page</a>.
+    </div>
+    <div class="callout warn">
+      <strong>Don't pick a Hermes-4 model for the agent loop.</strong> Hermes-4-70B / 405B are superb
+      chat/reasoning models, but they're <em>not</em> tool-call-tuned and will struggle in multi-step agent
+      loops — this is Nous's own guidance, not just mine. For agent work, stick to the frontier
+      <em>agentic</em> models (which is why Agnes 3 Flash, built for tool use, is a good primary). Also note:
+      Hermes requires a model with at least 64K context, which any of the above clears easily.
+    </div>
+    <p>
+      You now have a self-healing free stack: Agnes does the heavy lifting, and if it stumbles, a free Nous
+      model catches the fall. You can chain multiple fallbacks — Hermes tries them in order and drops back to
+      your main model as the final safety net.
+    </p>
+
+    <h3>Bonus: Agnes 2.5 Flash as a faster, lighter alternative</h3>
+    <p>
+      Agnes 3.0 Flash is the capable one, but it's a reasoning model — it <em>thinks</em> before it answers,
+      which costs latency. For quick, shallow tasks that don't need deep multi-step reasoning,
+      <strong>Agnes 2.5 Flash</strong> (<code>agnes-2.5-flash</code>) is often snappier: same free price, same
+      512K window, same API key, less deliberation. It's also the model with a published price and a longer
+      track record, so Agnes itself still treats it as the "suggested default." Trade-off in one line:
+      <em>3.0 Flash is smarter on hard jobs; 2.5 Flash is faster on easy ones.</em>
+    </p>
+    <p>
+      The nice part is that Hermes lets you keep <strong>both</strong> on tap and reach for the right one per
+      task — you don't have to commit globally. A few patterns I actually use:
+    </p>
+    <ul>
+      <li><strong>Per-session override.</strong> Start a throwaway session on the fast model without touching
+        your default:
+        <pre style="margin-top:8px;"><code>hermes chat --model agnes-2.5-flash -q "summarise this changelog into 3 bullets"</code></pre></li>
+      <li><strong>Mid-session switch.</strong> Inside a chat, flip models on the fly when a task gets heavier
+        or lighter:
+        <pre style="margin-top:8px;"><code>/model agnes-2.5-flash     # drop to fast mode for grunt work
+/model agnes-3.0-flash     # back to the deep thinker for the hard part</code></pre></li>
+      <li><strong>Auxiliary tasks on the cheap model.</strong> Hermes runs side jobs — vision, web-page
+        summarisation, context compression — through a separate "auxiliary" model. Point those at the fast
+        model so your main brain stays free for the actual reasoning:
+        <pre style="margin-top:8px;"><code>hermes config set auxiliary.compression.provider custom
+hermes config set auxiliary.compression.model agnes-2.5-flash</code></pre></li>
+      <li><strong>Scheduled / background work on fast, interactive on smart.</strong> A
+        <a href="https://hermes-agent.nousresearch.com/docs/user-guide/features/cron" target="_blank" rel="noopener">cron job</a>
+        that summarises your inbox every morning doesn't need the reasoning model — give it
+        <code>agnes-2.5-flash</code> with a per-job model override and keep <code>agnes-3.0-flash</code> as
+        your interactive default.</li>
+    </ul>
+    <p>
+      Think of it as two gears on the same free drivetrain: fast gear for reflexes, smart gear for climbs,
+      and the Nous free model as the tow truck if either gear slips.
+    </p>
+
+    <h2>Step 5 — Free image generation with Agnes</h2>
+    <p>
+      Your agent can draw, for free, on the same Agnes key. Agnes image generation is a straight
+      OpenAI-style call to <code>POST /v1/images/generations</code> — no separate account, no extra billing.
+      (Worth knowing: the Nous Portal image generation gateway is a <em>paid</em>-plan feature, so on a $0
+      budget, Agnes is specifically the free image path.)
+    </p>
+    <figure style="margin: 1.5rem 0;">
+      <img src="/blog/images/free-ai-agent-imagegen.png"
+           alt="An abstract AI-generated image materialising out of green matrix code particles onto a glowing canvas in a neon cyberpunk studio"
+           class="post-img-diagram" loading="lazy"
+           style="width:100%;border-radius:10px;display:block;">
+      <figcaption style="font-size:0.85rem;color:#8ea0be;margin-top:0.5rem;text-align:center;">
+        A generic scene generated with Agnes <code>agnes-image-2.5-flash</code> — cost: $0
+      </figcaption>
+    </figure>
+    <p>
+      Here's a minimal, self-contained call. Export your key once (<code>export
+      AGNES_AI_API_KEY=...</code>), then:
+    </p>
+    <pre><code>curl -s --max-time 120 -X POST https://apihub.agnes-ai.com/v1/images/generations \
+  -H "Authorization: Bearer $AGNES_AI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "agnes-image-2.5-flash",
+    "prompt": "an isometric data center at night, glowing server racks, clean futuristic style",
+    "size": "1536x1024",
+    "n": 1
+  }'</code></pre>
+    <p>
+      The response carries a temporary URL at <code>data[0].url</code> — <strong>download it
+      immediately</strong>, these URLs expire:
+    </p>
+    <pre><code>curl -sL "&lt;url-from-response&gt;" -o ~/Downloads/agnes-image.png</code></pre>
+    <p>
+      A few practical notes from running this a lot: generation takes ~20–30s, so allow a generous timeout and
+      retry on <code>503</code> (free capacity is bursty); describe <em>scenes and environments</em> rather
+      than asking for text or labels inside the image, because the model garbles rendered text; and there's a
+      practical ceiling of roughly 15–20 images/day on the free tier before you start getting persistent
+      rate-limits. Within Hermes, the agent can drive this for you as a tool — "generate a hero image for this
+      post and save it to Downloads" becomes a single instruction.
+    </p>
+    <h3>Teach Hermes to do this on its own — install the skill</h3>
+    <p>
+      Hermes has <strong>skills</strong> — reusable procedure documents the agent loads on demand. Rather than
+      pasting the curl command every time, you can install a ready-made Agnes image-generation skill so the
+      agent knows the endpoint, the retry logic, and the prompt rules automatically. I've published one
+      alongside this post; install it straight from the URL:
+    </p>
+    <pre><code>hermes skills install https://anas.semesmieh.com/blog/skills/agnes-image-generation/SKILL.md</code></pre>
+    <p>
+      After that, make sure your Agnes key is exported where Hermes can read it
+      (<code>echo 'AGNES_AI_API_KEY=your-key' &gt;&gt; ~/.hermes/.env</code>), start a new session, and just ask:
+      <em>"generate a wide banner of a neon server room and save it to ~/Downloads."</em> The skill loads, the
+      agent calls Agnes, retries on a busy signal, and downloads the result — no copy-paste. You can inspect
+      the skill first with <code>hermes skills inspect</code>, and <code>hermes skills list</code> shows
+      everything installed. This is the single most useful habit to build early: when you work out a reliable
+      procedure, save it as a skill and the agent gets permanently better at it.
+    </p>
+
+    <h2>Optional paid extra: video generation with Agnes</h2>
+    <div class="callout warn">
+      <strong>⚠️ This is the one thing in this guide that costs money.</strong> Everything above is $0.
+      Agnes <em>video</em> is billed per output second. If you're here purely for the free stack, you can stop
+      at Step 5 with a fully working agent — this section is for when you want motion and are OK spending a
+      few cents.
+    </div>
+    <p>
+      Agnes video (<code>agnes-video-2.5</code>) is served from the same key and gateway, as an
+      <strong>async</strong> job: you create a task, poll until it's done, then download the result. Pricing
+      is per output second:
+    </p>
+    <table>
+      <thead><tr><th>Resolution</th><th>Price per output second</th></tr></thead>
+      <tbody>
+        <tr><td>720P</td><td>$0.025 / sec</td></tr>
+        <tr><td>1080P / 1K</td><td>$0.040 / sec</td></tr>
+        <tr><td>2K</td><td>$0.055 / sec</td></tr>
+      </tbody>
+    </table>
+    <p>
+      The full formula is <code>output_sec × rate + input_video_sec × rate + max(0, images − 5) × $0.005</code>.
+      A worked example: an <strong>8-second 720P</strong> clip from a text prompt is
+      <code>8 × $0.025 = $0.20</code>. Add a 3-second input video to guide it and seven reference images and
+      you're at <code>(8 + 3) × $0.025 + 2 × $0.005 = $0.285</code>. In other words — pennies per clip, but
+      not zero, so <strong>decide the resolution and duration before you hit go</strong>. Default to 720P and
+      the shortest duration while you're experimenting.
+    </p>
+    <p>
+      The two-step async flow, trimmed to essentials:
+    </p>
+    <pre><code># 1. Create the task → returns a video_id (save THIS, not task_id)
+POST https://apihub.agnes-ai.com/v1/videos
+{
+  "model": "agnes-video-2.5",
+  "prompt": "a slow drone shot over a neon city at night",
+  "mode": "text",          # text | keyframe | reference
+  "seconds": "5",          # string, "4"–"12"
+  "size": "720P",
+  "aspect_ratio": "16:9"
+}
+
+# 2. Poll until status == completed, then download the (temporary) url
+GET https://apihub.agnes-ai.com/agnesapi?video_id=&lt;VIDEO_ID&gt;&amp;model_name=agnes-video-2.5</code></pre>
+    <div class="callout">
+      <strong>Two gotchas that waste the most time:</strong> poll with <code>video_id</code>, never
+      <code>task_id</code> (and always include <code>&amp;model_name=agnes-video-2.5</code>, or the task looks
+      stuck forever); and any reference images/video URLs you pass must be <em>publicly reachable</em> until
+      the job finishes — private or expiring URLs fail server-side. Because jobs take minutes, run them as
+      background work rather than blocking your session.
+    </div>
+
+    <h2>Make Hermes more capable: tools, toolsets, and plugins</h2>
+    <p>
+      The model is only half the agent — the other half is what it can <em>do</em>. Out of the box Hermes
+      bundles a deep toolset, and all of it works on the free stack. Manage what's on with
+      <code>hermes tools</code> (an interactive toggle) or <code>hermes tools list</code>. The ones you'll
+      reach for first:
+    </p>
+    <table>
+      <thead><tr><th>Toolset</th><th>What it gives the agent</th></tr></thead>
+      <tbody>
+        <tr><td><code>terminal</code></td><td>Run shell commands and manage processes</td></tr>
+        <tr><td><code>file</code></td><td>Read, write, search, and patch files</td></tr>
+        <tr><td><code>web</code> / <code>search</code></td><td>Web search and full-page extraction</td></tr>
+        <tr><td><code>code_execution</code></td><td>Sandboxed Python execution</td></tr>
+        <tr><td><code>vision</code></td><td>Analyse images (Agnes 3 Flash takes image input, so this is free)</td></tr>
+        <tr><td><code>image_gen</code> / <code>video</code></td><td>Generate and edit media</td></tr>
+        <tr><td><code>delegation</code></td><td>Spawn subagents for parallel subtasks</td></tr>
+        <tr><td><code>cronjob</code></td><td>Schedule unattended agent runs</td></tr>
+        <tr><td><code>memory</code> / <code>session_search</code></td><td>Persistent memory and search across past conversations</td></tr>
+        <tr><td><code>todo</code> / <code>clarify</code></td><td>In-session task planning and asking you questions</td></tr>
+      </tbody>
+    </table>
+    <div class="callout">
+      <strong>Tool changes apply on a new session.</strong> Enable a toolset, then <code>/reset</code> (or start
+      a fresh <code>hermes chat</code>). They don't hot-swap mid-conversation — that's deliberate, to preserve
+      prompt caching. Full list: <a href="https://hermes-agent.nousresearch.com/docs/reference/tools-reference" target="_blank" rel="noopener">tools reference</a>.
+    </div>
+    <h3>Skills — the agent's procedural memory</h3>
+    <p>
+      You already installed one in Step 5. Skills are how Hermes accumulates know-how: when it solves a gnarly
+      problem or you correct it, it can save the procedure as a skill that loads into future sessions.
+      <code>hermes skills browse</code> explores the hub, <code>hermes skills search &lt;query&gt;</code> finds
+      one, and <code>hermes skills install &lt;id-or-URL&gt;</code> adds it — the URL form is exactly how the
+      Agnes image skill installed. Over time this is what makes the agent feel tailored to <em>you</em> rather
+      than generic.
+    </p>
+    <h3>Plugins — add whole subsystems</h3>
+    <p>
+      Plugins extend Hermes with new tools, memory providers, desktop panes, and dashboard views.
+      <code>hermes plugins list</code> shows what's active and <code>hermes plugins install &lt;name&gt;</code>
+      pulls from the catalog or straight from a GitHub repo. You can also wire in
+      <a href="https://hermes-agent.nousresearch.com/docs/user-guide/features/mcp" target="_blank" rel="noopener">MCP servers</a>
+      (<code>hermes mcp add</code>) to expose external tools, and schedule recurring work with
+      <a href="https://hermes-agent.nousresearch.com/docs/user-guide/features/cron" target="_blank" rel="noopener">cron</a>.
+      Nothing here costs money on the free stack — the plugins are code, and they run against whichever free
+      model you configured. In the next section we install a plugin that gives your agent a genuine long-term
+      memory.
+    </p>
+
+    <h2>Give it a real memory: Mnemosyne + a memory dashboard</h2>
+    <p>
+      Hermes ships with a built-in memory (bounded personal notes + a user profile that survive across
+      sessions), and it's always on. But it's deliberately small. For an agent you actually live with, you want
+      something richer: semantic recall, a knowledge graph of facts, episodic consolidation — a real memory
+      layer. Hermes supports <strong>pluggable memory providers</strong> for exactly this, and only one external
+      provider is active at a time (the built-in memory stays active alongside it).
+    </p>
+    <p>
+      Several providers exist (Mem0, Honcho, Holographic, and more — see the
+      <a href="https://hermes-agent.nousresearch.com/docs/user-guide/features/memory-providers/" target="_blank" rel="noopener">memory providers docs</a>).
+      For a free, local-first setup my pick is <strong><a href="https://github.com/mnemosyne-oss/mnemosyne" target="_blank" rel="noopener">Mnemosyne</a></strong>:
+      one <code>pip install</code>, one SQLite database, no external services, no API keys, no cloud calls. It's
+      a Hermes-first memory layer with vector + full-text hybrid recall, a temporal knowledge graph, and
+      episodic "sleep" consolidation that compresses old working memories into summaries.
+    </p>
+    <h3>Install Mnemosyne as the memory provider</h3>
+    <p>
+      Install the Hermes wrapper package (it pulls in local embeddings), then point Hermes at it:
+    </p>
+    <pre><code># into the Hermes environment
+pip install mnemosyne-hermes
+
+# register it as the active provider + restart so tools load
+python -m mnemosyne.install
+hermes config set memory.provider mnemosyne
+hermes gateway restart</code></pre>
+    <div class="callout">
+      <strong>Debian/Ubuntu (PEP 668) note:</strong> newer releases block bare <code>pip install</code>. Use the
+      Hermes virtualenv, e.g. <code>source ~/.hermes/hermes-agent/venv/bin/activate</code> first, or a dedicated
+      venv — see the <a href="https://github.com/mnemosyne-oss/mnemosyne/blob/main/docs/hermes-integration.md" target="_blank" rel="noopener">Hermes integration guide</a>.
+      On Docker or desktop-binary installs, prefer Mnemosyne's <em>wrapper</em> mode so an update can't wipe the
+      side environment.
+    </div>
+    <p>
+      Verify it took:
+    </p>
+    <pre><code>hermes memory status        # should show Provider: mnemosyne
+mnemosyne stats             # working + episodic counts
+hermes tools list | grep mnemosyne</code></pre>
+    <p>
+      From now on the agent has <code>mnemosyne_remember</code>, <code>mnemosyne_recall</code>, knowledge-graph
+      triples, and more — it quietly recalls relevant facts before each turn and stores new ones as you go. It
+      remembers your stack, your preferences, and the lessons from past sessions, all in a local SQLite file you
+      own.
+    </p>
+    <h3>See and curate it: the Mnemosyne dashboard</h3>
+    <p>
+      Memory you can't inspect is memory you can't trust. The
+      <a href="https://github.com/wysie/mnemosyne-dashboard" target="_blank" rel="noopener">Mnemosyne dashboard</a>
+      is a small, local-first web UI for browsing, visualising, and (optionally) maintaining the store — a
+      Python-stdlib server with a static frontend, read-only by default, no cloud calls. Install it as a Hermes
+      plugin:
+    </p>
+    <pre><code>hermes plugins install wysie/mnemosyne-dashboard --enable
+hermes gateway restart</code></pre>
+    <p>
+      Start it with the <code>mnemosyne_dashboard_start</code> tool (or ask the agent to), then open
+      <strong>http://127.0.0.1:8765/</strong>. You'll see your working and episodic memories, the knowledge
+      graph, stats, and consolidation history. Control it with the companion tools —
+      <code>mnemosyne_dashboard_status</code>, <code>mnemosyne_dashboard_config</code>,
+      <code>mnemosyne_dashboard_stop</code> — and trigger a consolidation pass with
+      <code>mnemosyne_sleep</code>.
+    </p>
+    <div class="callout warn">
+      <strong>One security rule worth internalising.</strong> The dashboard is read-only on
+      <code>0.0.0.0</code> (LAN) by default. Admin/write mode exposes destructive endpoints, so Mnemosyne
+      <em>refuses</em> to enable it on a LAN bind without password auth. Keep it localhost-only, or set a
+      password before enabling admin mode on the network — never leave write access open on the LAN.
+    </div>
+    <p>
+      That's the whole free memory stack: Mnemosyne for the brain's long-term store, the dashboard for eyes on
+      it. Both local, both $0.
+    </p>
+
+    <h2>What it actually costs</h2>
+    <p>
+      Here's the whole bill, itemised honestly:
+    </p>
+    <table>
+      <thead><tr><th>Component</th><th>What it does</th><th>Cost</th></tr></thead>
+      <tbody>
+        <tr><td>Hermes Agent + Desktop</td><td>The agent itself, CLI and GUI</td><td>$0 (open source)</td></tr>
+        <tr><td>Agnes 3.0 Flash</td><td>Main model (512K, tool-calling)</td><td>$0 (preview)</td></tr>
+        <tr><td>Agnes 2.5 Flash</td><td>Fast alternative model</td><td>$0</td></tr>
+        <tr><td>Nous Portal free tier</td><td>Automatic fallback model</td><td>$0 (no card)</td></tr>
+        <tr><td>Agnes image generation</td><td>Free image generation</td><td>$0</td></tr>
+        <tr><td>Mnemosyne + dashboard</td><td>Local long-term memory + web UI</td><td>$0 (local, no API)</td></tr>
+        <tr><td>Agnes video generation</td><td><em>Optional</em> motion</td><td>~$0.025–0.055/sec</td></tr>
+      </tbody>
+    </table>
+    <p>
+      Two honest caveats so you're not surprised later:
+    </p>
+    <ul>
+      <li><strong>Agnes 3.0 Flash has no published price yet.</strong> Agnes's own docs say "pricing will be
+        announced separately." It is genuinely free today — verified against the live billing meter — but
+        it's a <em>preview</em>, so treat free-forever as not guaranteed. If that worries you, Agnes 2.5 Flash
+        has a published list price ($0.03/1M in, $0.15/1M out) that is <em>currently</em> $0 — a promotional
+        zero against numbers you can watch.</li>
+      <li><strong>The Nous free-model list rotates monthly.</strong> Your fallback slug may disappear from the
+        free tier; if fallback ever stops working, run <code>hermes model</code> and pick a current
+        <strong>(free)</strong> model. Thirty seconds of maintenance, occasionally.</li>
+    </ul>
+
+    <h2>Where to go next</h2>
+    <p>
+      You now have a real, free, self-healing agent on your machine — terminal and desktop. From here:
+    </p>
+    <ul>
+      <li><strong>Enable the free tools.</strong> <code>hermes tools</code> toggles web search, file,
+        terminal, code execution, and vision. Local <code>faster-whisper</code> gives you free speech-to-text
+        and Edge TTS gives free text-to-speech — no keys.</li>
+      <li><strong>Automate something.</strong> <code>hermes cron create "0 9 * * *" "summarise today's top
+        AI news" --name "daily-news"</code> runs unattended on your free stack.</li>
+      <li><strong>Use profiles.</strong> Run an experimental Agnes-primary profile and a Nous-primary profile
+        side by side with <code>hermes profile create</code> — isolated config, skills, and memory each.</li>
+      <li><strong>Read the source docs.</strong>
+        <a href="https://hermes-agent.nousresearch.com/docs/" target="_blank" rel="noopener">Hermes docs</a>,
+        <a href="https://portal.nousresearch.com/" target="_blank" rel="noopener">Nous Portal</a>, and the
+        <a href="https://wiki.agnes-ai.com/en/docs/agnes-30-flash" target="_blank" rel="noopener">Agnes 3.0 Flash reference</a>.
+        I've tried to cite them inline throughout — verify everything against the source, because free-tier
+        details move.</li>
+    </ul>
+    <p>
+      The barrier to running a capable AI agent in 2026 isn't money anymore — it's just knowing which free
+      pieces fit together. Now you do. Go build something.
+    </p>
+
+  </article>
+</div>
+</body>
+</html>

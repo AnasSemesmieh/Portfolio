@@ -5,7 +5,15 @@
     <link>https://anas.semesmieh.com/blog/</link>
     <description>Platform engineering, Azure architecture, DevSecOps, and engineering leadership insights.</description>
     <language>en-au</language>
-    <lastBuildDate>Sat, 16 Aug 2026 12:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 06 Oct 2026 12:00:00 +0000</lastBuildDate>
+
+    <item>
+      <title>Run a Real AI Agent for $0: Hermes + Agnes 3 Flash + Nous Free Models</title>
+      <link>https://anas.semesmieh.com/blog/posts/free-ai-agent-hermes-agnes-nous</link>
+      <guid>https://anas.semesmieh.com/blog/posts/free-ai-agent-hermes-agnes-nous</guid>
+      <pubDate>Mon, 06 Oct 2026 12:00:00 +0000</pubDate>
+      <description>A complete copy-paste tutorial for standing up Hermes Agent and Hermes Desktop for $0 — Agnes 3 Flash as the main model, a Nous Portal free model as automatic fallback, free Agnes image generation, Mnemosyne memory, with video as the one clearly flagged paid extra.</description>
+    </item>
 
     <item>
       <title>Production Grade Homelab #2: Ansible — No More SSH and Pray</title>
