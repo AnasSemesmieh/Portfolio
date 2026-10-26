@@ -130,18 +130,18 @@
         <a href="/blog/?tag=Security" class="tag" rel="nofollow">Security</a>
       </div>
 
-      <p>The source proposal behind this post was far more specific than the original article suggested. It was not just an argument for "edge is good." It asked for formal approval to standardize Cloudflare as the default hosting and execution environment for all future UI/UX and presentation-layer workloads after a proof of concept covering a static asset shell, SPA containers, and a headless CMS migration.</p>
+      <p>Frontend delivery was carrying the cost and operational shape of a backend platform, and the fix I proposed wasn't just an argument for "edge is good." I built the case to standardize Cloudflare as the default hosting and execution environment for all future UI/UX and presentation-layer workloads, backed by a proof of concept covering a static asset shell, SPA containers, and a headless CMS migration.</p>
 
       <div class="callout">
-        The design principle in the original proposal was explicit: serve at the edge, process and persist in Azure. Frontend delivery moves to Cloudflare, while transactional backends and sensitive data stay in Azure.
+        My design principle is explicit: serve at the edge, process and persist in Azure. Frontend delivery moves to Cloudflare, while transactional backends and sensitive data stay in Azure.
       </div>
 
-      <p>That distinction matters because the document is solving a concrete architecture problem. Frontend applications were running as Dockerized workloads on AKS, which meant Dockerfiles, Helm charts, cluster operations, region-bound latency, pre-provisioned compute, and maintenance overhead for systems that were primarily serving UI assets and presentation logic. The proposal argued that this was the wrong operating model for the workload.</p>
+      <p>That distinction matters because this solves a concrete architecture problem. Frontend applications were running as Dockerized workloads on AKS, which meant Dockerfiles, Helm charts, cluster operations, region-bound latency, pre-provisioned compute, and maintenance overhead for systems that were primarily serving UI assets and presentation logic. That's the wrong operating model for the workload.</p>
 
-      <h2>1. The proposal starts with a detailed current-state versus future-state model</h2>
-      <p>The current state in the document is a centralized Azure-region deployment. Frontend workloads are containerized, tied to AKS, and paid for as provisioned capacity. That means costs remain high even when the system is quiet, and user experience is shaped by physical distance to a single primary region. The document also calls out deeper developer friction: every frontend team effectively needs to understand container packaging and Kubernetes delivery just to ship presentation changes.</p>
+      <h2>1. A detailed current-state versus future-state model</h2>
+      <p>The current state was a centralized Azure-region deployment. Frontend workloads are containerized, tied to AKS, and paid for as provisioned capacity. That means costs remain high even when the system is quiet, and user experience is shaped by physical distance to a single primary region. There's deeper developer friction too: every frontend team effectively needs to understand container packaging and Kubernetes delivery just to ship presentation changes.</p>
 
-      <p>The future state is described as Cloudflare Edge: decentralized execution across Cloudflare's global network, event-driven scaling instead of provisioned nodes, GitHub-integrated deployment ergonomics, built-in OpenTelemetry export, and zero-downtime global updates. That is much more specific than the earlier blog wording. It is a direct architecture comparison across the following dimensions:</p>
+      <p>The future state is Cloudflare Edge: decentralized execution across Cloudflare's global network, event-driven scaling instead of provisioned nodes, GitHub-integrated deployment ergonomics, built-in OpenTelemetry export, and zero-downtime global updates. That's a direct architecture comparison across these dimensions:</p>
 
       <ul>
         <li>Centralized AKS versus distributed edge execution.</li>
@@ -151,12 +151,12 @@
         <li>Maintenance windows and rolling restarts versus atomic, globally propagated updates.</li>
       </ul>
 
-      <p>That is the first concrete problem the document solves: frontend delivery was carrying the cost and operational shape of a backend platform.</p>
+      <p>That's the first concrete problem this solves: frontend delivery was carrying the cost and operational shape of a backend platform.</p>
 
       <h2>2. The target architecture is layered and deliberately split across Cloudflare and Azure</h2>
-      <p>The technical architecture section in the source doc is where the real effort shows. Traffic enters through the nearest Cloudflare PoP. Before it reaches application logic, it passes through Cloudflare security controls including WAF, DDoS mitigation, and bot management. That makes the edge the actual front door rather than just a CDN bolt-on.</p>
+      <p>The real effort shows in the technical architecture. Traffic enters through the nearest Cloudflare PoP. Before it reaches application logic, it passes through Cloudflare security controls including WAF, DDoS mitigation, and bot management. That makes the edge the actual front door rather than just a CDN bolt-on.</p>
 
-      <p>At the edge, the proposal places presentation and content workloads on specific Cloudflare services:</p>
+      <p>At the edge, I place presentation and content workloads on specific Cloudflare services:</p>
 
       <ul>
         <li>A headless CMS hosted on <a href="https://developers.cloudflare.com/workers/">Cloudflare Workers</a> using <a href="https://developers.cloudflare.com/d1/">D1</a> for edge-side content data and <a href="https://developers.cloudflare.com/r2/">R2</a> for media assets.</li>
@@ -164,12 +164,12 @@
         <li>Dynamic image delivery handled through Cloudflare Images and R2.</li>
       </ul>
 
-      <p>The secure connectivity section is just as important. Rather than exposing Azure services directly, the proposal uses <a href="https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/">Cloudflare Tunnel</a> to create a private encrypted connection from the edge into Azure. Authenticated API requests are routed into Azure API Management, which then fans out to the backend mix that remains in Azure: AKS-hosted microservices where still needed, Function Apps for event-driven logic, Logic Apps for orchestration, Azure OpenAI for AI-backed capabilities, and region-bound data services like SQL, MongoDB, Search, or Cosmos DB.</p>
+      <p>The secure connectivity piece is just as important. Rather than exposing Azure services directly, I use <a href="https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/">Cloudflare Tunnel</a> to create a private encrypted connection from the edge into Azure. Authenticated API requests route into Azure API Management, which fans out to the backend mix that stays in Azure: AKS-hosted microservices where still needed, Function Apps for event-driven logic, Logic Apps for orchestration, Azure OpenAI for AI-backed capabilities, and region-bound data services like SQL, MongoDB, Search, or Cosmos DB.</p>
 
-      <p>That is the second concrete problem being solved: the frontend platform needed a clean separation between internet-scale delivery and transaction-heavy backend processing instead of forcing both into the same hosting model.</p>
+      <p>That's the second concrete problem being solved: the frontend platform needed a clean separation between internet-scale delivery and transaction-heavy backend processing instead of forcing both into the same hosting model.</p>
 
-      <h2>3. Security, data residency, and observability were first-class design constraints</h2>
-      <p>The source proposal is explicit that this is not a blanket migration of all systems to Cloudflare. It separates data classes and trust boundaries:</p>
+      <h2>3. Security, data residency, and observability as first-class design constraints</h2>
+      <p>This is not a blanket migration of all systems to Cloudflare. I separate data classes and trust boundaries:</p>
 
       <ul>
         <li>Public content and presentation-layer data can live at the edge in D1 and R2.</li>
@@ -177,19 +177,19 @@
         <li>Azure no longer exposes public ingress directly; traffic is forced through the Cloudflare edge and Cloudflare Tunnel path.</li>
       </ul>
 
-      <p>The observability piece is also stronger than the original post suggested. The document calls out native OpenTelemetry support at the edge and unified ingestion into Dynatrace for both Cloudflare Workers and Azure backend services. That means the proposal was not only about performance and cost. It was also about preserving end-to-end transaction visibility across a split architecture. The official <a href="https://opentelemetry.io/docs/">OpenTelemetry documentation</a> is relevant here because the proposal was clearly standardizing around portable telemetry rather than environment-specific instrumentation only.</p>
+      <p>The observability piece deserves its own attention. I rely on native OpenTelemetry support at the edge and unified ingestion into Dynatrace for both Cloudflare Workers and Azure backend services. This isn't only about performance and cost — it's also about preserving end-to-end transaction visibility across a split architecture. The official <a href="https://opentelemetry.io/docs/">OpenTelemetry documentation</a> is relevant here because I'm standardizing around portable telemetry rather than environment-specific instrumentation only.</p>
 
-      <p>That is the third concrete problem being solved: how to gain edge performance and security controls without compromising regional data control or operational visibility.</p>
+      <p>That's the third concrete problem being solved: how to gain edge performance and security controls without compromising regional data control or operational visibility.</p>
 
-      <h2>4. The architecture choice was justified by burst traffic, latency, and operating cost</h2>
-      <p>The document makes two business-pressure arguments that are also technical arguments. First, it calls out burst traffic during peak moments, where provisioned capacity and traditional autoscaling create either idle cost or reaction lag. The proposal leans on Cloudflare Workers' isolate model and per-request scaling to argue for elastic handling of sudden spikes.</p>
+      <h2>4. The architecture choice is justified by burst traffic, latency, and operating cost</h2>
+      <p>Two business-pressure arguments are also technical arguments. First, burst traffic during peak moments, where provisioned capacity and traditional autoscaling create either idle cost or reaction lag. I lean on Cloudflare Workers' isolate model and per-request scaling for elastic handling of sudden spikes.</p>
 
-      <p>Second, it calls out global reach. Serving a geographically distributed user base from a single Azure region turns physical distance into a frontend performance problem. Cloudflare's Anycast network and large PoP footprint are presented as the way to localize UI latency without replicating frontend clusters region by region.</p>
+      <p>Second, global reach. Serving a geographically distributed user base from a single Azure region turns physical distance into a frontend performance problem. Cloudflare's Anycast network and large PoP footprint localize UI latency without replicating frontend clusters region by region.</p>
 
-      <p>The cost section adds the harder-edged operational claim: decommissioning two of three AKS clusters, with an estimated 65 percent compute reduction and corresponding drops in monitoring and security-tool surface area. Even without repeating every internal dollar figure, the implementation effort is clear. This was not an aesthetic migration. It was a platform simplification program tied directly to cluster reduction, licensing impact, and less Kubernetes maintenance work.</p>
+      <p>The cost side adds the harder-edged operational claim: decommissioning two of three AKS clusters, with an estimated 65 percent compute reduction and corresponding drops in monitoring and security-tool surface area. This isn't an aesthetic migration — it's a platform simplification program tied directly to cluster reduction, licensing impact, and less Kubernetes maintenance work.</p>
 
-      <h2>5. The implementation plan is what makes the proposal credible</h2>
-      <p>The source document avoids the usual architecture-slide failure by defining a three-phase roadmap:</p>
+      <h2>5. The implementation plan is what makes this credible</h2>
+      <p>I avoid the usual architecture-slide failure by defining a three-phase roadmap:</p>
 
       <ul>
         <li><strong>Phase 1: Foundation, enablement, and governance.</strong> Continue the in-flight CMS-to-Workers and Cloudflare Images work, publish a developer guide, run workshops, and define strict scope boundaries so the pattern applies only to UI/UX and presentation-layer concerns.</li>
@@ -197,7 +197,7 @@
         <li><strong>Phase 3: Cutover and decommissioning.</strong> Route primary traffic via Cloudflare, drain frontend nodes from existing AKS clusters, and execute the cluster decommissioning plan.</li>
       </ul>
 
-      <p>That roadmap matters because it shows the standardization effort was not just technical design. It included education, pipeline changes, scope governance, and staged decommissioning. That is the implementation weight the earlier post failed to show.</p>
+      <p>That roadmap matters because the standardization effort wasn't just technical design — it included education, pipeline changes, scope governance, and staged decommissioning.</p>
 
       <h2>References</h2>
       <ul>
@@ -210,7 +210,7 @@
       </ul>
 
       <h2>Closing thought</h2>
-      <p>The technical insight in the original proposal is not just that Cloudflare can host a frontend. It is that presentation workloads, asset delivery, and edge-side content belong on a different operating model than the backend systems they talk to. The document earned that conclusion with a concrete architecture, a staged migration path, and a security model that still keeps Azure as the system of record.</p>
+      <p>The technical insight here isn't just that Cloudflare can host a frontend. It's that presentation workloads, asset delivery, and edge-side content belong on a different operating model than the backend systems they talk to. I earned that conclusion with a concrete architecture, a staged migration path, and a security model that still keeps Azure as the system of record.</p>
     </article>
   </div>
 </body>
