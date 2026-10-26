@@ -68,6 +68,12 @@
       border-color: rgba(34,197,94,0.4);
       color: var(--accent);
     }
+    .related-posts { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border); }
+    .related-posts h3 { font-size: 16px; color: var(--heading); margin-bottom: 12px; }
+    .related-posts ul { list-style: none; padding-left: 0; margin: 0; }
+    .related-posts li { margin: 6px 0; }
+    .related-posts a { color: var(--accent); }
+
 
   </style>
 
@@ -320,6 +326,14 @@ sed -i "s|^AUTHENTIK_SECRET_KEY=REDACTED|AUTHENTIK_SECRET_KEY=$AUTHENTIK_SECRET_
 
       <h2>Closing thought</h2>
       <p>Immutable infrastructure is not a slogan about never logging into servers. It is a discipline of reducing hidden state, codifying restore, and making replacement the default recovery path. The more your system can be rebuilt from a small, explicit, versioned definition plus a controlled secret set, the more operational confidence you gain.</p>
+      <div class="related-posts">
+        <h3>Related posts</h3>
+        <ul>
+          <li><a href="/blog/posts/cloudflare-frontend-standardization">The Edge-First Frontend: Standardizing Web Architecture on Cloudflare</a></li>
+          <li><a href="/blog/posts/backstage-idp-platform-capacity">The Ad-Hoc Tax: How Backstage Recovered Platform Capacity for Higher-Value Work</a></li>
+          <li><a href="/blog/posts/platform-engineering-innovation-with-guardrails">Platform Engineering Works When Innovation Ships With Guardrails</a></li>
+        </ul>
+      </div>
     </article>
   </div>
 </body>

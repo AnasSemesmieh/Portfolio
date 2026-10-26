@@ -59,6 +59,12 @@
       border-color: rgba(34,197,94,0.4);
       color: var(--accent);
     }
+    .related-posts { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border); }
+    .related-posts h3 { font-size: 16px; color: var(--heading); margin-bottom: 12px; }
+    .related-posts ul { list-style: none; padding-left: 0; margin: 0; }
+    .related-posts li { margin: 6px 0; }
+    .related-posts a { color: var(--accent); }
+
 
   </style>
 
@@ -211,6 +217,14 @@
 
       <h2>Closing thought</h2>
       <p>The technical insight here isn't just that Cloudflare can host a frontend. It's that presentation workloads, asset delivery, and edge-side content belong on a different operating model than the backend systems they talk to. I earned that conclusion with a concrete architecture, a staged migration path, and a security model that still keeps Azure as the system of record.</p>
+      <div class="related-posts">
+        <h3>Related posts</h3>
+        <ul>
+          <li><a href="/blog/posts/immutable-infrastructure-journey">From Legacy to Immutable: A Practical IaC Maturity Journey</a></li>
+          <li><a href="/blog/posts/dependabot-dependency-automation">Dependabot Without Pull Request Fatigue: Automating Dependency Hygiene the Right Way</a></li>
+          <li><a href="/blog/posts/backstage-idp-platform-capacity">The Ad-Hoc Tax: How Backstage Recovered Platform Capacity for Higher-Value Work</a></li>
+        </ul>
+      </div>
     </article>
   </div>
 </body>
