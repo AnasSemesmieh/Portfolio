@@ -140,7 +140,7 @@
       <p>As a platform engineering leader, I spend my weekdays designing cloud architectures and scaling teams. On weekends, I run a homelab — not because I have to, but because it keeps my hands dirty and my instincts sharp. This series documents everything I've built, broken, and automated along the way.</p>
 
       <div class="callout">
-        Every config, script, and runbook referenced in this series is open source in my <a href="https://github.com/AnasSemesmieh/homelab" target="_blank">homelab repo</a>.
+        Every config, script, and runbook referenced in this series is open source in my <a href="https://github.com/AnasSemesmieh/homelab" target="_blank" rel="noopener noreferrer">homelab repo</a>.
       </div>
 
       <h2>What I Run</h2>
@@ -162,7 +162,7 @@
       <h2>The Backup-First Philosophy</h2>
       <img src="/assets/images/blog/homelab-start-here/homelab-start-here-backup-philosophy.webp" alt="Cyberpunk vault with matrix data streams, glowing backup drives, and redundant storage nodes" class="post-img post-img-section" loading="lazy" />
       <p class="img-caption">Three copies, two media types, one offsite — always.</p>
-      <p>Before I ran a single container, I set up backups. Everything in my homelab follows the 3-2-1 rule: the centerpiece is an automated backup system where my <a href="https://github.com/AnasSemesmieh/homelab" target="_blank">repo</a> is the source of truth for all configuration. Every day at 03:25 UTC, a cron job:</p>
+      <p>Before I ran a single container, I set up backups. Everything in my homelab follows the 3-2-1 rule: the centerpiece is an automated backup system where my <a href="https://github.com/AnasSemesmieh/homelab" target="_blank" rel="noopener noreferrer">repo</a> is the source of truth for all configuration. Every day at 03:25 UTC, a cron job:</p>
       <ol>
         <li><strong>Syncs</strong> allowlisted config files from <code>~/</code> into <code>configs/</code> using an inventory file</li>
         <li><strong>Redacts</strong> every password, API key, and token automatically via regex patterns</li>
