@@ -332,6 +332,7 @@
     ]
   }
   </script>
+<style>img[height]{height:auto}</style>
 </head>
 
 <body>
@@ -357,7 +358,7 @@
       </div>
 
       <figure class="post-hero-image">
-        <img src="/blog/images/double-disk-hero.webp" alt="Bald bearded man staring calmly at two red SMART failure warnings on dual monitors in a dark server room" style="width:100%;border-radius:8px;margin-bottom:1.5rem;">
+        <img width="1248" height="832" src="/blog/images/double-disk-hero.webp" alt="Bald bearded man staring calmly at two red SMART failure warnings on dual monitors in a dark server room" style="width:100%;border-radius:8px;margin-bottom:1.5rem;">
       </figure>
 
       <p>Two posts ago, I moved Unraid from a Synology onto a QNAP DAS running as a Proxmox VM, and I made a deliberate decision to run the array <strong>without parity</strong> during the migration. That was the correct call at the time &mdash; parity sync competes for I/O with active data transfers, and there was no failed hardware yet to protect against. What I did not plan for was uplifting that same VM to bare metal a few days later, and having the very first disk scan flag two drives as failing at once &mdash; the boot/cache SSD and a 2 TB data disk &mdash; while the array was still running with exactly zero redundancy.</p>
@@ -371,7 +372,7 @@
       <h2>Bare Metal Doesn't Lie</h2>
 
       <figure style="margin:1.5rem 0;">
-        <img src="/blog/images/double-disk-bare-metal-reveal.webp" alt="Split diagram: QEMU hiding SMART errors on the left vs bare metal exposing reallocated sectors and failing health on the right" style="width:100%;border-radius:8px;">
+        <img loading="lazy" width="1248" height="832" src="/blog/images/double-disk-bare-metal-reveal.webp" alt="Split diagram: QEMU hiding SMART errors on the left vs bare metal exposing reallocated sectors and failing health on the right" style="width:100%;border-radius:8px;">
         <figcaption style="font-size:0.85rem;color:#888;margin-top:0.5rem;text-align:center;">QEMU masked the drive's deteriorating SMART attributes. Bare metal told the truth on first boot.</figcaption>
       </figure>
 
@@ -395,7 +396,7 @@
 
       <h2>Failure Two: The Data Disk at 90% Full</h2>
       <figure style="margin:1.5rem 0;">
-        <img src="/blog/images/double-disk-dual-replacement.webp" alt="QNAP DAS enclosure with two bays glowing red, two replacement drives hovering above with no parity safety net warning" style="width:100%;border-radius:8px;">
+        <img loading="lazy" width="1248" height="832" src="/blog/images/double-disk-dual-replacement.webp" alt="QNAP DAS enclosure with two bays glowing red, two replacement drives hovering above with no parity safety net warning" style="width:100%;border-radius:8px;">
         <figcaption style="font-size:0.85rem;color:#888;margin-top:0.5rem;text-align:center;">Replacing both drives simultaneously with zero parity — any third failure mid-recovery meant permanent data loss.</figcaption>
       </figure>
 
@@ -479,7 +480,7 @@
 
       <h2>Where Things Stand Right Now</h2>
       <figure style="margin:1.5rem 0;">
-        <img src="/blog/images/double-disk-parity-complete.webp" alt="Unraid dashboard showing all drives healthy and parity sync in progress for the first time" style="width:100%;border-radius:8px;">
+        <img loading="lazy" width="1248" height="832" src="/blog/images/double-disk-parity-complete.webp" alt="Unraid dashboard showing all drives healthy and parity sync in progress for the first time" style="width:100%;border-radius:8px;">
         <figcaption style="font-size:0.85rem;color:#888;margin-top:0.5rem;text-align:center;">Parity assigned for the first time — the array finally has redundancy after weeks without it.</figcaption>
       </figure>
 
