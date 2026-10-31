@@ -2,7 +2,7 @@
 
 Source code for **[anas.semesmieh.com](https://anas.semesmieh.com)** — my personal portfolio and engineering blog.
 
-Built with hand-crafted HTML/CSS (no frameworks, no build pipeline), hosted on **GitHub Pages**, and served on a custom domain via a **Cloudflare Worker** at [anas.semesmieh.com](https://anas.semesmieh.com).
+Built with hand-crafted HTML/CSS (no frameworks, no build pipeline), hosted on **Cloudflare Pages** (portfolio-4bo.pages.dev), served on the custom domain [anas.semesmieh.com](https://anas.semesmieh.com).
 
 ---
 
@@ -14,9 +14,9 @@ about/index.html        → Full profile page
 blog/index.html         → Blog index with tag filtering
 blog/categories/        → Posts browsable by category
 blog/tags/              → Posts browsable by tag (29 tags)
-blog/posts/*.html       → Individual blog posts (32 posts)
+blog/posts/*.html       → Individual blog posts (34 posts)
 blog/rss.xml            → RSS feed
-sitemap.xml             → Sitemap (37 URLs)
+sitemap.xml             → Sitemap (39 URLs)
 robots.txt              → Search engine directives
 anas-semesmieh-resume.pdf → Current resume (linked from the site)
 ```
