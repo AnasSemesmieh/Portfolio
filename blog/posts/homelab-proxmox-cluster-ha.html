@@ -182,7 +182,7 @@
     <p class="meta">By <a href="/about/">Anas Semesmieh</a> · August 3, 2026</p>
 
     <figure class="post-hero-image">
-      <img src="/blog/images/homelab-proxmox-cluster-ha-hero.png"
+      <img src="/blog/images/homelab-proxmox-cluster-ha-hero.webp"
            alt="Cyberpunk illustration of Anas at a holographic command station with two Proxmox nodes connected by ZFS replication streams"
            style="width:100%;border-radius:8px;margin-bottom:1.5rem;" loading="lazy">
     </figure>
@@ -221,7 +221,7 @@
     <h2>The Two-Node Quorum Problem</h2>
 
     <figure style="margin:1.5rem 0;">
-      <img src="/blog/images/homelab-proxmox-cluster-ha-quorum.png"
+      <img src="/blog/images/homelab-proxmox-cluster-ha-quorum.webp"
            alt="Three holographic nodes in a triangle — pve, pve2, and QDevice — connected by glowing neon voting beams"
            style="width:100%;border-radius:8px;" loading="lazy">
       <figcaption style="font-size:0.85rem;color:#888;margin-top:0.5rem;text-align:center;">Three voters, quorum at 2 — any single node failure leaves the cluster intact</figcaption>
@@ -306,7 +306,7 @@ pvecm status</code></pre>
     <h2>The Storage Architecture</h2>
 
     <figure style="margin:1.5rem 0;">
-      <img src="/blog/images/homelab-proxmox-cluster-ha-storage.png"
+      <img src="/blog/images/homelab-proxmox-cluster-ha-storage.webp"
            alt="Split-screen showing ZFS pool with blue replication streams on the left versus NFS network share with orange cables on the right"
            style="width:100%;border-radius:8px;" loading="lazy">
       <figcaption style="font-size:0.85rem;color:#888;margin-top:0.5rem;text-align:center;">Two-tier storage strategy — ZFS replication for critical services, NFS HA for media</figcaption>
@@ -411,7 +411,7 @@ service vm:100 (pve, started)
     <h2>The Final Architecture</h2>
 
     <figure style="margin:1.5rem 0;">
-      <img src="/blog/images/homelab-proxmox-cluster-ha-final-arch.png"
+      <img src="/blog/images/homelab-proxmox-cluster-ha-final-arch.webp"
            alt="Two cyberpunk server racks — pve (blue) and pve2 (purple) — with replication beams connecting containers, and Unraid NAS below with NFS cables to media containers"
            style="width:100%;border-radius:8px;" loading="lazy">
       <figcaption style="font-size:0.85rem;color:#888;margin-top:0.5rem;text-align:center;">Final HA architecture — critical services on ZFS replication, media CTs on NFS HA</figcaption>

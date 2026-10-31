@@ -289,7 +289,7 @@
       </div>
 
       <figure class="post-hero-image">
-        <img src="/blog/images/hermes-vm-migration-hero.png" alt="Anime illustration of a bald bearded man lifting a glowing cyan brain out of a cracked laptop and placing it into a Proxmox server rack" style="width:100%;border-radius:8px;margin-bottom:1.5rem;">
+        <img src="/blog/images/hermes-vm-migration-hero.webp" alt="Anime illustration of a bald bearded man lifting a glowing cyan brain out of a cracked laptop and placing it into a Proxmox server rack" style="width:100%;border-radius:8px;margin-bottom:1.5rem;">
       </figure>
 
       <p>
@@ -301,7 +301,7 @@
 
       <h2>Why the transplant was overdue</h2>
       <figure style="margin:1.5rem 0;">
-        <img src="/blog/images/hermes-vm-migration-fragile-setup.png" alt="Split cyberpunk illustration: chaotic Windows laptop with Gateway DEAD warnings vs clean Proxmox VM terminal showing services running" style="width:100%;border-radius:8px;">
+        <img src="/blog/images/hermes-vm-migration-fragile-setup.webp" alt="Split cyberpunk illustration: chaotic Windows laptop with Gateway DEAD warnings vs clean Proxmox VM terminal showing services running" style="width:100%;border-radius:8px;">
         <figcaption style="font-size:0.85rem;color:#888;margin-top:0.5rem;text-align:center;">Left: the fragile Windows setup. Right: the new Proxmox VM — a proper home for a production agent.</figcaption>
       </figure>
       <p>There were four compounding reasons, each enough on its own:</p>
@@ -387,7 +387,7 @@ h-mem.semesmieh.com {
 
       <h2>The gotchas</h2>
       <figure style="margin:1.5rem 0;">
-        <img src="/blog/images/hermes-vm-migration-gotchas.png" alt="Three-panel cyberpunk diagram showing the three gotchas: Tailscale MagicDNS blocking HuggingFace CDN, Electron crashing on RDP, and two conflicting gateway services" style="width:100%;border-radius:8px;">
+        <img src="/blog/images/hermes-vm-migration-gotchas.webp" alt="Three-panel cyberpunk diagram showing the three gotchas: Tailscale MagicDNS blocking HuggingFace CDN, Electron crashing on RDP, and two conflicting gateway services" style="width:100%;border-radius:8px;">
         <figcaption style="font-size:0.85rem;color:#888;margin-top:0.5rem;text-align:center;">Three gotchas that turned a 2-hour migration into a full-day job.</figcaption>
       </figure>
       <p>The happy path took about two hours. The gotchas took another two. Here's what bit me:</p>
@@ -434,7 +434,7 @@ systemctl --user reset-failed 2>/dev/null || true</code></pre>
 
       <h2>The result</h2>
       <figure style="margin:1.5rem 0;">
-        <img src="/blog/images/hermes-vm-migration-result-architecture.png" alt="Architecture diagram showing hermes-vm as the central node with Telegram gateway, Mnemosyne dashboard, XFCE desktop, Chromium browser, and cron jobs — all connected via Tailscale, with Caddy TLS and PBS backup" style="width:100%;border-radius:8px;">
+        <img src="/blog/images/hermes-vm-migration-result-architecture.webp" alt="Architecture diagram showing hermes-vm as the central node with Telegram gateway, Mnemosyne dashboard, XFCE desktop, Chromium browser, and cron jobs — all connected via Tailscale, with Caddy TLS and PBS backup" style="width:100%;border-radius:8px;">
         <figcaption style="font-size:0.85rem;color:#888;margin-top:0.5rem;text-align:center;">The new architecture: Hermes fully resident on hermes-vm, the Windows laptop decommissioned.</figcaption>
       </figure>
       <p>
