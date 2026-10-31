@@ -13,6 +13,9 @@ def resolve_path(root: Path, request_path: str) -> tuple[Path | None, int]:
     path = unquote(parsed.path)
     relative = path.lstrip("/")
 
+    if not (root / relative).resolve().is_relative_to(root.resolve()):
+        return None, HTTPStatus.NOT_FOUND
+
     if path.endswith("/"):
         candidate = root / relative / "index.html"
         if candidate.is_file():
